@@ -1,0 +1,27 @@
+type Message {
+  id: ID!
+  userId: ID!
+  sender: String! # "user" or "ai"
+  text: String!
+  timestamp: Float!
+  metadata: JSON
+}
+
+input MessageInput {
+  userId: ID!
+  sender: String! # "user" or "ai"
+  text: String!
+  timestamp: Float!
+  metadata: JSON
+}
+
+extend type Query {
+  messages: [Message!]
+  message(id: ID!): Message
+}
+
+extend type Mutation {
+  createMessage(input: MessageInput!): Message!
+  updateMessage(id: ID!, input: MessageInput!): Message!
+  deleteMessage(id: ID!): Message!
+}
