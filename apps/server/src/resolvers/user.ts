@@ -6,8 +6,8 @@ import {
   MutationDeleteUserArgs,
 } from "../graphql/__generated__/graphql.js";
 
-import { getUser } from "@accessLayer/user";
-import { User } from "@models/user";
+import { getUser } from "../access-layer/user";
+import { User } from "../models/user";
 
 export const userResolvers: Resolvers = {
   Query: {
