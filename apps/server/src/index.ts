@@ -11,7 +11,7 @@ import { connectDB } from "./db/db";
 
 import { resolvers } from "./resolvers/resolvers";
 
-const schemaPath = path.resolve("src/schema/typeDefs.graphql");
+const schemaPath = path.resolve("src/schema/**/*.graphql");
 
 export const startServer = async () => {
   await connectDB();
