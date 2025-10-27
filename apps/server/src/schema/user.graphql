@@ -1,7 +1,9 @@
 type User {
   id: ID!
   name: String
-  image: String
+  bio: String
+  picture: String
+  email: String
   createdAt: Float
   updatedAt: Float
 }
