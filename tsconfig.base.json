@@ -12,7 +12,10 @@
     "paths": {
       "@components/*": ["apps/client/src/components/*"],
       "@pages/*": ["apps/client/src/pages/*"],
-      "@graphql/*": ["apps/client/src/graphql/*"]
+      "@graphql/*": ["apps/client/src/graphql/*"],
+      "@models/*": ["apps/server/src/models/*"],
+      "@accessLayer/*": ["apps/server/src/access-layer/*"],
+      "@resolvers/*": ["apps/server/src/resolvers/*"]
     }
   }
 }
