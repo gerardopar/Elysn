@@ -14,10 +14,23 @@
   "packageManager": "pnpm@10.10.0",
   "dependencies": {
     "@apollo/server": "^5.0.0",
+    "@aws-sdk/client-s3": "^3.888.0",
+    "@aws-sdk/s3-request-presigner": "^3.888.0",
     "@graphql-tools/graphql-file-loader": "^8.1.2",
-    "@graphql-tools/load": "^8.1.2"
+    "@graphql-tools/load": "^8.1.2",
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "firebase-admin": "^13.5.0",
+    "mongodb": "^6.19.0",
+    "mongoose": "^8.18.1",
+    "openai": "^6.0.1",
+    "redis": "^5.8.2",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.4",
+    "@types/cors": "^2.8.19",
     "@graphql-codegen/cli": "^6.0.0",
     "@graphql-codegen/typescript": "^5.0.2",
     "@graphql-codegen/typescript-resolvers": "^5.1.0",
