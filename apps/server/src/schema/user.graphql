@@ -1,9 +1,10 @@
 type User {
   id: ID!
+  firebaseUid: String!
   name: String
   bio: String
   picture: String
-  email: String
+  email: String!
   createdAt: Float
   updatedAt: Float
 }
@@ -14,7 +15,12 @@ extend type Query {
 }
 
 extend type Mutation {
-  createUser(name: String!, image: String): User!
-  updateUser(id: ID!, name: String, image: String): User!
+  createUser(
+    firebaseUid: String!
+    email: String!
+    name: String
+    picture: String
+  ): User!
+  updateUser(id: ID!, name: String, picture: String): User!
   deleteUser(id: ID!): User!
 }

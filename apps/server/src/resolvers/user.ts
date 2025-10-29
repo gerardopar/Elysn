@@ -6,7 +6,7 @@ import {
   MutationDeleteUserArgs,
 } from "../graphql/__generated__/graphql.js";
 
-import { getUser } from "../access-layer/user";
+import { createUser, getUser } from "../access-layer/user";
 import { User } from "../models/user";
 
 export const userResolvers: Resolvers = {
@@ -14,6 +14,7 @@ export const userResolvers: Resolvers = {
     users: async (_parent, _args, _ctx) => {
       const users = await User.find();
       return users.map((user) => ({
+        firebaseUid: user.firebaseUid,
         id: String(user._id),
         name: user.name,
         bio: user.bio,
@@ -29,6 +30,7 @@ export const userResolvers: Resolvers = {
       if (!user) return null;
 
       return {
+        firebaseUid: user.firebaseUid,
         id: String(user._id),
         name: user.name,
         bio: user.bio,
@@ -42,14 +44,16 @@ export const userResolvers: Resolvers = {
 
   Mutation: {
     createUser: async (_parent, args: MutationCreateUserArgs, _ctx) => {
-      const user = await User.create({
-        name: args.name,
-        picture: args.image,
-        email: "", // You may want to add email to the mutation args
+      const user = await createUser({
+        name: args?.name || "",
+        picture: args?.picture || "",
+        email: args?.email,
+        firebaseUid: args?.firebaseUid,
       });
 
       return {
         id: String(user._id),
+        firebaseUid: user.firebaseUid,
         name: user.name,
         bio: user.bio,
         picture: user.picture,
@@ -63,8 +67,8 @@ export const userResolvers: Resolvers = {
       const user = await User.findByIdAndUpdate(
         args.id,
         {
-          ...(args.name && { name: args.name }),
-          ...(args.image && { picture: args.image }),
+          ...(args?.name && { name: args.name }),
+          ...(args?.picture && { picture: args.picture }),
         },
         { new: true }
       );
@@ -72,6 +76,7 @@ export const userResolvers: Resolvers = {
       if (!user) throw new Error("User not found");
 
       return {
+        firebaseUid: user.firebaseUid,
         id: String(user._id),
         name: user.name,
         bio: user.bio,
@@ -87,6 +92,7 @@ export const userResolvers: Resolvers = {
       if (!user) throw new Error("User not found");
 
       return {
+        firebaseUid: user.firebaseUid,
         id: String(user._id),
         name: user.name,
         bio: user.bio,
