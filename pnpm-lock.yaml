@@ -66,6 +66,9 @@ importers:
       '@graphql-codegen/cli':
         specifier: ^6.0.0
         version: 6.0.0(@parcel/watcher@2.5.1)(@types/node@24.9.1)(graphql@16.11.0)(typescript@5.9.3)
+      '@graphql-codegen/typed-document-node':
+        specifier: ^6.0.2
+        version: 6.0.2(graphql@16.11.0)
       '@graphql-codegen/typescript':
         specifier: ^5.0.2
         version: 5.0.2(graphql@16.11.0)
@@ -119,7 +122,7 @@ importers:
         version: 1.93.2
       tailwindcss:
         specifier: ^4.1.13
-        version: 4.1.15
+        version: 4.1.16
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
@@ -4444,9 +4447,6 @@ packages:
   sync-fetch@0.6.0-2:
     resolution: {integrity: sha512-c7AfkZ9udatCuAy9RSfiGPpeOKKUAUK5e1cXadLOGUjasdxqYqAK0jTNkM/FSEyJ3a5Ra27j/tw/PS0qLmaF/A==}
     engines: {node: '>=18'}
-
-  tailwindcss@4.1.15:
-    resolution: {integrity: sha512-k2WLnWkYFkdpRv+Oby3EBXIyQC8/s1HOFMBUViwtAh6Z5uAozeUSMQlIsn/c6Q2iJzqG6aJT3wdPaRNj70iYxQ==}
 
   tailwindcss@4.1.16:
     resolution: {integrity: sha512-pONL5awpaQX4LN5eiv7moSiSPd/DLDzKVRJz8Q9PgzmAdd1R4307GQS2ZpfiN7ZmekdQrfhZZiSE5jkLR4WNaA==}
@@ -9976,8 +9976,6 @@ snapshots:
       node-fetch: 3.3.2
       timeout-signal: 2.0.0
       whatwg-mimetype: 4.0.0
-
-  tailwindcss@4.1.15: {}
 
   tailwindcss@4.1.16: {}
 
