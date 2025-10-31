@@ -10,6 +10,7 @@ import { connectRedis } from "./cache/redisClient";
 import { connectDB } from "./db/db";
 
 import { resolvers } from "./resolvers/resolvers";
+import { firebaseAdmin } from "./firebase/firebase";
 
 const schemaPath = path.resolve("src/schema/**/*.graphql");
 
