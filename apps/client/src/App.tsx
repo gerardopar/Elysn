@@ -1,17 +1,16 @@
 import React from "react";
-import { ApolloProvider } from "@apollo/client/react";
 import { BrowserRouter } from "react-router-dom";
 
 import AppRouter from "./router/AppRouter";
-import apolloClient from "./apollo/Apollo";
+import { ApolloClientProvider } from "./apollo/ApolloClient";
 
 export const App: React.FC = () => {
   return (
-    <ApolloProvider client={apolloClient}>
+    <ApolloClientProvider>
       <BrowserRouter>
         <AppRouter />
       </BrowserRouter>
-    </ApolloProvider>
+    </ApolloClientProvider>
   );
 };
 

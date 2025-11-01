@@ -10,8 +10,9 @@ import { connectRedis } from "./cache/redisClient";
 import { connectDB } from "./db/db";
 
 import { resolvers } from "./resolvers/resolvers";
+import { firebaseAdmin } from "./firebase/firebase";
 
-const schemaPath = path.resolve("src/schema/typeDefs.graphql");
+const schemaPath = path.resolve("src/schema/**/*.graphql");
 
 export const startServer = async () => {
   await connectDB();
@@ -27,6 +28,22 @@ export const startServer = async () => {
   });
 
   const { url } = await startStandaloneServer(server, {
+    context: async ({ req }) => {
+      const authHeader = req.headers.authorization || "";
+      let user = null;
+
+      if (authHeader.startsWith("Bearer ")) {
+        const token = authHeader.split("Bearer ")[1];
+        try {
+          const decoded = await firebaseAdmin.auth().verifyIdToken(token);
+          user = decoded;
+        } catch (error) {
+          console.error("Invalid Firebase token:", error);
+        }
+      }
+
+      return { user };
+    },
     listen: { port: Number(process.env.PORT) || 4000 },
   });
 

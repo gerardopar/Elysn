@@ -2,4 +2,37 @@
 
 /* Tailwind v4: define design tokens via @theme */
 @theme {
+  --color-seasalt: #f8f9faff;
+  --color-antiflash-white: #e9ecefff;
+  --color-platinum: #dee2e6ff;
+  --color-french-gray: #ced4daff;
+  --color-french-gray-2: #adb5bdff;
+  --color-slate-gray: #6c757dff;
+  --color-outer-space: #495057ff;
+  --color-onyx: #343a40ff;
+
+  --color-oxford-blue: #00072dff;
+  --color-penn-blue: #001c55ff;
+  --color-royal-blue-traditional: #0a2472ff;
+  --color-bice-blue: #0e6ba8ff;
+  --color-non-photo-blue: #a6e1faff;
+
+  --color-night: #0b090aff;
+  --color-eerie-black: #161a1dff;
+  --color-blood-red: #660708ff;
+  --color-cornell-red: #a4161aff;
+  --color-cornell-red-2: #ba181bff;
+  --color-imperial-red: #e5383bff;
+  --color-silver: #b1a7a6ff;
+  --color-timberwolf: #d3d3d3ff;
+  --color-white-smoke: #f5f3f4ff;
+  --color-white: #ffffffff;
+
+  --font-bitcount-grid-single: "Bitcount Grid Single", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+
+  --breakpoint-mobile-768: 768px; /* everything ≤768px is considered mobile */
+  --breakpoint-mobile-640: 640px; /* everything ≤640px is considered mobile */
+  --breakpoint-mobile-425: 425px; /* everything ≤425px is considered mobile */
+  --breakpoint-mobile-375: 375px; /* everything ≤375px is considered mobile */
 }

@@ -1,18 +1,33 @@
 type User {
   id: ID!
+  firebaseUid: String!
   name: String
-  image: String
+  bio: String
+  picture: String
+  email: String!
   createdAt: Float
   updatedAt: Float
 }
 
 extend type Query {
   users: [User!]
-  user(id: ID!): User
+  getUser(id: ID!): User
+  getCurrentUser: User
 }
 
 extend type Mutation {
-  createUser(name: String!, image: String): User!
-  updateUser(id: ID!, name: String, image: String): User!
+  createUser(
+    firebaseUid: String!
+    email: String!
+    name: String
+    picture: String
+  ): User!
+  upsertUser(
+    firebaseUid: String!
+    email: String!
+    name: String
+    picture: String
+  ): User!
+  updateUser(id: ID!, name: String, picture: String): User!
   deleteUser(id: ID!): User!
 }

@@ -12,11 +12,142 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  JSON: { input: unknown; output: unknown; }
+};
+
+export type Chat = {
+  __typename: 'Chat';
+  createdAt: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+  messages: Array<Message>;
+  title: Maybe<Scalars['String']['output']>;
+  topic: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type Memory = {
+  __typename: 'Memory';
+  history: Array<Message>;
+  lastMessage: Maybe<Scalars['String']['output']>;
+  lastTopic: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type Message = {
+  __typename: 'Message';
+  id: Scalars['ID']['output'];
+  metadata: Maybe<Scalars['JSON']['output']>;
+  sender: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type MessageInput = {
+  metadata?: InputMaybe<Scalars['JSON']['input']>;
+  sender: Scalars['String']['input'];
+  text: Scalars['String']['input'];
+  timestamp: Scalars['Float']['input'];
+  userId: Scalars['ID']['input'];
+};
+
+export type Mutation = {
+  __typename: 'Mutation';
+  _empty: Maybe<Scalars['String']['output']>;
+  createChat: Chat;
+  createMessage: Message;
+  createUser: User;
+  deleteChat: Scalars['Boolean']['output'];
+  deleteMessage: Message;
+  deleteUser: User;
+  updateMessage: Message;
+  updateUser: User;
+  upsertUser: User;
+};
+
+
+export type MutationCreateChatArgs = {
+  title?: InputMaybe<Scalars['String']['input']>;
+  topic?: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateMessageArgs = {
+  input: MessageInput;
+};
+
+
+export type MutationCreateUserArgs = {
+  email: Scalars['String']['input'];
+  firebaseUid: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationDeleteChatArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteMessageArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateMessageArgs = {
+  id: Scalars['ID']['input'];
+  input: MessageInput;
+};
+
+
+export type MutationUpdateUserArgs = {
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpsertUserArgs = {
+  email: Scalars['String']['input'];
+  firebaseUid: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Query = {
   __typename: 'Query';
+  chat: Maybe<Chat>;
+  chats: Array<Chat>;
+  getCurrentUser: Maybe<User>;
+  getUser: Maybe<User>;
   hello: Maybe<Scalars['String']['output']>;
+  message: Maybe<Message>;
+  messages: Maybe<Array<Message>>;
+  users: Maybe<Array<User>>;
+};
+
+
+export type QueryChatArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryChatsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetUserArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -24,9 +155,51 @@ export type QueryHelloArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
+
+export type QueryMessageArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type User = {
+  __typename: 'User';
+  bio: Maybe<Scalars['String']['output']>;
+  createdAt: Maybe<Scalars['Float']['output']>;
+  email: Scalars['String']['output'];
+  firebaseUid: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Maybe<Scalars['String']['output']>;
+  picture: Maybe<Scalars['String']['output']>;
+  updatedAt: Maybe<Scalars['Float']['output']>;
+};
+
+export type CreateUserMutationVariables = Exact<{
+  firebaseUid: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CreateUserMutation = { createUser: { __typename: 'User', id: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } };
+
+export type UpsertUserMutationVariables = Exact<{
+  firebaseUid: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpsertUserMutation = { upsertUser: { __typename: 'User', id: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } };
+
 export type HelloQueryVariables = Exact<{
   name?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type HelloQuery = { hello: string | null };
+
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserQuery = { getCurrentUser: { __typename: 'User', id: string, firebaseUid: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } | null };

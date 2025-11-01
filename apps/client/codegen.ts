@@ -16,6 +16,7 @@ const config: CodegenConfig = {
         defaultScalarType: "unknown",
         nonOptionalTypename: true,
         skipTypeNameForRoot: true,
+        withHooks: false,
       },
     },
   },
