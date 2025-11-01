@@ -12,7 +12,9 @@
     "paths": {
       "@components/*": ["apps/client/src/components/*"],
       "@pages/*": ["apps/client/src/pages/*"],
-      "@graphql/*": ["apps/client/src/graphql/*"]
+      "@graphql/*": ["apps/client/src/graphql/*"],
+      "@hooks/*": ["apps/client/src/hooks/*"],
+      "@stores/*": ["apps/client/src/stores/*"]
     }
   }
 }
