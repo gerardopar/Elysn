@@ -66,6 +66,7 @@ export type Mutation = {
   deleteUser: User;
   updateMessage: Message;
   updateUser: User;
+  upsertUser: User;
 };
 
 
@@ -112,6 +113,14 @@ export type MutationUpdateMessageArgs = {
 
 export type MutationUpdateUserArgs = {
   id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpsertUserArgs = {
+  email: Scalars['String']['input'];
+  firebaseUid: Scalars['String']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   picture?: InputMaybe<Scalars['String']['input']>;
 };
@@ -308,6 +317,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   updateMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationUpdateMessageArgs, 'id' | 'input'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id'>>;
+  upsertUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpsertUserArgs, 'email' | 'firebaseUid'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {

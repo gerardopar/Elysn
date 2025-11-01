@@ -21,6 +21,12 @@ extend type Mutation {
     name: String
     picture: String
   ): User!
+  upsertUser(
+    firebaseUid: String!
+    email: String!
+    name: String
+    picture: String
+  ): User!
   updateUser(id: ID!, name: String, picture: String): User!
   deleteUser(id: ID!): User!
 }

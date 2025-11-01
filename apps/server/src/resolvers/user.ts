@@ -4,6 +4,7 @@ import {
   MutationCreateUserArgs,
   MutationUpdateUserArgs,
   MutationDeleteUserArgs,
+  MutationUpsertUserArgs,
 } from "../graphql/__generated__/graphql.js";
 
 import { createUser, getUser } from "../access-layer/user";
@@ -50,6 +51,38 @@ export const userResolvers: Resolvers = {
         email: args?.email,
         firebaseUid: args?.firebaseUid,
       });
+
+      return {
+        id: String(user._id),
+        firebaseUid: user.firebaseUid,
+        name: user.name,
+        bio: user.bio,
+        picture: user.picture,
+        email: user.email,
+        createdAt: user.createdAt.getTime(),
+        updatedAt: user.updatedAt.getTime(),
+      };
+    },
+
+    upsertUser: async (_parent, args: MutationUpsertUserArgs, _ctx) => {
+      console.log("args", args);
+      const { firebaseUid, name, email, picture } = args;
+
+      const user = await User.findOneAndUpdate(
+        { firebaseUid },
+        {
+          $set: {
+            name,
+            email,
+            picture,
+          },
+        },
+        {
+          new: true,
+          upsert: true, // create if not exists
+          setDefaultsOnInsert: true,
+        }
+      );
 
       return {
         id: String(user._id),
