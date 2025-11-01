@@ -10,7 +10,7 @@ import { connectRedis } from "./cache/redisClient";
 import { connectDB } from "./db/db";
 
 import { resolvers } from "./resolvers/resolvers";
-import { firebaseAdmin } from "./firebase/firebase";
+import { getContext } from "./context/context";
 
 const schemaPath = path.resolve("src/schema/**/*.graphql");
 
@@ -28,6 +28,9 @@ export const startServer = async () => {
   });
 
   const { url } = await startStandaloneServer(server, {
+    context: async ({ req, res }) => {
+      return await getContext({ req });
+    },
     listen: { port: Number(process.env.PORT) || 4000 },
   });
 
