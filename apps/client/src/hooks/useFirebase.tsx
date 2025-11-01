@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 
+import { useUpsertUserMutation } from "../graphql/mutations/user";
+
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
-import { userStore } from "../stores/user";
+import { userStore } from "@stores/user";
 
 export const useFirebase = () => {
   const auth = getAuth();
 
-  const user = userStore.useTracked("user");
   const { setUser, setHydrated, clearUser } = userStore.actions;
 
-  // const { mutateAsync: upsertUser } = trpc.user.createUser.useMutation();
+  const [upsertUser] = useUpsertUserMutation();
 
   useEffect(() => {
     let isMounted = true;
@@ -51,33 +52,39 @@ export const useFirebase = () => {
       const provider = new GoogleAuthProvider();
       const { user } = await signInWithPopup(auth, provider);
 
-      setUser({
-        uid: user?.uid,
-        email: user?.email ?? "",
-        displayName: user?.displayName ?? "",
-        photoURL: user?.photoURL ?? "",
-        providerId: user?.providerId,
-      });
+      if (user?.uid) {
+        // Call the mutation with variables directly
+        const { data } = await upsertUser({
+          variables: {
+            name: user.displayName || "",
+            email: user.email!,
+            firebaseUid: user.uid,
+            picture: user.photoURL || "",
+          },
+        });
 
-      // await upsertUser(
-      //   {
-      //     email: user?.email ?? "",
-      //     name: "",
-      //     firebaseUid: user?.uid,
-      //     picture: user?.photoURL ?? "",
-      //   },
-      //   {
-      //     onSuccess: () => closeModal(),
-      //   }
-      // );
-    } catch (error) {
-      if ((error as { message: string }).message) {
-        // console.error((error as { message: string }).message);
-        // open(<ErrorToast message={(error as { message: string }).message} />, {
-        //   duration: DEFAULT_TOAST_DURATION,
-        // });
-        // return;
+        const gqlUser = data?.upsertUser;
+
+        if (gqlUser && user) {
+          setUser({
+            uid: user.uid,
+            email: user.email ?? "",
+            displayName: user.displayName ?? "",
+            photoURL: user.photoURL ?? "",
+            providerId: user.providerId,
+          });
+        }
+      } else {
+        throw new Error("Missing required user information");
       }
+    } catch (error) {
+      console.error("Sign in error:", error);
+      // Uncomment and use your error handling here
+      // if ((error as { message: string }).message) {
+      //   open(<ErrorToast message={(error as { message: string }).message} />, {
+      //     duration: DEFAULT_TOAST_DURATION,
+      //   });
+      // }
     }
   };
 
