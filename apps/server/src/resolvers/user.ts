@@ -7,7 +7,11 @@ import {
   MutationUpsertUserArgs,
 } from "../graphql/__generated__/graphql.js";
 
-import { createUser, getUser } from "../access-layer/user";
+import {
+  createUser,
+  getUser,
+  getUserByFirebaseUid,
+} from "../access-layer/user";
 import { User } from "../models/user";
 
 export const userResolvers: Resolvers = {
@@ -28,6 +32,23 @@ export const userResolvers: Resolvers = {
 
     getUser: async (_parent, args: QueryGetUserArgs, _ctx) => {
       const user = await getUser(args.id);
+      if (!user) return null;
+
+      return {
+        firebaseUid: user.firebaseUid,
+        id: String(user._id),
+        name: user.name,
+        bio: user.bio,
+        picture: user.picture,
+        email: user.email,
+        createdAt: user.createdAt.getTime(),
+        updatedAt: user.updatedAt.getTime(),
+      };
+    },
+
+    getCurrentUser: async (_parent, _args, _ctx) => {
+      const user = await getUserByFirebaseUid(_ctx?.user?.uid);
+
       if (!user) return null;
 
       return {

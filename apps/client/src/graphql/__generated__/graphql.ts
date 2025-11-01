@@ -127,6 +127,7 @@ export type Query = {
   __typename: 'Query';
   chat: Maybe<Chat>;
   chats: Array<Chat>;
+  getCurrentUser: Maybe<User>;
   getUser: Maybe<User>;
   hello: Maybe<Scalars['String']['output']>;
   message: Maybe<Message>;
@@ -197,3 +198,8 @@ export type HelloQueryVariables = Exact<{
 
 
 export type HelloQuery = { hello: string | null };
+
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserQuery = { getCurrentUser: { __typename: 'User', id: string, firebaseUid: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } | null };

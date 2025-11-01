@@ -5,6 +5,11 @@ export const getUser = async (id: string) => {
   return user;
 };
 
+export const getUserByFirebaseUid = async (firebaseUid: string) => {
+  const user = await User.findOne({ firebaseUid });
+  return user;
+};
+
 export const createUser = async ({
   firebaseUid,
   email,
