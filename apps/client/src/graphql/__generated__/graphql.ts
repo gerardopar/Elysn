@@ -64,6 +64,7 @@ export type Mutation = {
   deleteUser: User;
   updateMessage: Message;
   updateUser: User;
+  upsertUser: User;
 };
 
 
@@ -110,6 +111,14 @@ export type MutationUpdateMessageArgs = {
 
 export type MutationUpdateUserArgs = {
   id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpsertUserArgs = {
+  email: Scalars['String']['input'];
+  firebaseUid: Scalars['String']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   picture?: InputMaybe<Scalars['String']['input']>;
 };
@@ -171,6 +180,16 @@ export type CreateUserMutationVariables = Exact<{
 
 
 export type CreateUserMutation = { createUser: { __typename: 'User', id: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } };
+
+export type UpsertUserMutationVariables = Exact<{
+  firebaseUid: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  picture?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpsertUserMutation = { upsertUser: { __typename: 'User', id: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } };
 
 export type HelloQueryVariables = Exact<{
   name?: InputMaybe<Scalars['String']['input']>;
