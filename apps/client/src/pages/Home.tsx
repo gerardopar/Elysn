@@ -8,7 +8,7 @@ export const Home: React.FC = () => {
   });
 
   return (
-    <div className="h-screen flex items-center justify-center flex-col bg-gray-900">
+    <div className="h-screen flex items-center justify-center flex-col bg-gray-900 font">
       <img
         src="https://cdn.worldvectorlogo.com/logos/apollo-graphql-1.svg"
         alt="apollo-gql"

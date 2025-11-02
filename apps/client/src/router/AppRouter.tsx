@@ -1,32 +1,31 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
+import { IonRouterOutlet } from "@ionic/react";
 
 import Home from "@pages/Home";
 import Login from "@pages/login/Login";
+import { useCurrentUser } from "../stores/user";
 
-import { PrivateRoute } from "./PrivateRoute";
-
-import { userStore } from "../stores/user";
-
-export const AppRouter = () => {
-  const user = userStore.useTracked("user");
+const AppRouter: React.FC = () => {
+  // Using the useCurrentUser hook to access the user state
+  const { user } = useCurrentUser();
 
   return (
-    <Routes>
-      {/* If user is logged in, redirect "/" → "/home" */}
-      <Route
-        path="/"
-        element={user ? <Navigate to="/home" replace /> : <Login />}
-      />
+    <IonRouterOutlet>
+      <Switch>
+        <Route
+          exact
+          path="/"
+          render={() => (user ? <Redirect to="/home" /> : <Login />)}
+        />
 
-      <Route
-        path="/home"
-        element={
-          <PrivateRoute>
-            <Home />
-          </PrivateRoute>
-        }
-      />
-    </Routes>
+        <Route
+          path="/home"
+          render={() => (user ? <Home /> : <Redirect to="/" />)}
+        />
+
+        <Route render={() => <Redirect to="/" />} />
+      </Switch>
+    </IonRouterOutlet>
   );
 };
 
