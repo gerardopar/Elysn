@@ -1,0 +1,17 @@
+:root {
+  --ion-color-eerie-black: #161a1dff;
+  --ion-color-eerie-black-rgb: 26, 29, 255;
+  --ion-color-eerie-black-contrast: #ffffff;
+  --ion-color-eerie-black-contrast-rgb: 255, 255, 255;
+  --ion-color-eerie-black-shade: #171ae0;
+  --ion-color-eerie-black-tint: #3134ff;
+}
+
+.ion-color-eerie-black {
+  --ion-color-base: var(--ion-color-eerie-black);
+  --ion-color-base-rgb: var(--ion-color-eerie-black-rgb);
+  --ion-color-contrast: var(--ion-color-eerie-black-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-eerie-black-contrast-rgb);
+  --ion-color-shade: var(--ion-color-eerie-black-shade);
+  --ion-color-tint: var(--ion-color-eerie-black-tint);
+}

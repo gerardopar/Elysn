@@ -27,6 +27,7 @@ import "@ionic/react/css/display.css";
 
 import "./styles/index.css";
 import "./styles/index.scss";
+import "./theme/ionic.css";
 
 setupIonicReact();
 
