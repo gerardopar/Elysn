@@ -14,6 +14,7 @@ export default defineConfig({
       "@graphql": path.resolve(__dirname, "./src/graphql"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),
       "@stores": path.resolve(__dirname, "./src/stores"),
+      "@layout": path.resolve(__dirname, "./src/layout"),
     },
   },
 });
