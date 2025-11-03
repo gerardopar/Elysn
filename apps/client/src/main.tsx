@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+import { setupIonicReact } from "@ionic/react";
 import { defineCustomElements } from "@ionic/pwa-elements/loader";
 
 // @ts-ignore
@@ -26,6 +27,8 @@ import "@ionic/react/css/display.css";
 
 import "./styles/index.css";
 import "./styles/index.scss";
+
+setupIonicReact();
 
 // Call the element loader before the render call
 defineCustomElements(window);
