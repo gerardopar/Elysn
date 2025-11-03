@@ -1,8 +1,12 @@
 import React from "react";
 
-export const BrandingTextLogo: React.FC = () => {
+export const BrandingTextLogo: React.FC<{ className?: string }> = ({
+  className,
+}) => {
   return (
-    <p className="text-[24px] font-roboto tracking-widest text-seasalt font-extralight">
+    <p
+      className={`${className} text-[24px] font-roboto tracking-widest font-extralight`}
+    >
       ELYSN
     </p>
   );
