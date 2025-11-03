@@ -1,10 +1,19 @@
 :root {
+  /* Eerie Black */
   --ion-color-eerie-black: #161a1dff;
   --ion-color-eerie-black-rgb: 26, 29, 255;
   --ion-color-eerie-black-contrast: #ffffff;
   --ion-color-eerie-black-contrast-rgb: 255, 255, 255;
   --ion-color-eerie-black-shade: #171ae0;
   --ion-color-eerie-black-tint: #3134ff;
+
+  /* Night */
+  --ion-color-night: #0b090aff;
+  --ion-color-night-rgb: 9, 10, 255;
+  --ion-color-night-contrast: #ffffff;
+  --ion-color-night-contrast-rgb: 255, 255, 255;
+  --ion-color-night-shade: #0809e0;
+  --ion-color-night-tint: #2223ff;
 }
 
 .ion-color-eerie-black {
@@ -14,4 +23,13 @@
   --ion-color-contrast-rgb: var(--ion-color-eerie-black-contrast-rgb);
   --ion-color-shade: var(--ion-color-eerie-black-shade);
   --ion-color-tint: var(--ion-color-eerie-black-tint);
+}
+
+.ion-color-night {
+  --ion-color-base: var(--ion-color-night);
+  --ion-color-base-rgb: var(--ion-color-night-rgb);
+  --ion-color-contrast: var(--ion-color-night-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-night-contrast-rgb);
+  --ion-color-shade: var(--ion-color-night-shade);
+  --ion-color-tint: var(--ion-color-night-tint);
 }
