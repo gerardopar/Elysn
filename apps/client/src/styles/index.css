@@ -33,6 +33,7 @@
 
   --color-primary-dark: #212121;
   --color-secondary-gray: #171717;
+  --color-primary-light: #f8f9faff;
 
   --breakpoint-mobile-768: 768px; /* everything ≤768px is considered mobile */
   --breakpoint-mobile-640: 640px; /* everything ≤640px is considered mobile */
