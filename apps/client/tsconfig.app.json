@@ -14,7 +14,8 @@
       "@pages/*": ["./src/pages/*"],
       "@graphql/*": ["./src/graphql/*"],
       "@hooks/*": ["./src/hooks/*"],
-      "@stores/*": ["./src/stores/*"]
+      "@stores/*": ["./src/stores/*"],
+      "@layout/*": ["./src/layout/*"]
     },
 
     /* Bundler mode */
@@ -29,7 +30,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
+    "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },

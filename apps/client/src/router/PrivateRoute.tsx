@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
-import { useCurrentUser } from "../stores/user";
+import { Redirect } from "react-router-dom";
+
+import { userStore } from "../stores/user";
 
 export const PrivateRoute = ({ children }: { children: ReactNode }) => {
-  const { user } = useCurrentUser();
+  const user = userStore.useTracked("user");
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Redirect to="/" />;
   }
 
   return children;

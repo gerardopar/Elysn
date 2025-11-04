@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 
 import { useUpsertUserMutation } from "../graphql/mutations/user";
 
@@ -8,6 +9,7 @@ import { userStore } from "@stores/user";
 
 export const useFirebase = () => {
   const auth = getAuth();
+  const history = useHistory();
 
   const { setUser, setHydrated, clearUser } = userStore.actions;
 
@@ -73,6 +75,7 @@ export const useFirebase = () => {
             photoURL: user.photoURL ?? "",
             providerId: user.providerId,
           });
+          history.push("/home");
         }
       } else {
         throw new Error("Missing required user information");
@@ -92,6 +95,7 @@ export const useFirebase = () => {
     try {
       auth.signOut();
       clearUser();
+      history.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }

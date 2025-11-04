@@ -7,7 +7,7 @@ import SocialLogins from "@components/login/SocialLogins";
 
 export const Login: React.FC = () => {
   return (
-    <div className="h-screen w-full flex flex-col items-center justify-center bg-eerie-black">
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-primary-dark">
       <LiquidEther
         colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
         mouseForce={20}
@@ -28,7 +28,7 @@ export const Login: React.FC = () => {
       />
       <div className="z-2 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center p-4">
         <div className="flex flex-1 flex-col justify-center items-center">
-          <BrandingTextLogo />
+          <BrandingTextLogo className="text-seasalt" />
         </div>
         <SocialLogins />
       </div>
