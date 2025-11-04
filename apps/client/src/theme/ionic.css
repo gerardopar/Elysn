@@ -15,6 +15,14 @@
   --ion-color-secondary-gray-shade: #141414;
   --ion-color-secondary-gray-tint: #2e2e2e;
 
+  /* Tertiary gray */
+  --ion-color-tertiary-gray: #545454;
+  --ion-color-tertiary-gray-rgb: 84, 84, 84;
+  --ion-color-tertiary-gray-contrast: #ffffff;
+  --ion-color-tertiary-gray-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-gray-shade: #4a4a4a;
+  --ion-color-tertiary-gray-tint: #656565;
+
   /* Primary light */
   --ion-color-primary-light: #f8f9faff;
   --ion-color-primary-light-rgb: 249, 250, 255;
@@ -40,6 +48,15 @@
   --ion-color-contrast-rgb: var(--ion-color-secondary-gray-contrast-rgb);
   --ion-color-shade: var(--ion-color-secondary-gray-shade);
   --ion-color-tint: var(--ion-color-secondary-gray-tint);
+}
+
+.ion-color-tertiary-gray {
+  --ion-color-base: var(--ion-color-tertiary-gray);
+  --ion-color-base-rgb: var(--ion-color-tertiary-gray-rgb);
+  --ion-color-contrast: var(--ion-color-tertiary-gray-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-tertiary-gray-contrast-rgb);
+  --ion-color-shade: var(--ion-color-tertiary-gray-shade);
+  --ion-color-tint: var(--ion-color-tertiary-gray-tint);
 }
 
 .ion-color-primary-light {

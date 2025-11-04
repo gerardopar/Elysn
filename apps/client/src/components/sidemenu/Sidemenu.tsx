@@ -6,8 +6,12 @@ import {
   IonList,
   IonListHeader,
   IonItem,
+  IonRow,
+  IonToolbar,
+  IonFooter,
 } from "@ionic/react";
 
+import UserAvatar from "../user-avatar/UserAvatar";
 import AppIcon from "../../assets/images/app-icon.png";
 import ChevronExpandIcon from "../svgs/ChevronExpandIcon";
 import ChevronCollapseIcon from "../svgs/ChevronCollapseIcon";
@@ -22,10 +26,10 @@ export const Sidemenu: React.FC = () => {
 
   return (
     <IonMenu contentId="main" side="start" className="sidemenu">
-      <IonContent fullscreen>
+      <IonContent fullscreen color="secondary-gray">
         <IonList
           color="secondary-gray"
-          className="h-full bg-secondary-gray!"
+          className="bg-secondary-gray!"
           lines="none"
         >
           <IonListHeader className="flex items-center justify-between px-6 w-full gap-4">
@@ -63,13 +67,28 @@ export const Sidemenu: React.FC = () => {
                   color="primary-light"
                 />
               </div>
-              <span className="text-primary-light text-base">
+              <span className="text-primary-light text-base font-roboto">
                 {option.title}
               </span>
             </IonItem>
           ))}
         </IonList>
+
+        <div className="flex-1" />
       </IonContent>
+      <IonToolbar color="secondary-gray">
+        <IonFooter className="px-1 pb-1">
+          <IonRow className="w-full flex items-center justify-start gap-2 rounded-lg bg-primary-dark px-2 py-2">
+            <UserAvatar className="w-[30px] h-[30px] max-w-[30px] max-h-[30px]" />
+            <IonRow className="flex flex-col">
+              <span className="text-primary-light font-roboto text-base">
+                Gerardo Paredes
+              </span>
+              <span className="text-gray-400 font-roboto text-xs">Beta</span>
+            </IonRow>
+          </IonRow>
+        </IonFooter>
+      </IonToolbar>
     </IonMenu>
   );
 };
