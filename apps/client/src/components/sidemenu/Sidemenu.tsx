@@ -59,7 +59,11 @@ export const Sidemenu: React.FC = () => {
             </button>
           </IonListHeader>
           {sidemenuOptions.map((option) => (
-            <IonItem color="secondary-gray" key={option.type} className="gap-3">
+            <IonItem
+              color="secondary-gray"
+              key={option.type}
+              className="gap-3 cursor-pointer"
+            >
               <div className="w-8 flex items-center justify-center">
                 <option.icon
                   variant="outline"
@@ -67,7 +71,7 @@ export const Sidemenu: React.FC = () => {
                   color="primary-light"
                 />
               </div>
-              <span className="text-primary-light text-base font-roboto">
+              <span className="text-primary-light text-sm font-roboto">
                 {option.title}
               </span>
             </IonItem>
@@ -76,12 +80,15 @@ export const Sidemenu: React.FC = () => {
 
         <div className="flex-1" />
       </IonContent>
-      <IonToolbar color="secondary-gray">
-        <IonFooter className="px-1 pb-1">
-          <IonRow className="w-full flex items-center justify-start gap-2 rounded-lg bg-primary-dark px-2 py-2">
+      <IonToolbar
+        color="secondary-gray"
+        className="border-t border-primary-dark"
+      >
+        <IonFooter className="px-1 pb-1 cursor-pointer">
+          <IonRow className="w-full flex items-center justify-start gap-2 rounded-lg px-2 py-2">
             <UserAvatar className="w-[30px] h-[30px] max-w-[30px] max-h-[30px]" />
             <IonRow className="flex flex-col">
-              <span className="text-primary-light font-roboto text-base">
+              <span className="text-primary-light font-roboto text-sm">
                 Gerardo Paredes
               </span>
               <span className="text-gray-400 font-roboto text-xs">Beta</span>
