@@ -2,7 +2,6 @@ import React, { type ReactNode } from "react";
 
 import { IonSplitPane, IonPage } from "@ionic/react";
 import Sidemenu from "@components/sidemenu/Sidemenu";
-import Header from "@components/header/Header";
 
 interface MainLayoutProps {
   children: ReactNode;

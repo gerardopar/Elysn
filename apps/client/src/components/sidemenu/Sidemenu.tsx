@@ -2,17 +2,17 @@ import React from "react";
 
 import {
   IonMenu,
-  IonHeader,
   IonContent,
   IonList,
   IonListHeader,
   IonItem,
 } from "@ionic/react";
 
+import { sidemenuOptions } from "./sidemenu.helpers";
+
 export const Sidemenu: React.FC = () => {
   return (
     <IonMenu contentId="main" side="start" className="sidemenu">
-      <IonHeader />
       <IonContent fullscreen>
         <IonList
           color="secondary-gray"
@@ -20,9 +20,20 @@ export const Sidemenu: React.FC = () => {
           lines="none"
         >
           <IonListHeader>Menu</IonListHeader>
-          <IonItem color="secondary-gray">Item 1</IonItem>
-          <IonItem color="secondary-gray">Item 2</IonItem>
-          <IonItem color="secondary-gray">Item 3</IonItem>
+          {sidemenuOptions.map((option) => (
+            <IonItem color="secondary-gray" key={option.type} className="gap-3">
+              <div className="w-8 flex items-center justify-center">
+                <option.icon
+                  variant="outline"
+                  className="text-xl"
+                  color="primary-light"
+                />
+              </div>
+              <span className="text-primary-light text-base">
+                {option.title}
+              </span>
+            </IonItem>
+          ))}
         </IonList>
       </IonContent>
     </IonMenu>
