@@ -18,9 +18,7 @@ import { sideMenuStore } from "../../stores/sidemenu";
 export const Sidemenu: React.FC = () => {
   const isExpanded = sideMenuStore.useTracked("isExpanded");
 
-  const toggleMenu = () => {
-    sideMenuStore.actions.setExpanded(!isExpanded);
-  };
+  const toggleMenu = () => sideMenuStore.actions.setExpanded(!isExpanded);
 
   return (
     <IonMenu contentId="main" side="start" className="sidemenu">
