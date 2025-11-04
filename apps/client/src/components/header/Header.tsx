@@ -6,7 +6,7 @@ import BrandingTextLogo from "@components/shared/BrandingTextLogo";
 export const Header: React.FC = () => {
   return (
     <IonHeader className="ion-no-border">
-      <IonToolbar color="night" className="px-4">
+      <IonToolbar color="primary-dark" className="px-4">
         <IonTitle>
           <BrandingTextLogo />
         </IonTitle>

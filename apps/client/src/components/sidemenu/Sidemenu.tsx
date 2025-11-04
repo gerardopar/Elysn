@@ -14,11 +14,15 @@ export const Sidemenu: React.FC = () => {
     <IonMenu contentId="main" side="start" className="sidemenu">
       <IonHeader />
       <IonContent fullscreen>
-        <IonList color="night" className="h-full bg-night!" lines="none">
+        <IonList
+          color="secondary-gray"
+          className="h-full bg-secondary-gray!"
+          lines="none"
+        >
           <IonListHeader>Menu</IonListHeader>
-          <IonItem color="night">Item 1</IonItem>
-          <IonItem color="night">Item 2</IonItem>
-          <IonItem color="night">Item 3</IonItem>
+          <IonItem color="secondary-gray">Item 1</IonItem>
+          <IonItem color="secondary-gray">Item 2</IonItem>
+          <IonItem color="secondary-gray">Item 3</IonItem>
         </IonList>
       </IonContent>
     </IonMenu>

@@ -16,7 +16,6 @@ interface MainLayoutProps {
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <>
-      <Header />
       <IonSplitPane contentId="main" when="md">
         {/* md = show split on ≥768px */}
         {/* Side Menu */}

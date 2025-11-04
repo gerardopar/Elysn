@@ -7,7 +7,7 @@ import SocialLogins from "@components/login/SocialLogins";
 
 export const Login: React.FC = () => {
   return (
-    <div className="h-screen w-full flex flex-col items-center justify-center bg-night">
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-primary-dark">
       <LiquidEther
         colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
         mouseForce={20}
