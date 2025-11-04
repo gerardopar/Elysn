@@ -51,8 +51,8 @@ importers:
         specifier: ^4.10.1
         version: 4.10.1
       ionicons:
-        specifier: ^7.4.0
-        version: 7.4.0
+        specifier: ^8.0.13
+        version: 8.0.13
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -3693,6 +3693,9 @@ packages:
 
   ionicons@7.4.0:
     resolution: {integrity: sha512-ZK94MMqgzMCPPMhmk8Ouu6goyVHFIlw/ACP6oe3FrikcI0N7CX0xcwVaEbUc0G/v3W0shI93vo+9ve/KpvcNhQ==}
+
+  ionicons@8.0.13:
+    resolution: {integrity: sha512-2QQVyG2P4wszne79jemMjWYLp0DBbDhr4/yFroPCxvPP1wtMxgdIV3l5n+XZ5E9mgoXU79w7yTWpm2XzJsISxQ==}
 
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
@@ -9830,6 +9833,10 @@ snapshots:
       loose-envify: 1.4.0
 
   ionicons@7.4.0:
+    dependencies:
+      '@stencil/core': 4.38.2
+
+  ionicons@8.0.13:
     dependencies:
       '@stencil/core': 4.38.2
 
