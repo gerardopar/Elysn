@@ -1,4 +1,5 @@
 import React from "react";
+import { type RouteComponentProps } from "react-router-dom";
 
 import { IonRow } from "@ionic/react";
 
@@ -9,12 +10,16 @@ import {
 
 import { useFirebase } from "@hooks/useFirebase";
 
-const SidemenuPopover: React.FC<{ dismiss: () => void }> = ({ dismiss }) => {
+const SidemenuPopover: React.FC<{
+  dismiss: () => void;
+  history: RouteComponentProps["history"];
+}> = ({ dismiss, history }) => {
   const { handleSignOut } = useFirebase();
 
-  const onClick = (type: SideMenuPopoverOptionsEnum) => {
+  const onClick = async (type: SideMenuPopoverOptionsEnum) => {
     if (type === SideMenuPopoverOptionsEnum.logout) {
-      handleSignOut();
+      await handleSignOut();
+      history.push("/");
       dismiss();
     }
   };

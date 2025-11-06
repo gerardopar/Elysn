@@ -1,4 +1,5 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
 import { IonRow, useIonPopover } from "@ionic/react";
 
@@ -7,8 +8,11 @@ import UserAvatar from "../../user/UserAvatar";
 import UserInfo from "../../user/UserInfo";
 
 export const SidemenuPopoverController: React.FC = () => {
+  const history = useHistory();
+
   const [present, dismiss] = useIonPopover(SidemenuPopover, {
     dismiss: () => dismiss(),
+    history: history,
   });
 
   return (

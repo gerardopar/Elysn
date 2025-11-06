@@ -95,7 +95,6 @@ export const useFirebase = () => {
     try {
       await auth.signOut();
       clearUser();
-      history.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }
