@@ -1,0 +1,5 @@
+.sidemenu-popover::part(content) {
+  --offset-y: -20px;
+  border-radius: 20px;
+  --background: var(--ion-color-tertiary-gray);
+}
