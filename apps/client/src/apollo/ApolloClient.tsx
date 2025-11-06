@@ -14,7 +14,12 @@ export const useApolloClient = () => {
     () =>
       new SetContextLink(async (prevCtx) => {
         const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : "";
+        const token = user
+          ? await user.getIdToken(true).catch((error) => {
+              console.error("Error getting ID token:", error);
+              return "";
+            })
+          : "";
         return {
           headers: {
             ...prevCtx.headers,
