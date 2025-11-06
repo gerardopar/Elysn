@@ -8,7 +8,7 @@ export const UserInfo: React.FC = () => {
   const { user } = useCurrentUser();
 
   return (
-    <IonRow className="flex flex-col">
+    <IonRow className="flex flex-col text-left">
       <span className="text-primary-light font-roboto text-sm">
         {user?.displayName}
       </span>
