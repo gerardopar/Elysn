@@ -7,7 +7,7 @@ import SidemenuOptionsList from "./SidemenuOptionsList";
 
 export const Sidemenu: React.FC = () => {
   return (
-    <IonMenu contentId="main" side="start" className="sidemenu">
+    <IonMenu contentId="main" menuId="main" side="start" className="sidemenu">
       <IonContent fullscreen color="secondary-gray">
         <SidemenuOptionsList />
         <div className="flex-1" />

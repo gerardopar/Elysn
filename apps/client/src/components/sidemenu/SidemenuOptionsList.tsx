@@ -16,7 +16,7 @@ export const SidemenuOptionsList: React.FC = () => {
 
   return (
     <IonList color="secondary-gray" className="bg-secondary-gray!" lines="none">
-      <IonListHeader className="flex items-center justify-between px-6 w-full gap-4">
+      <IonListHeader className="flex items-center justify-between px-6 w-full gap-4 pt-2!">
         <img
           src={AppIcon}
           alt="App Icon"
