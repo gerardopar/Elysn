@@ -20,9 +20,9 @@ export const DEFAULT_MODAL_OPTIONS: Partial<ModalOptions> = {
 /**
  * Unified modal/popover hook w/ defaults and override support
  */
-export const useModal = (
-  component: React.ElementType,
-  props: Record<string, any> = {},
+export const useModal = <P extends object = {}>(
+  Component: React.ComponentType<P>,
+  props: P,
   options?: {
     popoverOptions?: Partial<PopoverOptions>;
     modalOptions?: Partial<ModalOptions>;
@@ -30,8 +30,8 @@ export const useModal = (
 ) => {
   const { isMobile } = useDeviceWidth();
 
-  const [presentPopover, dismissPopover] = useIonPopover(component, props);
-  const [presentModal, dismissModal] = useIonModal(component, props);
+  const [presentPopover, dismissPopover] = useIonPopover(Component, props);
+  const [presentModal, dismissModal] = useIonModal(Component, props);
 
   const mergedPopoverOpts = {
     ...DEFAULT_POPOVER_OPTIONS,

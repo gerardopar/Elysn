@@ -9,12 +9,14 @@ import UserInfo from "../../user/UserInfo";
 import useDeviceWidth from "@hooks/useDeviceWidth";
 import { useModal } from "@hooks/useModal";
 
+import { type SidemenuPopoverProps } from "./SidemenuPopover";
+
 export const SidemenuPopoverController: React.FC = () => {
   const history = useHistory();
   const { isMobile } = useDeviceWidth();
 
-  const { open, close } = useModal(SidemenuPopover, {
-    history: history,
+  const { open, close } = useModal<SidemenuPopoverProps>(SidemenuPopover, {
+    history,
     dismiss: () => close(),
   });
 

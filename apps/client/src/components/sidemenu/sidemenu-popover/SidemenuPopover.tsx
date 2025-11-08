@@ -10,10 +10,15 @@ import {
 
 import { useFirebase } from "@hooks/useFirebase";
 
-const SidemenuPopover: React.FC<{
+export type SidemenuPopoverProps = {
   dismiss: () => void;
   history: RouteComponentProps["history"];
-}> = ({ dismiss, history }) => {
+};
+
+const SidemenuPopover: React.FC<SidemenuPopoverProps> = ({
+  dismiss,
+  history,
+}) => {
   const { handleSignOut } = useFirebase();
 
   const onClick = async (type: SideMenuPopoverOptionsEnum) => {
