@@ -32,6 +32,9 @@ importers:
       '@capacitor/ios':
         specifier: ^7.4.4
         version: 7.4.4(@capacitor/core@7.4.4)
+      '@ionic/core':
+        specifier: ^7.8.6
+        version: 7.8.6
       '@ionic/pwa-elements':
         specifier: ^3.3.0
         version: 3.3.0
