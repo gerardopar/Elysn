@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 
+import ChatEmptyState from "./ChatEmptyState";
 import ChatInput from "./ChatInput";
 
 import { chatSchema } from "./chat.helpers";
+import { IonContent } from "@ionic/react";
 
-const Chat: React.FC = () => {
+import { useDeviceWidth } from "@hooks/useDeviceWidth";
+
+export const Chat: React.FC = () => {
+  const { isMobile } = useDeviceWidth();
+
   const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<{ text: string; isUser: boolean }[]>(
     []
@@ -17,19 +23,31 @@ const Chat: React.FC = () => {
     setInput("");
   };
 
+  const isEmptyChat = messages.length === 0;
+
   return (
-    <div className="w-full h-full bg-primary-dark ion-padding overflow-y-auto flex items-center justify-center pt-[60px]">
-      <div className="flex items-center justify-center flex-col w-full gap-4 mb-[300px]">
-        <h1 className="text-white text-2xl font-bold font-roboto">
-          What's on your mind?
-        </h1>
+    <>
+      <IonContent fullscreen color="primary-dark">
+        <div className="w-full h-full bg-primary-dark ion-padding overflow-y-auto flex items-center justify-center pt-[60px]">
+          {isEmptyChat && (
+            <ChatEmptyState
+              input={input}
+              setInput={setInput}
+              handleSubmit={handleSubmit}
+            />
+          )}
+        </div>
+      </IonContent>
+
+      {((!isMobile && !isEmptyChat) || isMobile) && (
         <ChatInput
           input={input}
           setInput={setInput}
           handleSubmit={handleSubmit}
+          mode="fixed"
         />
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
