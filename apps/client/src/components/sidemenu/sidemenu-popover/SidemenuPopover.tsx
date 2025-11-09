@@ -30,7 +30,7 @@ const SidemenuPopover: React.FC<SidemenuPopoverProps> = ({
   };
 
   return (
-    <IonRow className="w-full flex flex-col gap-1 bg-tertiary-gray p-2">
+    <IonRow className="w-full flex flex-col gap-1 bg-secondary-dark p-2">
       {sidemenuPopoverOptions.map((option) => (
         <button
           key={option.type}
