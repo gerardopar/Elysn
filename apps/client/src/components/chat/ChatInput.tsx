@@ -9,12 +9,18 @@ import {
 } from "@ionic/react";
 import PaperPlaneIcon from "@components/svgs/PaperPlaneIcon";
 
+import { INPUT_PLACEHOLDERS } from "./chat.helpers";
+
+import getRandomString from "@helpers/string.helpers";
+
 const ChatInput: React.FC<{
   input: string;
   setInput: (value: string) => void;
   handleSubmit: () => void;
   mode?: "default" | "fixed";
 }> = ({ input, setInput, handleSubmit, mode = "default" }) => {
+  const placeholder = getRandomString(INPUT_PLACEHOLDERS);
+
   const inputForm = (
     <form
       className="w-full flex items-center justify-center relative"
@@ -38,7 +44,7 @@ const ChatInput: React.FC<{
       >
         <IonInput
           type="text"
-          placeholder="Say something..."
+          placeholder={placeholder}
           className="rounded-full bg-secondary-dark pl-[24px]! pr-[56px]! w-full text-[16px] py-1! focus:border-none!"
           value={input}
           onIonInput={(e) => setInput(e.detail.value!)}
@@ -52,10 +58,11 @@ const ChatInput: React.FC<{
             "--ripple-color": "var(--ion-color-primary-dark)",
             "--color-hover": "var(--ion-color-primary-dark)",
             "--background-hover": "var(--ion-color-primary-dark)",
+            "--background": "var(--ion-color-primary-light)",
           }}
           disabled={input.trim() === ""}
         >
-          <PaperPlaneIcon className="text-white" />
+          <PaperPlaneIcon className="text-primary-dark" size="small" />
         </IonButton>
       </IonItem>
     </form>
