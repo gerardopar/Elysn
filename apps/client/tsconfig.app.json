@@ -15,7 +15,8 @@
       "@graphql/*": ["./src/graphql/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@stores/*": ["./src/stores/*"],
-      "@layout/*": ["./src/layout/*"]
+      "@layout/*": ["./src/layout/*"],
+      "@helpers/*": ["./src/helpers/*"]
     },
 
     /* Bundler mode */
