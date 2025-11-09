@@ -8,7 +8,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@elysn/shared": ["../../packages/shared/src"],
+      "@elysn/shared/*": ["../../packages/shared/src/*"]
+    }
   },
   "include": ["src"]
 }

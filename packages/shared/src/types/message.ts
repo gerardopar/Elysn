@@ -4,12 +4,12 @@ export type Message = {
   sender: string;
   text: string;
   timestamp: number;
-  metadata: any;
+  metadata?: any;
 };
 
 export type MessageInput = {
   userId: string;
   sender: string;
   text: string;
-  metadata: any;
+  metadata?: any;
 };

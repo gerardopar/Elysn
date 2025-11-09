@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --clear --loader ts-node/esm src/index.ts",
+    "dev": "ts-node-dev --respawn --clear -r tsconfig-paths/register src/index.ts",
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch"
   },

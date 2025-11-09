@@ -10,6 +10,8 @@
     // for monorepo
     "baseUrl": ".",
     "paths": {
+      "@elysn/shared": ["packages/shared/src"],
+      "@elysn/shared/*": ["packages/shared/src/*"],
       "@components/*": ["apps/client/src/components/*"],
       "@pages/*": ["apps/client/src/pages/*"],
       "@graphql/*": ["apps/client/src/graphql/*"],
