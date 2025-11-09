@@ -15,7 +15,8 @@
       "@graphql/*": ["apps/client/src/graphql/*"],
       "@hooks/*": ["apps/client/src/hooks/*"],
       "@stores/*": ["apps/client/src/stores/*"],
-      "@layout/*": ["apps/client/src/layout/*"]
+      "@layout/*": ["apps/client/src/layout/*"],
+      "@helpers/*": ["apps/client/src/helpers/*"]
     }
   }
 }

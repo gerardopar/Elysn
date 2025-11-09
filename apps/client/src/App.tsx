@@ -7,13 +7,13 @@ import { ApolloClientProvider } from "./apollo/ApolloClient";
 
 export const App: React.FC = () => {
   return (
-    <IonApp>
-      <ApolloClientProvider>
+    <ApolloClientProvider>
+      <IonApp>
         <IonReactRouter>
           <AppRouter />
         </IonReactRouter>
-      </ApolloClientProvider>
-    </IonApp>
+      </IonApp>
+    </ApolloClientProvider>
   );
 };
 
