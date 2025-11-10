@@ -6,7 +6,7 @@ import { IonContent } from "@ionic/react";
 import ChatInput from "./ChatInput";
 
 import { chatInputSchema } from "./chat.helpers";
-import { type Message as MessageT } from "@elysn/shared";
+import { type Message as MessageT, MessageSenderEnum } from "@elysn/shared";
 
 import { useDeviceWidth } from "@hooks/useDeviceWidth";
 
@@ -19,17 +19,19 @@ export const Chat: React.FC = () => {
   const handleSubmit = () => {
     const result = chatInputSchema.safeParse({ input });
     if (!result.success) return;
-    setMessages((prev) => [
-      ...prev,
-      {
+
+    setMessages((prev) => {
+      const newMessages = [...prev];
+      newMessages.push({
         id: Math.random().toString(),
         userId: "abc123",
-        sender: "user",
+        sender: MessageSenderEnum.USER,
         text: input,
         timestamp: Date.now(),
         metadata: {},
-      },
-    ]);
+      });
+      return newMessages;
+    });
     setInput("");
   };
 

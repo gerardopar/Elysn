@@ -140,12 +140,19 @@ export type MutationUpsertUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  chat?: Maybe<Chat>;
+  chats: Array<Chat>;
   getCurrentUser?: Maybe<User>;
   getUser?: Maybe<User>;
   hello?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Message>;
   messages?: Maybe<Array<Message>>;
   users?: Maybe<Array<User>>;
+};
+
+
+export type QueryChatArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -327,6 +334,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, RequireFields<QueryChatArgs, 'id'>>;
+  chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
   getCurrentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   hello?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, Partial<QueryHelloArgs>>;

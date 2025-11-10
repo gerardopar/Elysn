@@ -22,3 +22,8 @@ extend type Mutation {
   createChat(input: CreateChatInput!): Chat!
   createChatWithMessage(input: CreateChatWithMessageInput!): Chat!
 }
+
+extend type Query {
+  chats: [Chat!]!
+  chat(id: ID!): Chat
+}
