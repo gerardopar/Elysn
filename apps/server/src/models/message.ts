@@ -1,8 +1,11 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
+import { MessageSenderEnum } from "@elysn/shared";
+
 export interface Message extends Document {
+  chatId: mongoose.Types.ObjectId;
   userId: string;
-  sender: "user" | "ai";
+  sender: MessageSenderEnum;
   text: string;
   timestamp: Date;
   metadata?: Record<string, any>;
@@ -10,8 +13,13 @@ export interface Message extends Document {
 
 const MessageSchema = new Schema<Message>(
   {
+    chatId: { type: Schema.Types.ObjectId, ref: "Chat", required: true },
     userId: { type: String, required: true },
-    sender: { type: String, enum: ["user", "ai"], required: true },
+    sender: {
+      type: String,
+      enum: [MessageSenderEnum.USER, MessageSenderEnum.AI],
+      required: true,
+    },
     text: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
     metadata: { type: Schema.Types.Mixed },
@@ -19,7 +27,7 @@ const MessageSchema = new Schema<Message>(
   { timestamps: true }
 );
 
-// Index to optimize user/message lookups
+MessageSchema.index({ chatId: 1, timestamp: -1 }); // fetch messages by chat
 MessageSchema.index({ userId: 1, timestamp: -1 });
 
 export const Message: Model<Message> =
