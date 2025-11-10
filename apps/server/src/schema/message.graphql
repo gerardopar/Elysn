@@ -1,7 +1,12 @@
+enum MessageSenderEnum {
+  USER
+  AI
+}
+
 type Message {
   id: ID!
   userId: ID!
-  sender: String! # "user" or "ai"
+  sender: MessageSenderEnum!
   text: String!
   timestamp: Float!
   metadata: JSON
@@ -9,7 +14,7 @@ type Message {
 
 input MessageInput {
   userId: ID!
-  sender: String! # "user" or "ai"
+  sender: MessageSenderEnum!
   text: String!
   timestamp: Float!
   metadata: JSON

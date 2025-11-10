@@ -1,7 +1,7 @@
 export type Message = {
   id: string;
   userId: string;
-  sender: string;
+  sender: MessageSenderEnum;
   text: string;
   timestamp: number;
   metadata?: any;
@@ -9,7 +9,12 @@ export type Message = {
 
 export type MessageInput = {
   userId: string;
-  sender: string;
+  sender: MessageSenderEnum;
   text: string;
   metadata?: any;
 };
+
+export enum MessageSenderEnum {
+  USER = "USER",
+  AI = "AI",
+}
