@@ -17,6 +17,8 @@ const config: CodegenConfig = {
         nonOptionalTypename: true,
         skipTypeNameForRoot: true,
         withHooks: false,
+        namingConvention: { enumValues: "keep" },
+        useTypeImports: true,
       },
     },
   },
