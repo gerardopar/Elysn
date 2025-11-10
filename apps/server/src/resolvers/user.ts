@@ -46,8 +46,8 @@ export const userResolvers: Resolvers = {
       };
     },
 
-    getCurrentUser: async (_parent, _args, _ctx) => {
-      const user = await getUserByFirebaseUid(_ctx?.user?.uid);
+    getCurrentUser: async (_parent, _args, ctx) => {
+      const user = await getUserByFirebaseUid(ctx?.user?.uid);
 
       if (!user) return null;
 
