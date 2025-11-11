@@ -1,6 +1,6 @@
 export type Message = {
   id: string;
-  chatId?: string;
+  chatId: string | null | undefined;
   userId: string;
   sender: MessageSenderEnum;
   text: string;

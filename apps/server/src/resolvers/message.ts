@@ -29,6 +29,7 @@ export const messageResolvers: Resolvers = {
       const messages = await getMessages(chatId);
       return messages.map((message) => ({
         id: String(message._id),
+        chatId: String(message.chatId),
         userId: message.userId,
         sender: message.sender,
         text: message.text,
@@ -47,6 +48,7 @@ export const messageResolvers: Resolvers = {
 
       return {
         id: String(message._id),
+        chatId: String(message.chatId),
         userId: message.userId,
         sender: message.sender,
         text: message.text,
@@ -79,6 +81,7 @@ export const messageResolvers: Resolvers = {
 
       return {
         id: String(message?._id),
+        chatId: String(message?.chatId),
         userId: message?.userId,
         sender: message?.sender,
         text: message?.text,
@@ -94,6 +97,7 @@ export const messageResolvers: Resolvers = {
 
       return {
         id: String(message._id),
+        chatId: String(message.chatId),
         userId: message.userId,
         sender: message.sender,
         text: message.text,
@@ -109,6 +113,7 @@ export const messageResolvers: Resolvers = {
 
       return {
         id: String(message._id),
+        chatId: String(message.chatId),
         userId: message.userId,
         sender: message.sender,
         text: message.text,
