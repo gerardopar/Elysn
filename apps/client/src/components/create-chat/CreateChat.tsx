@@ -1,31 +1,23 @@
 import React, { useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-import ChatEmptyState from "./ChatEmptyState";
-import Messages from "./messages/Messages";
+import ChatEmptyState from "../chat/ChatEmptyState";
 import { IonContent } from "@ionic/react";
-import ChatInput from "./ChatInput";
+import ChatInput from "../chat/ChatInput";
 
-import { chatInputSchema } from "./chat.helpers";
+import { chatInputSchema } from "../chat/chat.helpers";
 import { MessageSenderEnum } from "@elysn/shared";
 
 import { useCreateChatWithMessageMutation } from "@graphql/mutations/chat";
-import { useGetMessagesQuery } from "@graphql/queries/message";
 
 import { useDeviceWidth } from "@hooks/useDeviceWidth";
 
-export const Chat: React.FC = () => {
+export const CreateChat: React.FC = () => {
   const history = useHistory();
-  const { chatId } = useParams<{ chatId: string }>();
 
   const { isMobile } = useDeviceWidth();
 
   const [input, setInput] = useState<string>("");
-
-  const { data } = useGetMessagesQuery({
-    chatId: chatId!,
-  });
-  const messages = data?.messages || [];
 
   const [createChatWithMessage] = useCreateChatWithMessageMutation();
 
@@ -56,28 +48,21 @@ export const Chat: React.FC = () => {
     });
   };
 
-  const isEmptyChat = messages.length === 0;
-  const containerStyles = isEmptyChat ? "items-center" : "items-start";
-
   return (
     <>
       <IonContent fullscreen color="primary-dark">
         <div
-          className={`w-full h-full bg-primary-dark ion-padding overflow-y-auto flex justify-center pt-[60px] ${containerStyles}`}
+          className={`w-full h-full bg-primary-dark ion-padding overflow-y-auto flex justify-center items-center pt-[60px]`}
         >
-          {isEmptyChat ? (
-            <ChatEmptyState
-              input={input}
-              setInput={setInput}
-              handleSubmit={handleCreateChatWithMessage}
-            />
-          ) : (
-            <Messages messages={messages} />
-          )}
+          <ChatEmptyState
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleCreateChatWithMessage}
+          />
         </div>
       </IonContent>
 
-      {((!isMobile && !isEmptyChat) || isMobile) && (
+      {isMobile && (
         <ChatInput
           input={input}
           setInput={setInput}
@@ -89,4 +74,4 @@ export const Chat: React.FC = () => {
   );
 };
 
-export default Chat;
+export default CreateChat;
