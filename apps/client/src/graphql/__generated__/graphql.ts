@@ -187,6 +187,42 @@ export type User = {
   updatedAt: Maybe<Scalars['Float']['output']>;
 };
 
+export type CreateChatMutationVariables = Exact<{
+  input: CreateChatInput;
+}>;
+
+
+export type CreateChatMutation = { createChat: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } };
+
+export type CreateChatWithMessageMutationVariables = Exact<{
+  input: CreateChatWithMessageInput;
+}>;
+
+
+export type CreateChatWithMessageMutation = { createChatWithMessage: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } };
+
+export type CreateMessageMutationVariables = Exact<{
+  input: MessageInput;
+}>;
+
+
+export type CreateMessageMutation = { createMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+
+export type UpdateMessageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: MessageInput;
+}>;
+
+
+export type UpdateMessageMutation = { updateMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+
+export type DeleteMessageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteMessageMutation = { deleteMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+
 export type CreateUserMutationVariables = Exact<{
   firebaseUid: Scalars['String']['input'];
   email: Scalars['String']['input'];
