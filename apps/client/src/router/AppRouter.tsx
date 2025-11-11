@@ -2,6 +2,7 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import { IonRouterOutlet } from "@ionic/react";
 
 import Home from "@pages/home/Home";
+import Chat from "@pages/Chat/Chat";
 import Login from "@pages/login/Login";
 
 import { userStore } from "../stores/user";
@@ -27,7 +28,7 @@ const AppRouter: React.FC = () => {
         <Route
           exact
           path="/chat/:chatId"
-          render={() => (user ? <Home /> : <Redirect to="/" />)}
+          render={() => (user ? <Chat /> : <Redirect to="/" />)}
         />
 
         <Route render={() => <Redirect to="/" />} />
