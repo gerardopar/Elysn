@@ -50,3 +50,14 @@ export const updateMessage = async (
 ) => {
   return Message.findByIdAndUpdate(id, update, { new: true });
 };
+
+export const getMessages = async (chatId: string, limit: number = 100) => {
+  return Message.find({ chatId })
+    .sort({ timestamp: 1 }) // chronological order
+    .limit(limit) // optional pagination
+    .lean();
+};
+
+export const getMessage = async (id: string) => {
+  return Message.findById(id).lean();
+};
