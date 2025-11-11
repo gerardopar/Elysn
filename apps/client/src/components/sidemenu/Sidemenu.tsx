@@ -3,6 +3,7 @@ import React from "react";
 import { IonMenu, IonContent } from "@ionic/react";
 
 import SidemenuFooter from "./SidemenuFooter";
+import ChatsList from "../chats-list/ChatsList";
 import SidemenuOptionsList from "./SidemenuOptionsList";
 
 export const Sidemenu: React.FC = () => {
@@ -10,6 +11,7 @@ export const Sidemenu: React.FC = () => {
     <IonMenu contentId="main" menuId="main" side="start" className="sidemenu">
       <IonContent fullscreen color="secondary-gray">
         <SidemenuOptionsList />
+        <ChatsList />
         <div className="flex-1" />
       </IonContent>
       <SidemenuFooter />
