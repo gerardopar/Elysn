@@ -6,6 +6,7 @@ enum MessageSenderEnum {
 type Message {
   id: ID!
   userId: ID!
+  chatId: ID
   sender: MessageSenderEnum!
   text: String!
   timestamp: Float!
@@ -14,6 +15,7 @@ type Message {
 
 input MessageInput {
   userId: ID!
+  chatId: ID
   sender: MessageSenderEnum!
   text: String!
   timestamp: Float!
@@ -21,7 +23,7 @@ input MessageInput {
 }
 
 extend type Query {
-  messages: [Message!]
+  messages(chatId: ID!): [Message!]
   message(id: ID!): Message
 }
 
