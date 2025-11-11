@@ -29,6 +29,7 @@ export const useGetMessagesQuery = (variables: GetMessagesQueryVariables) => {
     GET_MESSAGES_QUERY,
     {
       variables,
+      skip: !variables?.chatId,
     }
   );
 };

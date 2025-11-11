@@ -14,7 +14,6 @@ type Message {
 }
 
 input MessageInput {
-  userId: ID!
   chatId: ID
   sender: MessageSenderEnum!
   text: String!

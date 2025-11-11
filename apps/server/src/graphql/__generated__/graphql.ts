@@ -64,7 +64,6 @@ export type MessageInput = {
   sender: MessageSenderEnum;
   text: Scalars['String']['input'];
   timestamp: Scalars['Float']['input'];
-  userId: Scalars['ID']['input'];
 };
 
 export enum MessageSenderEnum {
