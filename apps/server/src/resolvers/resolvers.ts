@@ -1,6 +1,8 @@
-import { Resolvers } from "../graphql/__generated__/graphql";
 import { userResolvers } from "./user";
 import { chatResolvers } from "./chat";
+import { messageResolvers } from "./message";
+
+import { Resolvers } from "../graphql/__generated__/graphql";
 
 export const resolvers: Resolvers = {
   Query: {
@@ -9,9 +11,11 @@ export const resolvers: Resolvers = {
     },
     ...userResolvers.Query,
     ...chatResolvers.Query,
+    ...messageResolvers.Query,
   },
   Mutation: {
     ...userResolvers.Mutation,
     ...chatResolvers.Mutation,
+    ...messageResolvers.Mutation,
   },
 };

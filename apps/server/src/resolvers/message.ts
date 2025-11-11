@@ -18,7 +18,7 @@ import {
   QueryMessageArgs,
 } from "../graphql/__generated__/graphql";
 
-export const chatResolvers: Resolvers = {
+export const messageResolvers: Resolvers = {
   Query: {
     messages: async (_parent, { chatId }: QueryMessagesArgs, ctx) => {
       if (!ctx.user?.uid) throw new Error("Must be authenticated");
