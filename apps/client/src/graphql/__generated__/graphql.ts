@@ -243,12 +243,31 @@ export type UpsertUserMutationVariables = Exact<{
 
 export type UpsertUserMutation = { upsertUser: { __typename: 'User', id: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } };
 
+export type GetChatsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetChatsQuery = { chats: Array<{ __typename: 'Chat', id: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number }> };
+
+export type GetChatQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetChatQuery = { chat: { __typename: 'Chat', id: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } | null };
+
 export type HelloQueryVariables = Exact<{
   name?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type HelloQuery = { hello: string | null };
+
+export type GetMessagesQueryVariables = Exact<{
+  chatId: Scalars['ID']['input'];
+}>;
+
+
+export type GetMessagesQuery = { messages: Array<{ __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string }> | null };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
