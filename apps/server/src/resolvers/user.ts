@@ -5,7 +5,7 @@ import {
   MutationUpdateUserArgs,
   MutationDeleteUserArgs,
   MutationUpsertUserArgs,
-} from "../graphql/__generated__/graphql.js";
+} from "../graphql/__generated__/graphql";
 
 import {
   createUser,

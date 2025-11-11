@@ -47,6 +47,7 @@ export type Memory = {
 
 export type Message = {
   __typename: 'Message';
+  chatId: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   metadata: Maybe<Scalars['JSON']['output']>;
   sender: MessageSenderEnum;
@@ -56,6 +57,7 @@ export type Message = {
 };
 
 export type MessageInput = {
+  chatId?: InputMaybe<Scalars['ID']['input']>;
   metadata?: InputMaybe<Scalars['JSON']['input']>;
   sender: MessageSenderEnum;
   text: Scalars['String']['input'];
@@ -138,12 +140,19 @@ export type MutationUpsertUserArgs = {
 
 export type Query = {
   __typename: 'Query';
+  chat: Maybe<Chat>;
+  chats: Array<Chat>;
   getCurrentUser: Maybe<User>;
   getUser: Maybe<User>;
   hello: Maybe<Scalars['String']['output']>;
   message: Maybe<Message>;
   messages: Maybe<Array<Message>>;
   users: Maybe<Array<User>>;
+};
+
+
+export type QueryChatArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -159,6 +168,11 @@ export type QueryHelloArgs = {
 
 export type QueryMessageArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryMessagesArgs = {
+  chatId: Scalars['ID']['input'];
 };
 
 export type User = {

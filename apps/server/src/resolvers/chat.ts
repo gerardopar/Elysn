@@ -1,5 +1,5 @@
-import { getUserByFirebaseUid } from "src/access-layer/user";
 import { createChat, getChat, getChats } from "../access-layer/chat";
+import { getUserByFirebaseUid } from "src/access-layer/user";
 import { createMessage } from "../access-layer/message";
 
 import {

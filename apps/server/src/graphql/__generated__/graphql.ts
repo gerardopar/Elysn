@@ -49,6 +49,7 @@ export type Memory = {
 
 export type Message = {
   __typename?: 'Message';
+  chatId?: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   metadata?: Maybe<Scalars['JSON']['output']>;
   sender: MessageSenderEnum;
@@ -58,6 +59,7 @@ export type Message = {
 };
 
 export type MessageInput = {
+  chatId?: InputMaybe<Scalars['ID']['input']>;
   metadata?: InputMaybe<Scalars['JSON']['input']>;
   sender: MessageSenderEnum;
   text: Scalars['String']['input'];
@@ -168,6 +170,11 @@ export type QueryHelloArgs = {
 
 export type QueryMessageArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryMessagesArgs = {
+  chatId: Scalars['ID']['input'];
 };
 
 export type User = {
@@ -312,6 +319,7 @@ export type MemoryResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type MessageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
+  chatId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   metadata?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   sender?: Resolver<ResolversTypes['MessageSenderEnum'], ParentType, ContextType>;
@@ -340,7 +348,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   hello?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, Partial<QueryHelloArgs>>;
   message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessageArgs, 'id'>>;
-  messages?: Resolver<Maybe<Array<ResolversTypes['Message']>>, ParentType, ContextType>;
+  messages?: Resolver<Maybe<Array<ResolversTypes['Message']>>, ParentType, ContextType, RequireFields<QueryMessagesArgs, 'chatId'>>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
 };
 

@@ -1,4 +1,4 @@
-import { Resolvers } from "../graphql/__generated__/graphql.js";
+import { Resolvers } from "../graphql/__generated__/graphql";
 import { userResolvers } from "./user";
 import { chatResolvers } from "./chat";
 
