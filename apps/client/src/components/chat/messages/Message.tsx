@@ -1,9 +1,9 @@
 import React from "react";
 
-import { type Message as MessageT } from "@elysn/shared";
+import { type Message as MessageT, MessageSenderEnum } from "@elysn/shared";
 
-export const Message: React.FC<MessageT> = ({ sender, text, timestamp }) => {
-  const isUser = sender === "user";
+export const Message: React.FC<MessageT> = ({ sender, text }) => {
+  const isUser = sender === MessageSenderEnum.USER;
 
   const containerStyles = isUser ? "justify-end" : "justify-start";
   const messageStyles = isUser ? "bg-tertiary-gray" : "bg-primary-dark";
@@ -13,7 +13,7 @@ export const Message: React.FC<MessageT> = ({ sender, text, timestamp }) => {
       <div
         className={`max-w-[540px] py-2 px-4 rounded-[16px] inline  ${messageStyles}`}
       >
-        <p>{text}</p>
+        <p className="text-white">{text}</p>
       </div>
     </li>
   );

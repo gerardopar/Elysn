@@ -24,6 +24,12 @@ const AppRouter: React.FC = () => {
           render={() => (user ? <Home /> : <Redirect to="/" />)}
         />
 
+        <Route
+          exact
+          path="/chat/:chatId"
+          render={() => (user ? <Home /> : <Redirect to="/" />)}
+        />
+
         <Route render={() => <Redirect to="/" />} />
       </Switch>
     </IonRouterOutlet>
