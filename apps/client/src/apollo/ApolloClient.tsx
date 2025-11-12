@@ -1,10 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { ApolloProvider } from "@apollo/client/react";
-import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
-import { SetContextLink } from "@apollo/client/link/context";
+import {
+  ApolloClient,
+  InMemoryCache,
+  HttpLink,
+  ApolloLink,
+} from "@apollo/client";
 import { getAuth } from "firebase/auth";
+import { createClient } from "graphql-ws";
+import { SetContextLink } from "@apollo/client/link/context";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { getMainDefinition } from "@apollo/client/utilities";
 
-const httpLink = new HttpLink({ uri: "http://localhost:4000/graphql" });
+const HTTP_URL = "http://localhost:4000/graphql";
+const WS_URL = "ws://localhost:4000/graphql";
 
 export const useApolloClient = () => {
   const auth = getAuth();
@@ -30,15 +39,53 @@ export const useApolloClient = () => {
     [auth]
   );
 
+  /** 🌐 HTTP Link for queries + mutations */
+  const httpLink = useMemo(() => new HttpLink({ uri: HTTP_URL }), []);
+
+  /** 🔌 WebSocket Link for subscriptions */
+  const wsLink = useMemo(() => {
+    const wsClient = createClient({
+      url: WS_URL,
+      connectionParams: async () => {
+        const user = auth.currentUser;
+        const token = user ? await user.getIdToken(true).catch(() => "") : "";
+        return {
+          Authorization: token ? `Bearer ${token}` : "",
+        };
+      },
+    });
+
+    return new GraphQLWsLink(wsClient);
+  }, [auth]);
+
+  /** ⚡ Split link: HTTP for queries/mutations, WS for subscriptions */
+  const splitLink = useMemo(
+    () =>
+      ApolloLink.split(
+        ({ query }) => {
+          const definition = getMainDefinition(query);
+          return (
+            definition.kind === "OperationDefinition" &&
+            definition.operation === "subscription"
+          );
+        },
+        wsLink,
+        authLink.concat(httpLink)
+      ),
+    [authLink, httpLink, wsLink]
+  );
+
+  /** 🚀 Apollo Client instance */
   const apolloClient = useMemo(
     () =>
       new ApolloClient({
-        link: authLink.concat(httpLink),
+        link: splitLink,
         cache: new InMemoryCache(),
       }),
-    [authLink]
+    [splitLink]
   );
 
+  /** ✅ Wait for Firebase auth before rendering */
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(() => {
       setReady(true);
