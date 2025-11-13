@@ -1,16 +1,16 @@
 import React from "react";
 
-import CreateChat from "@components/create-chat/CreateChat";
+import ChatView from "@components/chat/ChatView";
 import MainLayout from "@layout/MainLayout";
 import Header from "@components/header/Header";
 
-const Home: React.FC = () => {
+const Chat: React.FC = () => {
   return (
     <MainLayout>
       <Header />
-      <CreateChat />
+      <ChatView />
     </MainLayout>
   );
 };
 
-export default Home;
+export default Chat;

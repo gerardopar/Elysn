@@ -1,10 +1,10 @@
 import z from "zod";
 
-export const chatSchema = z.object({
+export const chatInputSchema = z.object({
   input: z.string().min(1),
 });
 
-export type ChatSchema = z.infer<typeof chatSchema>;
+export type ChatInputSchema = z.infer<typeof chatInputSchema>;
 
 export const INPUT_PLACEHOLDERS: string[] = [
   "I'm listening...",

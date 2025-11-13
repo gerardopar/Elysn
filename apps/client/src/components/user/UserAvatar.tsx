@@ -7,8 +7,6 @@ import { useCurrentUser } from "@stores/user";
 export const UserAvatar: React.FC<{ className?: string }> = ({ className }) => {
   const { user } = useCurrentUser();
 
-  console.log(user);
-
   const src = user?.photoURL;
 
   return (

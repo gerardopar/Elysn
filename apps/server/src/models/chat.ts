@@ -4,7 +4,6 @@ export interface Chat extends Document {
   userId: string;
   title?: string;
   topic?: string;
-  messages: string[]; // message IDs
   createdAt: Date;
   updatedAt: Date;
 }
@@ -12,11 +11,13 @@ export interface Chat extends Document {
 const ChatSchema = new Schema<Chat>(
   {
     userId: { type: String, required: true },
-    title: { type: String, required: false },
-    topic: { type: String, required: false },
-    messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
+    title: { type: String },
+    topic: { type: String },
   },
   { timestamps: true }
 );
 
-export const Chat: Model<Chat> = mongoose.model<Chat>("Chat", ChatSchema);
+ChatSchema.index({ userId: 1, updatedAt: -1 });
+
+export const Chat: Model<Chat> =
+  mongoose.models.Chat || mongoose.model<Chat>("Chat", ChatSchema);

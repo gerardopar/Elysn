@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import type { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -21,11 +21,21 @@ export type Chat = {
   __typename?: 'Chat';
   createdAt: Scalars['Float']['output'];
   id: Scalars['ID']['output'];
-  messages: Array<Message>;
   title?: Maybe<Scalars['String']['output']>;
   topic?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['Float']['output'];
   userId: Scalars['ID']['output'];
+};
+
+export type CreateChatInput = {
+  title?: InputMaybe<Scalars['String']['input']>;
+  topic?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateChatWithMessageInput = {
+  message: MessageInput;
+  title?: InputMaybe<Scalars['String']['input']>;
+  topic?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Memory = {
@@ -39,29 +49,35 @@ export type Memory = {
 
 export type Message = {
   __typename?: 'Message';
+  chatId?: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   metadata?: Maybe<Scalars['JSON']['output']>;
-  sender: Scalars['String']['output'];
+  sender: MessageSenderEnum;
   text: Scalars['String']['output'];
   timestamp: Scalars['Float']['output'];
   userId: Scalars['ID']['output'];
 };
 
 export type MessageInput = {
+  chatId?: InputMaybe<Scalars['ID']['input']>;
   metadata?: InputMaybe<Scalars['JSON']['input']>;
-  sender: Scalars['String']['input'];
+  sender: MessageSenderEnum;
   text: Scalars['String']['input'];
   timestamp: Scalars['Float']['input'];
-  userId: Scalars['ID']['input'];
 };
+
+export enum MessageSenderEnum {
+  AI = 'AI',
+  USER = 'USER'
+}
 
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
   createChat: Chat;
+  createChatWithMessage: Chat;
   createMessage: Message;
   createUser: User;
-  deleteChat: Scalars['Boolean']['output'];
   deleteMessage: Message;
   deleteUser: User;
   updateMessage: Message;
@@ -71,9 +87,12 @@ export type Mutation = {
 
 
 export type MutationCreateChatArgs = {
-  title?: InputMaybe<Scalars['String']['input']>;
-  topic?: InputMaybe<Scalars['String']['input']>;
-  userId: Scalars['ID']['input'];
+  input: CreateChatInput;
+};
+
+
+export type MutationCreateChatWithMessageArgs = {
+  input: CreateChatWithMessageInput;
 };
 
 
@@ -87,11 +106,6 @@ export type MutationCreateUserArgs = {
   firebaseUid: Scalars['String']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   picture?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationDeleteChatArgs = {
-  id: Scalars['ID']['input'];
 };
 
 
@@ -143,11 +157,6 @@ export type QueryChatArgs = {
 };
 
 
-export type QueryChatsArgs = {
-  userId: Scalars['ID']['input'];
-};
-
-
 export type QueryGetUserArgs = {
   id: Scalars['ID']['input'];
 };
@@ -160,6 +169,22 @@ export type QueryHelloArgs = {
 
 export type QueryMessageArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryMessagesArgs = {
+  chatId: Scalars['ID']['input'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  _empty?: Maybe<Scalars['String']['output']>;
+  newMessage: Message;
+};
+
+
+export type SubscriptionNewMessageArgs = {
+  chatId: Scalars['ID']['input'];
 };
 
 export type User = {
@@ -249,15 +274,19 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Chat: ResolverTypeWrapper<Chat>;
+  CreateChatInput: CreateChatInput;
+  CreateChatWithMessageInput: CreateChatWithMessageInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   Memory: ResolverTypeWrapper<Memory>;
   Message: ResolverTypeWrapper<Message>;
   MessageInput: MessageInput;
+  MessageSenderEnum: MessageSenderEnum;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -265,6 +294,8 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Chat: Chat;
+  CreateChatInput: CreateChatInput;
+  CreateChatWithMessageInput: CreateChatWithMessageInput;
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   JSON: Scalars['JSON']['output'];
@@ -274,13 +305,13 @@ export type ResolversParentTypes = {
   Mutation: Record<PropertyKey, never>;
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
+  Subscription: Record<PropertyKey, never>;
   User: User;
 };
 
 export type ChatResolvers<ContextType = any, ParentType extends ResolversParentTypes['Chat'] = ResolversParentTypes['Chat']> = {
   createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   topic?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -300,9 +331,10 @@ export type MemoryResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type MessageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
+  chatId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   metadata?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
-  sender?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  sender?: Resolver<ResolversTypes['MessageSenderEnum'], ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   timestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -310,10 +342,10 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  createChat?: Resolver<ResolversTypes['Chat'], ParentType, ContextType, RequireFields<MutationCreateChatArgs, 'userId'>>;
+  createChat?: Resolver<ResolversTypes['Chat'], ParentType, ContextType, RequireFields<MutationCreateChatArgs, 'input'>>;
+  createChatWithMessage?: Resolver<ResolversTypes['Chat'], ParentType, ContextType, RequireFields<MutationCreateChatWithMessageArgs, 'input'>>;
   createMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationCreateMessageArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'firebaseUid'>>;
-  deleteChat?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteChatArgs, 'id'>>;
   deleteMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationDeleteMessageArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   updateMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationUpdateMessageArgs, 'id' | 'input'>>;
@@ -323,13 +355,18 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, RequireFields<QueryChatArgs, 'id'>>;
-  chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType, RequireFields<QueryChatsArgs, 'userId'>>;
+  chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
   getCurrentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   hello?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, Partial<QueryHelloArgs>>;
   message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessageArgs, 'id'>>;
-  messages?: Resolver<Maybe<Array<ResolversTypes['Message']>>, ParentType, ContextType>;
+  messages?: Resolver<Maybe<Array<ResolversTypes['Message']>>, ParentType, ContextType, RequireFields<QueryMessagesArgs, 'chatId'>>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
+};
+
+export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  _empty?: SubscriptionResolver<Maybe<ResolversTypes['String']>, "_empty", ParentType, ContextType>;
+  newMessage?: SubscriptionResolver<ResolversTypes['Message'], "newMessage", ParentType, ContextType, RequireFields<SubscriptionNewMessageArgs, 'chatId'>>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -350,6 +387,7 @@ export type Resolvers<ContextType = any> = {
   Message?: MessageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

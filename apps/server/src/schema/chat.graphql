@@ -3,17 +3,27 @@ type Chat {
   userId: ID!
   title: String
   topic: String
-  messages: [Message!]!
   createdAt: Float!
   updatedAt: Float!
 }
 
-extend type Query {
-  chats(userId: ID!): [Chat!]!
-  chat(id: ID!): Chat
+input CreateChatInput {
+  title: String
+  topic: String
+}
+
+input CreateChatWithMessageInput {
+  title: String
+  topic: String
+  message: MessageInput!
 }
 
 extend type Mutation {
-  createChat(userId: ID!, title: String, topic: String): Chat!
-  deleteChat(id: ID!): Boolean!
+  createChat(input: CreateChatInput!): Chat!
+  createChatWithMessage(input: CreateChatWithMessageInput!): Chat!
+}
+
+extend type Query {
+  chats: [Chat!]!
+  chat(id: ID!): Chat
 }

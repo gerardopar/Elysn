@@ -2,7 +2,7 @@ import { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   overwrite: true,
-  schema: "http://localhost:4000/",
+  schema: "http://localhost:4000/graphql",
   documents: ["src/**/*.{ts,tsx}"],
   ignoreNoDocuments: true,
   generates: {
@@ -17,6 +17,8 @@ const config: CodegenConfig = {
         nonOptionalTypename: true,
         skipTypeNameForRoot: true,
         withHooks: false,
+        namingConvention: { enumValues: "keep" },
+        useTypeImports: true,
       },
     },
   },

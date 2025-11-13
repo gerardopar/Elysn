@@ -1,0 +1,63 @@
+import { Chat } from "../models/chat";
+import { Message } from "../models/message";
+
+/**
+ * Fetch all chats for a specific user.
+ * Sorted by most recently updated.
+ */
+export const getChats = async (userId: string) => {
+  return Chat.find({ userId }).sort({ updatedAt: -1 });
+};
+
+/**
+ * Fetch a single chat by ID.
+ */
+export const getChat = async (id: string) => {
+  return Chat.findById(id);
+};
+
+/**
+ * Create a new chat for a user.
+ */
+export const createChat = async ({
+  userId,
+  title,
+  topic,
+}: {
+  userId: string;
+  title?: string;
+  topic?: string | null;
+}) => {
+  const chat = new Chat({
+    userId,
+    title: title?.trim() || "New Chat",
+    topic: topic?.trim() || null,
+  });
+  await chat.save();
+  return chat;
+};
+
+/**
+ * Delete a chat and cascade delete its messages.
+ */
+export const deleteChat = async (id: string) => {
+  const session = await Chat.startSession();
+  session.startTransaction();
+
+  try {
+    // Remove all messages for this chat
+    await Message.deleteMany({ chatId: id }).session(session);
+
+    // Remove the chat itself
+    const deletedChat = await Chat.findByIdAndDelete(id).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return deletedChat;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};

@@ -1,0 +1,55 @@
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
+import type { TypedDocumentNode } from "@apollo/client";
+
+import type {
+  CreateChatMutation,
+  CreateChatMutationVariables,
+  CreateChatWithMessageMutation,
+  CreateChatWithMessageMutationVariables,
+} from "../__generated__/graphql";
+
+export const CREATE_CHAT_MUTATION: TypedDocumentNode<
+  CreateChatMutation,
+  CreateChatMutationVariables
+> = gql`
+  mutation CreateChat($input: CreateChatInput!) {
+    createChat(input: $input) {
+      id
+      userId
+      title
+      topic
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const useCreateChatMutation = () => {
+  return useMutation<CreateChatMutation, CreateChatMutationVariables>(
+    CREATE_CHAT_MUTATION
+  );
+};
+
+export const CREATE_CHAT_WITH_MESSAGE_MUTATION: TypedDocumentNode<
+  CreateChatWithMessageMutation,
+  CreateChatWithMessageMutationVariables
+> = gql`
+  mutation CreateChatWithMessage($input: CreateChatWithMessageInput!) {
+    createChatWithMessage(input: $input) {
+      id
+      userId
+      title
+      topic
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const useCreateChatWithMessageMutation = () => {
+  return useMutation<
+    CreateChatWithMessageMutation,
+    CreateChatWithMessageMutationVariables
+  >(CREATE_CHAT_WITH_MESSAGE_MUTATION);
+};

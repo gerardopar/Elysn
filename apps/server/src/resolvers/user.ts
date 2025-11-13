@@ -5,7 +5,7 @@ import {
   MutationUpdateUserArgs,
   MutationDeleteUserArgs,
   MutationUpsertUserArgs,
-} from "../graphql/__generated__/graphql.js";
+} from "../graphql/__generated__/graphql";
 
 import {
   createUser,
@@ -46,8 +46,8 @@ export const userResolvers: Resolvers = {
       };
     },
 
-    getCurrentUser: async (_parent, _args, _ctx) => {
-      const user = await getUserByFirebaseUid(_ctx?.user?.uid);
+    getCurrentUser: async (_parent, _args, ctx) => {
+      const user = await getUserByFirebaseUid(ctx?.user?.uid);
 
       if (!user) return null;
 
