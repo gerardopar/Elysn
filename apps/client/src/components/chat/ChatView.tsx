@@ -7,6 +7,7 @@ import ChatInput from "./ChatInput";
 
 import { useGetMessagesQuery } from "@graphql/queries/message";
 import { useCreateMessageMutation } from "@graphql/mutations/message";
+import { useNewMessageSubscription } from "@graphql/subscriptions/message";
 
 import { MessageSenderEnum } from "@elysn/shared";
 import { chatInputSchema } from "../chat/chat.helpers";
@@ -21,6 +22,7 @@ export const ChatView: React.FC = () => {
   const { data } = useGetMessagesQuery({
     chatId: chatId!,
   });
+  useNewMessageSubscription(chatId!);
 
   const messages = data?.messages || [];
 
