@@ -283,3 +283,10 @@ export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetCurrentUserQuery = { getCurrentUser: { __typename: 'User', id: string, firebaseUid: string, name: string | null, bio: string | null, picture: string | null, email: string, createdAt: number | null, updatedAt: number | null } | null };
+
+export type NewMessageSubscriptionVariables = Exact<{
+  chatId: Scalars['ID']['input'];
+}>;
+
+
+export type NewMessageSubscription = { newMessage: { __typename: 'Message', id: string, userId: string, sender: MessageSenderEnum, text: string, timestamp: number, metadata: unknown | null } };

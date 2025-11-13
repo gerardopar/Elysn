@@ -31,3 +31,7 @@ extend type Mutation {
   updateMessage(id: ID!, input: MessageInput!): Message!
   deleteMessage(id: ID!): Message!
 }
+
+extend type Subscription {
+  newMessage(chatId: ID!): Message!
+}
