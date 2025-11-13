@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import {
   IonButton,
@@ -19,7 +19,7 @@ const ChatInput: React.FC<{
   handleSubmit: () => void;
   mode?: "default" | "fixed";
 }> = ({ input, setInput, handleSubmit, mode = "default" }) => {
-  const placeholder = getRandomString(INPUT_PLACEHOLDERS);
+  const placeholder = useMemo(() => getRandomString(INPUT_PLACEHOLDERS), []);
 
   const inputForm = (
     <form
