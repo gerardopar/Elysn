@@ -6,16 +6,45 @@ import { IonContent } from "@ionic/react";
 import ChatInput from "./ChatInput";
 
 import { useGetMessagesQuery } from "@graphql/queries/message";
+import { useCreateMessageMutation } from "@graphql/mutations/message";
+
+import { MessageSenderEnum } from "@elysn/shared";
+import { chatInputSchema } from "../chat/chat.helpers";
 
 export const ChatView: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
 
   const [input, setInput] = useState<string>("");
 
+  const [createMessage] = useCreateMessageMutation();
+
   const { data } = useGetMessagesQuery({
     chatId: chatId!,
   });
+
   const messages = data?.messages || [];
+
+  const handleCreateMessage = async () => {
+    const result = chatInputSchema.safeParse({ input });
+    if (!result.success) return;
+
+    try {
+      await createMessage({
+        variables: {
+          input: {
+            chatId: chatId!,
+            sender: MessageSenderEnum.USER,
+            text: input,
+            timestamp: Date.now(),
+          },
+        },
+      });
+      setInput("");
+    } catch (error) {
+      // TODO: show error toast
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -30,7 +59,7 @@ export const ChatView: React.FC = () => {
       <ChatInput
         input={input}
         setInput={setInput}
-        handleSubmit={() => {}}
+        handleSubmit={handleCreateMessage}
         mode="fixed"
       />
     </>
