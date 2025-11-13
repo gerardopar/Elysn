@@ -174,6 +174,17 @@ export type QueryMessagesArgs = {
   chatId: Scalars['ID']['input'];
 };
 
+export type Subscription = {
+  __typename: 'Subscription';
+  _empty: Maybe<Scalars['String']['output']>;
+  newMessage: Message;
+};
+
+
+export type SubscriptionNewMessageArgs = {
+  chatId: Scalars['ID']['input'];
+};
+
 export type User = {
   __typename: 'User';
   bio: Maybe<Scalars['String']['output']>;

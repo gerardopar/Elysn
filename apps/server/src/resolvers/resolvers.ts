@@ -18,4 +18,7 @@ export const resolvers: Resolvers = {
     ...chatResolvers.Mutation,
     ...messageResolvers.Mutation,
   },
+  Subscription: {
+    ...messageResolvers.Subscription,
+  },
 };

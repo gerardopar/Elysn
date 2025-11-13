@@ -14,9 +14,12 @@ import {
   MutationCreateMessageArgs,
   MutationUpdateMessageArgs,
   MutationDeleteMessageArgs,
+  SubscriptionNewMessageArgs,
   QueryMessagesArgs,
   QueryMessageArgs,
 } from "../graphql/__generated__/graphql";
+
+import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
 
 export const messageResolvers: Resolvers = {
   Query: {
@@ -79,6 +82,17 @@ export const messageResolvers: Resolvers = {
         metadata: input?.metadata,
       });
 
+      await pubsub.publish(`${MESSAGE_CHANNEL}_${String(chat?._id)}`, {
+        newMessage: {
+          id: String(message._id),
+          userId: message.userId,
+          sender: message.sender,
+          text: message.text,
+          timestamp: message.timestamp.getTime(),
+          metadata: message.metadata,
+        },
+      });
+
       return {
         id: String(message?._id),
         chatId: String(message?.chatId),
@@ -120,6 +134,15 @@ export const messageResolvers: Resolvers = {
         timestamp: message.timestamp.getTime(),
         metadata: message.metadata,
       };
+    },
+  },
+
+  Subscription: {
+    newMessage: {
+      // Subscription resolver — returns async iterator tied to chatId
+      subscribe: (_parent, { chatId }: SubscriptionNewMessageArgs) => {
+        return pubsub.asyncIterableIterator(`${MESSAGE_CHANNEL}_${chatId}`);
+      },
     },
   },
 };

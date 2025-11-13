@@ -27,3 +27,7 @@ extend type Query {
   chats: [Chat!]!
   chat(id: ID!): Chat
 }
+
+extend type Subscription {
+  newMessage(chatId: ID!): Message!
+}
