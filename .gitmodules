@@ -1,0 +1,4 @@
+[submodule "packages/elysn-core"]
+	path = packages/elysn-core
+	url = git@github.com:gerardopar/elysn-core.git
+	branch = main
