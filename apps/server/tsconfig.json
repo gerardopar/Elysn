@@ -10,11 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "types": ["node"],
-    "baseUrl": ".",
-    "paths": {
-      "@elysn/shared": ["../../packages/shared/src"],
-      "@elysn/shared/*": ["../../packages/shared/src/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["src"]
 }
