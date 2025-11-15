@@ -62,7 +62,6 @@ export type Message = {
 
 export type MessageInput = {
   chatId?: InputMaybe<Scalars['ID']['input']>;
-  metadata?: InputMaybe<MessageMetadata>;
   sender: MessageSenderEnum;
   text: Scalars['String']['input'];
   timestamp: Scalars['Float']['input'];

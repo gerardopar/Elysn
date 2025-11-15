@@ -25,7 +25,6 @@ input MessageInput {
   sender: MessageSenderEnum!
   text: String!
   timestamp: Float!
-  metadata: MessageMetadata
 }
 
 extend type Query {
