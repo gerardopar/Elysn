@@ -35,7 +35,7 @@ export const useNewMessageSubscription = (chatId: string) => {
       client.cache.modify({
         fields: {
           messages(existingMessageRefs = [], { toReference }) {
-            const newRef = toReference(newMessage);
+            const newRef = toReference(newMessage as any);
             // avoid duplicates:
             if (
               existingMessageRefs.some(

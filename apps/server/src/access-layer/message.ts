@@ -1,5 +1,5 @@
-import { Message } from "../models/message";
-import { Chat } from "../models/chat";
+import { Message } from "@elysn/core";
+import { Chat } from "@elysn/core";
 import { MessageSenderEnum } from "@elysn/shared";
 
 /**
