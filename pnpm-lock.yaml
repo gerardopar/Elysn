@@ -226,6 +226,9 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.888.0
         version: 3.920.0
+      '@elysn/core':
+        specifier: workspace:*
+        version: link:../../packages/elysn-core
       body-parser:
         specifier: ^2.2.0
         version: 2.2.0
