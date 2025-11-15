@@ -286,10 +286,6 @@ importers:
         version: 5.9.3
 
   packages/elysn-core:
-    dependencies:
-      mongoose:
-        specifier: ^8.18.1
-        version: 8.19.2
     devDependencies:
       typescript:
         specifier: ^5.9.3
