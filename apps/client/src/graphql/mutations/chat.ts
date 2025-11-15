@@ -7,6 +7,8 @@ import type {
   CreateChatMutationVariables,
   CreateChatWithMessageMutation,
   CreateChatWithMessageMutationVariables,
+  DeleteChatMutation,
+  DeleteChatMutationVariables,
 } from "../__generated__/graphql";
 
 export const CREATE_CHAT_MUTATION: TypedDocumentNode<
@@ -52,4 +54,19 @@ export const useCreateChatWithMessageMutation = () => {
     CreateChatWithMessageMutation,
     CreateChatWithMessageMutationVariables
   >(CREATE_CHAT_WITH_MESSAGE_MUTATION);
+};
+
+export const DELETE_CHAT_MUTATION: TypedDocumentNode<
+  DeleteChatMutation,
+  DeleteChatMutationVariables
+> = gql`
+  mutation DeleteChat($id: ID!) {
+    deleteChat(id: $id)
+  }
+`;
+
+export const useDeleteChatMutation = () => {
+  return useMutation<DeleteChatMutation, DeleteChatMutationVariables>(
+    DELETE_CHAT_MUTATION
+  );
 };

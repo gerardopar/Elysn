@@ -18,7 +18,6 @@ export const NEW_MESSAGE_SUBSCRIPTION: TypedDocumentNode<
       sender
       text
       timestamp
-      metadata
     }
   }
 `;
