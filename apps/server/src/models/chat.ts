@@ -5,6 +5,7 @@ export interface Chat extends Document {
   personaId: string;
   title?: string;
   topic?: string;
+  summary?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -12,8 +13,10 @@ export interface Chat extends Document {
 const ChatSchema = new Schema<Chat>(
   {
     userId: { type: String, required: true },
+    personaId: { type: String, required: true },
     title: { type: String },
     topic: { type: String },
+    summary: { type: String },
   },
   { timestamps: true }
 );

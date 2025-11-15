@@ -1,8 +1,10 @@
 type Chat {
   id: ID!
   userId: ID!
+  personaId: ID!
   title: String
   topic: String
+  summary: String
   createdAt: Float!
   updatedAt: Float!
 }
