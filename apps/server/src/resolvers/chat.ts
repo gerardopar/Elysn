@@ -23,6 +23,7 @@ export const chatResolvers: Resolvers = {
       return chats.map((chat) => ({
         id: String(chat._id),
         userId: chat.userId,
+        personaId: chat.personaId,
         title: chat.title,
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
@@ -45,6 +46,7 @@ export const chatResolvers: Resolvers = {
       return {
         id: String(chat._id),
         userId: chat.userId,
+        personaId: chat.personaId,
         title: chat.title,
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
@@ -72,6 +74,7 @@ export const chatResolvers: Resolvers = {
       return {
         id: String(chat._id),
         userId: chat.userId,
+        personaId: chat.personaId,
         title: chat.title,
         topic: chat.topic,
         createdAt: chat.createdAt.getTime(),
@@ -105,12 +108,12 @@ export const chatResolvers: Resolvers = {
         userId: String(user._id),
         sender: message.sender,
         text: message.text,
-        metadata: message.metadata,
       });
 
       return {
         id: String(chat._id),
         userId: chat.userId,
+        personaId: chat.personaId,
         title: chat.title,
         topic: chat.topic,
         createdAt: chat.createdAt.getTime(),

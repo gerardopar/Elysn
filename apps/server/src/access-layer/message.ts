@@ -16,7 +16,7 @@ export const createMessage = async ({
   userId: string;
   sender: MessageSenderEnum;
   text: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any> | null;
 }) => {
   const message = new Message({
     chatId,
