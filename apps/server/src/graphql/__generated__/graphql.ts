@@ -88,6 +88,7 @@ export type Mutation = {
   createChatWithMessage: Chat;
   createMessage: Message;
   createUser: User;
+  deleteChat: Scalars['Boolean']['output'];
   deleteMessage: Message;
   deleteUser: User;
   updateMessage: Message;
@@ -117,6 +118,11 @@ export type MutationCreateUserArgs = {
   firebaseUid: Scalars['String']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   picture?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationDeleteChatArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -472,6 +478,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createChatWithMessage?: Resolver<ResolversTypes['Chat'], ParentType, ContextType, RequireFields<MutationCreateChatWithMessageArgs, 'input'>>;
   createMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationCreateMessageArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'firebaseUid'>>;
+  deleteChat?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteChatArgs, 'id'>>;
   deleteMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationDeleteMessageArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   updateMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationUpdateMessageArgs, 'id' | 'input'>>;

@@ -1,12 +1,18 @@
-import { createChat, getChat, getChats } from "../access-layer/chat";
+import {
+  createChat,
+  getChat,
+  getChats,
+  deleteChat,
+} from "../access-layer/chat";
 import { getUserByFirebaseUid } from "src/access-layer/user";
 import { createMessage } from "../access-layer/message";
 
 import {
   Resolvers,
+  QueryChatArgs,
   MutationCreateChatArgs,
   MutationCreateChatWithMessageArgs,
-  QueryChatArgs,
+  MutationDeleteChatArgs,
 } from "../graphql/__generated__/graphql";
 
 export const chatResolvers: Resolvers = {
@@ -19,7 +25,7 @@ export const chatResolvers: Resolvers = {
 
       const chats = await getChats(String(user._id));
 
-      // TODO: implement pagination
+      // TODO: implement  pagination
       return chats.map((chat) => ({
         id: String(chat._id),
         userId: chat.userId,
@@ -119,6 +125,29 @@ export const chatResolvers: Resolvers = {
         createdAt: chat.createdAt.getTime(),
         updatedAt: chat.updatedAt.getTime(),
       };
+    },
+
+    deleteChat: async (_parent, { id }: MutationDeleteChatArgs, ctx) => {
+      if (!ctx.user?.uid) throw new Error("Must be authenticated");
+
+      const user = await getUserByFirebaseUid(ctx.user.uid);
+      if (!user) throw new Error("User not found");
+
+      const chat = await getChat(id);
+      if (!chat) throw new Error("Chat not found");
+
+      if (chat.userId !== String(user._id)) {
+        throw new Error("User not authorized");
+      }
+
+      try {
+        await deleteChat(id);
+      } catch (error) {
+        console.error("Error deleting chat:", error);
+        throw new Error("Failed to delete chat");
+      }
+
+      return true;
     },
   },
 };

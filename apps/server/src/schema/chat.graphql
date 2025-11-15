@@ -23,6 +23,7 @@ input CreateChatWithMessageInput {
 extend type Mutation {
   createChat(input: CreateChatInput!): Chat!
   createChatWithMessage(input: CreateChatWithMessageInput!): Chat!
+  deleteChat(id: ID!): Boolean!
 }
 
 extend type Query {
