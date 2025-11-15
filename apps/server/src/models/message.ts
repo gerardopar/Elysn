@@ -8,7 +8,12 @@ export interface Message extends Document {
   sender: MessageSenderEnum;
   text: string;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: {
+    emotion?: string;
+    intent?: string;
+    memoryTag?: string;
+    isMemoryWorthy?: boolean;
+  };
 }
 
 const MessageSchema = new Schema<Message>(
@@ -22,7 +27,17 @@ const MessageSchema = new Schema<Message>(
     },
     text: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
-    metadata: { type: Schema.Types.Mixed },
+    metadata: {
+      type: new Schema(
+        {
+          emotion: { type: String },
+          intent: { type: String },
+          memoryTag: { type: String },
+          isMemoryWorthy: { type: Boolean },
+        },
+        { _id: false }
+      ),
+    },
   },
   { timestamps: true }
 );
