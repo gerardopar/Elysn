@@ -79,7 +79,6 @@ export const messageResolvers: Resolvers = {
         userId: String(user?._id),
         sender: input?.sender,
         text: input?.text,
-        metadata: input?.metadata,
       });
 
       await pubsub.publish(`${MESSAGE_CHANNEL}_${String(chat?._id)}`, {

@@ -38,15 +38,6 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type Memory = {
-  __typename: 'Memory';
-  history: Array<Message>;
-  lastMessage: Maybe<Scalars['String']['output']>;
-  lastTopic: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['Float']['output'];
-  userId: Scalars['ID']['output'];
-};
-
 export type Message = {
   __typename: 'Message';
   chatId: Maybe<Scalars['ID']['output']>;

@@ -40,15 +40,6 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type Memory = {
-  __typename?: 'Memory';
-  history: Array<Message>;
-  lastMessage?: Maybe<Scalars['String']['output']>;
-  lastTopic?: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['Float']['output'];
-  userId: Scalars['ID']['output'];
-};
-
 export type Message = {
   __typename?: 'Message';
   chatId?: Maybe<Scalars['ID']['output']>;
@@ -380,7 +371,6 @@ export type ResolversTypes = {
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
-  Memory: ResolverTypeWrapper<Memory>;
   Message: ResolverTypeWrapper<Message>;
   MessageInput: MessageInput;
   MessageMetadata: ResolverTypeWrapper<MessageMetadata>;
@@ -411,7 +401,6 @@ export type ResolversParentTypes = {
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   JSON: Scalars['JSON']['output'];
-  Memory: Memory;
   Message: Message;
   MessageInput: MessageInput;
   MessageMetadata: MessageMetadata;
@@ -445,14 +434,6 @@ export type ChatResolvers<ContextType = any, ParentType extends ResolversParentT
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
   name: 'JSON';
 }
-
-export type MemoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Memory'] = ResolversParentTypes['Memory']> = {
-  history?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
-  lastMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  lastTopic?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  updatedAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-};
 
 export type MessageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
   chatId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
@@ -576,7 +557,6 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 export type Resolvers<ContextType = any> = {
   Chat?: ChatResolvers<ContextType>;
   JSON?: GraphQLScalarType;
-  Memory?: MemoryResolvers<ContextType>;
   Message?: MessageResolvers<ContextType>;
   MessageMetadata?: MessageMetadataResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
