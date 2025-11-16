@@ -7,17 +7,57 @@ import {
   ChatsListOptionsEnum,
 } from "./chats-list-options.helpers";
 
+import { useDeleteChatMutation } from "@graphql/mutations/chat";
+
+import type { GetChatQuery } from "@graphql/__generated__/graphql";
+
 export type ChatsListItemOptionsProps = {
   dismiss: () => void;
+  chat: GetChatQuery["chat"];
 };
 
 const ChatsListItemOptions: React.FC<ChatsListItemOptionsProps> = ({
   dismiss,
+  chat,
 }) => {
+  const [deleteChatMutation] = useDeleteChatMutation();
+
+  const handleDeleteChat = async () => {
+    // TODO: show confirmation modal before deleting
+
+    try {
+      await deleteChatMutation({
+        variables: {
+          id: chat?.id!,
+        },
+        update(cache) {
+          const deletedId = chat?.id;
+          if (!deletedId) return;
+
+          cache.modify({
+            fields: {
+              chats(existingChats = [], { readField }) {
+                return existingChats.filter((chatRef: any) => {
+                  const refId = readField<string>("id", chatRef);
+                  return refId !== deletedId;
+                });
+              },
+            },
+          });
+        },
+        onCompleted: ({ deleteChat }) => {
+          if (deleteChat) dismiss();
+        },
+      });
+    } catch (error) {
+      // TODO: show error toast
+      console.error(error);
+    }
+  };
+
   const onClick = async (type: ChatsListOptionsEnum) => {
     if (type === ChatsListOptionsEnum.delete) {
-      // TODO: delete chat
-      dismiss();
+      await handleDeleteChat();
     } else if (type === ChatsListOptionsEnum.edit) {
       // TODO: edit chat name
       dismiss();

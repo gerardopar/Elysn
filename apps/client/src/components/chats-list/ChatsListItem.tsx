@@ -15,15 +15,11 @@ export const ChatsListItem: React.FC<{
 }> = ({ chat }) => {
   const history = useHistory();
 
-  // TODOS:
-  // # implement chat options modal / popover
-  // # support deleting chat
-  // # support renaming chat
-  // # update cache
   const { open } = useModal<ChatsListItemOptionsProps>(
     ChatsListItemOptions,
     {
       dismiss: () => {},
+      chat,
     },
     {
       popoverOptions: {
