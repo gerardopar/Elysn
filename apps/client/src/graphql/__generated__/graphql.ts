@@ -38,6 +38,11 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateChatInput = {
+  title?: InputMaybe<Scalars['String']['input']>;
+  topic?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Message = {
   __typename: 'Message';
   chatId: Maybe<Scalars['ID']['output']>;
@@ -79,6 +84,7 @@ export type Mutation = {
   deleteChat: Scalars['Boolean']['output'];
   deleteMessage: Message;
   deleteUser: User;
+  updateChat: Chat;
   updateMessage: Message;
   updatePersona: Persona;
   updateUser: User;
@@ -121,6 +127,12 @@ export type MutationDeleteMessageArgs = {
 
 export type MutationDeleteUserArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateChatArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateChatInput;
 };
 
 
@@ -308,6 +320,14 @@ export type DeleteChatMutationVariables = Exact<{
 
 
 export type DeleteChatMutation = { deleteChat: boolean };
+
+export type UpdateChatMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateChatInput;
+}>;
+
+
+export type UpdateChatMutation = { updateChat: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } };
 
 export type CreateMessageMutationVariables = Exact<{
   input: MessageInput;

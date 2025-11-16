@@ -38,6 +38,41 @@ export const createChat = async ({
 };
 
 /**
+ * Update an existing chat's properties.
+ */
+export const updateChat = async (
+  id: string,
+  {
+    title,
+    topic,
+  }: {
+    title?: string | null;
+    topic?: string | null;
+  }
+) => {
+  const update: Record<string, unknown> = {};
+
+  if (title !== undefined) {
+    const trimmed = title?.trim();
+    update.title = trimmed && trimmed.length > 0 ? trimmed : "New Chat";
+  }
+
+  if (topic !== undefined) {
+    const trimmed = topic?.trim();
+    update.topic = trimmed && trimmed.length > 0 ? trimmed : null;
+  }
+
+  return Chat.findByIdAndUpdate(
+    id,
+    { $set: update },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+};
+
+/**
  * Delete a chat and cascade delete its messages.
  */
 export const deleteChat = async (id: string) => {

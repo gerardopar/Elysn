@@ -40,6 +40,11 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateChatInput = {
+  title?: InputMaybe<Scalars['String']['input']>;
+  topic?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Message = {
   __typename?: 'Message';
   chatId?: Maybe<Scalars['ID']['output']>;
@@ -81,6 +86,7 @@ export type Mutation = {
   deleteChat: Scalars['Boolean']['output'];
   deleteMessage: Message;
   deleteUser: User;
+  updateChat: Chat;
   updateMessage: Message;
   updatePersona: Persona;
   updateUser: User;
@@ -123,6 +129,12 @@ export type MutationDeleteMessageArgs = {
 
 export type MutationDeleteUserArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateChatArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateChatInput;
 };
 
 
@@ -387,6 +399,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  UpdateChatInput: UpdateChatInput;
   UpdatePersonaInput: UpdatePersonaInput;
   User: ResolverTypeWrapper<User>;
 };
@@ -416,6 +429,7 @@ export type ResolversParentTypes = {
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
   Subscription: Record<PropertyKey, never>;
+  UpdateChatInput: UpdateChatInput;
   UpdatePersonaInput: UpdatePersonaInput;
   User: User;
 };
@@ -461,6 +475,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteChat?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteChatArgs, 'id'>>;
   deleteMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationDeleteMessageArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
+  updateChat?: Resolver<ResolversTypes['Chat'], ParentType, ContextType, RequireFields<MutationUpdateChatArgs, 'id' | 'input'>>;
   updateMessage?: Resolver<ResolversTypes['Message'], ParentType, ContextType, RequireFields<MutationUpdateMessageArgs, 'id' | 'input'>>;
   updatePersona?: Resolver<ResolversTypes['Persona'], ParentType, ContextType, RequireFields<MutationUpdatePersonaArgs, 'id' | 'input'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id'>>;
@@ -572,4 +587,3 @@ export type Resolvers<ContextType = any> = {
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
-

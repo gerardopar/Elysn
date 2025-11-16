@@ -3,6 +3,7 @@ import {
   getChat,
   getChats,
   deleteChat,
+  updateChat as updateChatRecord,
 } from "../access-layer/chat";
 import { getUserByFirebaseUid } from "src/access-layer/user";
 import { createMessage } from "../access-layer/message";
@@ -13,6 +14,7 @@ import {
   MutationCreateChatArgs,
   MutationCreateChatWithMessageArgs,
   MutationDeleteChatArgs,
+  MutationUpdateChatArgs,
 } from "../graphql/__generated__/graphql";
 
 export const chatResolvers: Resolvers = {
@@ -148,6 +150,37 @@ export const chatResolvers: Resolvers = {
       }
 
       return true;
+    },
+
+    updateChat: async (
+      _parent,
+      { id, input }: MutationUpdateChatArgs,
+      ctx
+    ) => {
+      if (!ctx.user?.uid) throw new Error("Must be authenticated");
+
+      const user = await getUserByFirebaseUid(ctx.user.uid);
+      if (!user) throw new Error("User not found");
+
+      const chat = await getChat(id);
+      if (!chat) throw new Error("Chat not found");
+
+      if (chat.userId !== String(user._id)) {
+        throw new Error("User not authorized");
+      }
+
+      const updatedChat = await updateChatRecord(id, input);
+      if (!updatedChat) throw new Error("Chat not found");
+
+      return {
+        id: String(updatedChat._id),
+        userId: updatedChat.userId,
+        personaId: updatedChat.personaId,
+        title: updatedChat.title,
+        topic: updatedChat.topic,
+        createdAt: updatedChat.createdAt.getTime(),
+        updatedAt: updatedChat.updatedAt.getTime(),
+      };
     },
   },
 };
