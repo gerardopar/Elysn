@@ -26,7 +26,7 @@ const ChatsListItemOptions: React.FC<ChatsListItemOptionsProps> = ({
     // TODO: show confirmation modal before deleting
 
     try {
-      await deleteChatMutation({
+      const { data } = await deleteChatMutation({
         variables: {
           id: chat?.id!,
         },
@@ -45,10 +45,8 @@ const ChatsListItemOptions: React.FC<ChatsListItemOptionsProps> = ({
             },
           });
         },
-        onCompleted: ({ deleteChat }) => {
-          if (deleteChat) dismiss();
-        },
       });
+      if (data?.deleteChat) dismiss();
     } catch (error) {
       // TODO: show error toast
       console.error(error);
@@ -66,22 +64,34 @@ const ChatsListItemOptions: React.FC<ChatsListItemOptionsProps> = ({
 
   return (
     <IonRow className="w-full flex flex-col gap-1 bg-secondary-dark p-2">
-      {chatsListOptions.map((option) => (
-        <button
-          key={option.type}
-          onClick={() => onClick(option.type as ChatsListOptionsEnum)}
-          className="w-full flex items-center justify-start gap-2 rounded-lg last:border-t! last:border-primary-light! last:rounded-none! last:pt-4! last:mt-2 p-2!"
-        >
-          <option.icon
-            className="text-xl"
-            variant="outline"
-            color="primary-light"
-          />
-          <span className="text-primary-light font-roboto text-sm">
-            {option.title}
-          </span>
-        </button>
-      ))}
+      {chatsListOptions.map((option) => {
+        const iconColor =
+          option?.type === ChatsListOptionsEnum.delete
+            ? "imperial-red"
+            : "primary-light";
+
+        const textColor =
+          option?.type === ChatsListOptionsEnum.delete
+            ? "text-imperial-red"
+            : "text-primary-light";
+
+        return (
+          <button
+            key={option.type}
+            onClick={() => onClick(option.type as ChatsListOptionsEnum)}
+            className="w-full flex items-center justify-start gap-2 rounded-lg last:border-t! last:border-primary-light! last:rounded-none! last:pt-4! last:mt-2 p-2!"
+          >
+            <option.icon
+              className="text-xl"
+              variant="outline"
+              color={iconColor}
+            />
+            <span className={`font-roboto text-sm ${textColor}`}>
+              {option.title}
+            </span>
+          </button>
+        );
+      })}
     </IonRow>
   );
 };
