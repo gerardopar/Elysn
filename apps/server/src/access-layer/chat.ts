@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { Chat } from "../models/chat";
 import { Message } from "../models/message";
 
@@ -19,25 +21,32 @@ export const getChat = async (id: string) => {
 /**
  * Create a new chat for a user.
  */
-export const createChat = async ({
-  userId,
-  personaId,
-  title,
-  topic,
-}: {
-  userId: string;
-  personaId: string;
-  title?: string;
-  topic?: string | null;
-}) => {
+export const createChat = async (
+  {
+    userId,
+    personaId,
+    title,
+    topic,
+  }: {
+    userId: string;
+    personaId: string;
+    title?: string;
+    topic?: string | null;
+  },
+  session?: mongoose.ClientSession
+) => {
   const chat = new Chat({
     userId,
     personaId,
     title: title?.trim() || "New Chat",
     topic: topic?.trim() || null,
   });
-  await chat.save();
-  return chat;
+
+  if (session) {
+    return await chat.save({ session });
+  }
+
+  return await chat.save();
 };
 
 /**

@@ -5,12 +5,19 @@ import mongoose from "mongoose";
 /**
  * Create a new persona
  */
-export const createPersona = async (userId: string) => {
+export const createPersona = async (
+  userId: string,
+  session?: mongoose.ClientSession
+) => {
   const persona = new Persona({
     userId,
   });
 
-  return persona.save();
+  if (session) {
+    return await persona.save({ session });
+  }
+
+  return await persona.save();
 };
 
 /**

@@ -1,25 +1,31 @@
+import mongoose from "mongoose";
+
 import { Message } from "../models/message";
 import { Chat } from "../models/chat";
+
 import { MessageSenderEnum } from "@elysn/shared";
 
 /**
  * Create a new message and update its parent chat's timestamp.
  */
-export const createMessage = async ({
-  chatId,
-  userId,
-  personaId,
-  sender,
-  text,
-  metadata,
-}: {
-  chatId: string;
-  userId: string;
-  personaId: string;
-  sender: MessageSenderEnum;
-  text: string;
-  metadata?: Record<string, any> | null;
-}) => {
+export const createMessage = async (
+  {
+    chatId,
+    userId,
+    personaId,
+    sender,
+    text,
+    metadata,
+  }: {
+    chatId: string;
+    userId: string;
+    personaId: string;
+    sender: MessageSenderEnum;
+    text: string;
+    metadata?: Record<string, any> | null;
+  },
+  session?: mongoose.ClientSession
+) => {
   const message = new Message({
     chatId,
     userId,
@@ -29,10 +35,21 @@ export const createMessage = async ({
     metadata,
   });
 
-  await message.save();
+  // Save message (in or out of transaction)
+  if (session) {
+    await message.save({ session });
 
-  // Update chat's updatedAt timestamp
-  await Chat.findByIdAndUpdate(chatId, { $set: { updatedAt: new Date() } });
+    // Also update the chat timestamp WITH session
+    await Chat.findByIdAndUpdate(
+      chatId,
+      { $set: { updatedAt: new Date() } },
+      { session }
+    );
+  } else {
+    await message.save();
+
+    await Chat.findByIdAndUpdate(chatId, { $set: { updatedAt: new Date() } });
+  }
 
   return message;
 };

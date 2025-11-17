@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import {
   createChat,
   getChat,
@@ -74,33 +76,42 @@ export const chatResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
-      const persona = await createPersona(String(user._id));
-      if (!persona) throw new Error("Failed to create persona");
+      const session = await mongoose.startSession();
+      session.startTransaction();
 
-      const chat = await createChat({
-        userId: String(user._id),
-        personaId: String(persona._id),
-        title: title?.trim() || "New Chat",
-        topic: topic?.trim() || null,
-      });
+      try {
+        const persona = await createPersona(String(user._id), session);
+        if (!persona) throw new Error("Failed to create persona");
 
-      return {
-        id: String(chat._id),
-        userId: chat.userId,
-        personaId: chat.personaId,
-        title: chat.title,
-        topic: chat.topic,
-        createdAt: chat.createdAt.getTime(),
-        updatedAt: chat.updatedAt.getTime(),
-      };
+        const chat = await createChat(
+          {
+            userId: String(user._id),
+            personaId: String(persona._id),
+            title: title?.trim() || "New Chat",
+            topic: topic?.trim() || null,
+          },
+          session
+        );
+
+        return {
+          id: String(chat._id),
+          userId: chat.userId,
+          personaId: chat.personaId,
+          title: chat.title,
+          topic: chat.topic,
+          createdAt: chat.createdAt.getTime(),
+          updatedAt: chat.updatedAt.getTime(),
+        };
+      } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+      } finally {
+        session.endSession();
+      }
     },
 
-    // TODO: implement session / transaction
-    createChatWithMessage: async (
-      _parent,
-      args: MutationCreateChatWithMessageArgs,
-      ctx
-    ) => {
+    createChatWithMessage: async (_parent, args, ctx) => {
       const { title, topic, message } = args.input;
 
       if (!ctx?.user?.uid) {
@@ -110,33 +121,51 @@ export const chatResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
-      const persona = await createPersona(String(user._id));
-      if (!persona) throw new Error("Failed to create persona");
+      const session = await mongoose.startSession();
+      session.startTransaction();
 
-      const chat = await createChat({
-        userId: String(user._id),
-        personaId: String(persona._id),
-        title: title?.trim() || "New Chat",
-        topic: topic?.trim() || null,
-      });
+      try {
+        const persona = await createPersona(String(user._id), session);
+        if (!persona) throw new Error("Failed to create persona");
 
-      await createMessage({
-        chatId: String(chat._id),
-        userId: String(user._id),
-        personaId: String(persona._id),
-        sender: message.sender,
-        text: message.text,
-      });
+        const chat = await createChat(
+          {
+            userId: String(user._id),
+            personaId: String(persona._id),
+            title: title?.trim() || "New Chat",
+            topic: topic?.trim() || null,
+          },
+          session
+        );
 
-      return {
-        id: String(chat._id),
-        userId: chat.userId,
-        personaId: chat.personaId,
-        title: chat.title,
-        topic: chat.topic,
-        createdAt: chat.createdAt.getTime(),
-        updatedAt: chat.updatedAt.getTime(),
-      };
+        await createMessage(
+          {
+            chatId: String(chat._id),
+            userId: String(user._id),
+            personaId: String(persona._id),
+            sender: message.sender,
+            text: message.text,
+          },
+          session
+        );
+
+        await session.commitTransaction();
+
+        return {
+          id: String(chat._id),
+          userId: chat.userId,
+          personaId: chat.personaId,
+          title: chat.title,
+          topic: chat.topic,
+          createdAt: chat.createdAt.getTime(),
+          updatedAt: chat.updatedAt.getTime(),
+        };
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
     },
 
     deleteChat: async (_parent, { id }: MutationDeleteChatArgs, ctx) => {
