@@ -1,56 +1,8 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface Persona extends Document {
-  userId: string;
-  name: string;
-  avatarUrl?: string;
+import { Persona as PersonaCore } from "@elysn/core";
 
-  persona: {
-    coreTraits: string[];
-    tone: string;
-    archetype: string;
-    baseSystemPrompt: string;
-    dynamicSystemPrompt: string;
-  };
-
-  relationship: {
-    trust: number;
-    closeness: number;
-    history: string[];
-  };
-
-  emotion: {
-    current: string;
-    lastUpdated: Date;
-  };
-
-  state: {
-    availability: string; // online | idle | sleepy | busy-processing
-    energy: number; // 0–1
-    attention: number; // 0–1
-  };
-
-  settings: {
-    model: string;
-    temperature: number;
-    openness: number;
-    memoryRetention: number;
-  };
-
-  memoryIndex: {
-    longTermMemories: string[];
-    shortTermSummary: string | null;
-  };
-
-  meta: {
-    version: string;
-    interactions: number;
-    tokensUsed: number;
-  };
-
-  createdAt: Date;
-  updatedAt: Date;
-}
+export interface Persona extends PersonaCore, Document {}
 
 const PersonaSchema = new Schema<Persona>(
   {
