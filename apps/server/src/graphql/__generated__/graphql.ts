@@ -40,11 +40,6 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UpdateChatInput = {
-  title?: InputMaybe<Scalars['String']['input']>;
-  topic?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type Message = {
   __typename?: 'Message';
   chatId?: Maybe<Scalars['ID']['output']>;
@@ -283,6 +278,11 @@ export type Subscription = {
 
 export type SubscriptionNewMessageArgs = {
   chatId: Scalars['ID']['input'];
+};
+
+export type UpdateChatInput = {
+  title?: InputMaybe<Scalars['String']['input']>;
+  topic?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdatePersonaInput = {
@@ -587,3 +587,4 @@ export type Resolvers<ContextType = any> = {
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
+

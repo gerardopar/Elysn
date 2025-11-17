@@ -152,11 +152,7 @@ export const chatResolvers: Resolvers = {
       return true;
     },
 
-    updateChat: async (
-      _parent,
-      { id, input }: MutationUpdateChatArgs,
-      ctx
-    ) => {
+    updateChat: async (_parent, { id, input }: MutationUpdateChatArgs, ctx) => {
       if (!ctx.user?.uid) throw new Error("Must be authenticated");
 
       const user = await getUserByFirebaseUid(ctx.user.uid);
