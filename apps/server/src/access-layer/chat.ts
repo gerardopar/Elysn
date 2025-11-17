@@ -21,15 +21,18 @@ export const getChat = async (id: string) => {
  */
 export const createChat = async ({
   userId,
+  personaId,
   title,
   topic,
 }: {
   userId: string;
+  personaId: string;
   title?: string;
   topic?: string | null;
 }) => {
   const chat = new Chat({
     userId,
+    personaId,
     title: title?.trim() || "New Chat",
     topic: topic?.trim() || null,
   });

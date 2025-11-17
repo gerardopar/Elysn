@@ -8,12 +8,14 @@ import { MessageSenderEnum } from "@elysn/shared";
 export const createMessage = async ({
   chatId,
   userId,
+  personaId,
   sender,
   text,
   metadata,
 }: {
   chatId: string;
   userId: string;
+  personaId: string;
   sender: MessageSenderEnum;
   text: string;
   metadata?: Record<string, any> | null;
@@ -21,6 +23,7 @@ export const createMessage = async ({
   const message = new Message({
     chatId,
     userId,
+    personaId,
     sender,
     text: text.trim(),
     metadata,

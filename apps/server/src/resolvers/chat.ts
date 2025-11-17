@@ -5,8 +5,9 @@ import {
   deleteChat,
   updateChat as updateChatRecord,
 } from "../access-layer/chat";
-import { getUserByFirebaseUid } from "src/access-layer/user";
+import { createPersona } from "../access-layer/persona";
 import { createMessage } from "../access-layer/message";
+import { getUserByFirebaseUid } from "src/access-layer/user";
 
 import {
   Resolvers,
@@ -73,8 +74,12 @@ export const chatResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
+      const persona = await createPersona(String(user._id));
+      if (!persona) throw new Error("Failed to create persona");
+
       const chat = await createChat({
         userId: String(user._id),
+        personaId: String(persona._id),
         title: title?.trim() || "New Chat",
         topic: topic?.trim() || null,
       });
@@ -105,8 +110,12 @@ export const chatResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
+      const persona = await createPersona(String(user._id));
+      if (!persona) throw new Error("Failed to create persona");
+
       const chat = await createChat({
         userId: String(user._id),
+        personaId: String(persona._id),
         title: title?.trim() || "New Chat",
         topic: topic?.trim() || null,
       });
@@ -114,6 +123,7 @@ export const chatResolvers: Resolvers = {
       await createMessage({
         chatId: String(chat._id),
         userId: String(user._id),
+        personaId: String(persona._id),
         sender: message.sender,
         text: message.text,
       });
