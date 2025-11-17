@@ -1,24 +1,13 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { MessageSenderEnum } from "@elysn/shared";
 
-export interface Message extends Document {
-  chatId: mongoose.Types.ObjectId;
-  userId: string;
-  personaId: string;
-  sender: MessageSenderEnum;
-  text: string;
-  timestamp: Date;
-  metadata?: {
-    emotion?: string;
-    intent?: string;
-    memoryTag?: string;
-    isMemoryWorthy?: boolean;
-  };
-}
+import { type Message as MessageCore } from "@elysn/core";
+
+export interface Message extends MessageCore, Document {}
 
 const MessageSchema = new Schema<Message>(
   {
-    chatId: { type: Schema.Types.ObjectId, ref: "Chat", required: true },
+    chatId: { type: String, ref: "Chat", required: true },
     userId: { type: String, required: true },
     personaId: { type: String, required: true },
 

@@ -1,14 +1,8 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-export interface User extends Document {
-  firebaseUid: string;
-  name?: string;
-  bio?: string;
-  picture?: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { type User as UserCore } from "@elysn/core";
+
+export interface User extends UserCore, Document {}
 
 const UserSchema = new Schema<User>(
   {

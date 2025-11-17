@@ -111,7 +111,11 @@ export const chatResolvers: Resolvers = {
       }
     },
 
-    createChatWithMessage: async (_parent, args, ctx) => {
+    createChatWithMessage: async (
+      _parent,
+      args: MutationCreateChatWithMessageArgs,
+      ctx
+    ) => {
       const { title, topic, message } = args.input;
 
       if (!ctx?.user?.uid) {

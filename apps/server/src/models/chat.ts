@@ -1,14 +1,8 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface Chat extends Document {
-  userId: string;
-  personaId: string;
-  title?: string;
-  topic?: string;
-  summary?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { type Chat as ChatCore } from "@elysn/core";
+
+export interface Chat extends ChatCore, Document {}
 
 const ChatSchema = new Schema<Chat>(
   {
