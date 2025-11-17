@@ -76,10 +76,12 @@ export const messageResolvers: Resolvers = {
 
       const message = await createMessage({
         chatId: String(chat?._id),
+        personaId: String(chat?.personaId),
         userId: String(user?._id),
         sender: input?.sender,
         text: input?.text,
       });
+      if (!message) throw new Error("Failed to create message");
 
       await pubsub.publish(`${MESSAGE_CHANNEL}_${String(chat?._id)}`, {
         newMessage: {

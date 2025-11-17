@@ -86,7 +86,6 @@ export const userResolvers: Resolvers = {
     },
 
     upsertUser: async (_parent, args: MutationUpsertUserArgs, _ctx) => {
-      console.log("args", args);
       const { firebaseUid, name, email, picture } = args;
 
       const user = await User.findOneAndUpdate(
@@ -144,6 +143,9 @@ export const userResolvers: Resolvers = {
     deleteUser: async (_parent, args: MutationDeleteUserArgs, _ctx) => {
       const user = await User.findByIdAndDelete(args.id);
       if (!user) throw new Error("User not found");
+
+      // TODO: delete all chats and messages associated with user
+      // TODO: delete all personas associated with user
 
       return {
         firebaseUid: user.firebaseUid,
