@@ -54,6 +54,18 @@ export const createMessage = async (
   return message;
 };
 
+export const getRecentMessages = async (
+  chatId: string,
+  limit: number = 10
+): Promise<Message[]> => {
+  const messages = await Message.find({ chatId })
+    .sort({ timestamp: -1 })
+    .limit(limit)
+    .lean<Message[]>();
+
+  return messages.reverse();
+};
+
 /**
  * Delete a message by ID.
  */
