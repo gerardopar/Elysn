@@ -111,6 +111,7 @@ export const messageResolvers: Resolvers = {
 
       recentMessages = [...recentMessages, message];
 
+      // AI response
       const payload = createResponse(persona, recentMessages, input.text);
 
       let aiText = "";

@@ -1,3 +1,5 @@
+import { openaiClient as openai } from "../services/openAi";
+
 import mongoose from "mongoose";
 
 import {
@@ -7,7 +9,7 @@ import {
   deleteChat,
   updateChat as updateChatRecord,
 } from "../access-layer/chat";
-import { createPersona } from "../access-layer/persona";
+import { getOrCreatePersona } from "../access-layer/persona";
 import { createMessage } from "../access-layer/message";
 import { getUserByFirebaseUid } from "src/access-layer/user";
 
@@ -19,6 +21,12 @@ import {
   MutationDeleteChatArgs,
   MutationUpdateChatArgs,
 } from "../graphql/__generated__/graphql";
+
+import { isChatOwner } from "../helpers/chat.helpers";
+import { createResponse } from "@elysn/core";
+
+import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
+import { MessageSenderEnum } from "@elysn/shared";
 
 export const chatResolvers: Resolvers = {
   Query: {
@@ -50,7 +58,7 @@ export const chatResolvers: Resolvers = {
       const chat = await getChat(id);
       if (!chat) return null;
 
-      if (chat.userId !== String(user._id)) {
+      if (!isChatOwner(chat, String(user._id))) {
         throw new Error("User not authorized");
       }
 
@@ -80,8 +88,7 @@ export const chatResolvers: Resolvers = {
       session.startTransaction();
 
       try {
-        const persona = await createPersona(String(user._id), session);
-        if (!persona) throw new Error("Failed to create persona");
+        const persona = await getOrCreatePersona(String(user._id), session);
 
         const chat = await createChat(
           {
@@ -129,8 +136,7 @@ export const chatResolvers: Resolvers = {
       session.startTransaction();
 
       try {
-        const persona = await createPersona(String(user._id), session);
-        if (!persona) throw new Error("Failed to create persona");
+        const persona = await getOrCreatePersona(String(user._id), session);
 
         const chat = await createChat(
           {
@@ -142,7 +148,7 @@ export const chatResolvers: Resolvers = {
           session
         );
 
-        await createMessage(
+        const createdMessage = await createMessage(
           {
             chatId: String(chat._id),
             userId: String(user._id),
@@ -153,7 +159,53 @@ export const chatResolvers: Resolvers = {
           session
         );
 
+        // Publish user message
+        await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+          newMessage: {
+            id: String(createdMessage._id),
+            userId: createdMessage.userId,
+            sender: createdMessage.sender,
+            text: createdMessage.text,
+            timestamp: createdMessage.timestamp.getTime(),
+            metadata: createdMessage.metadata,
+          },
+        });
+
         await session.commitTransaction();
+
+        const payload = createResponse(persona, [], message.text);
+
+        let aiText = "";
+        try {
+          const response = await openai.responses.create(payload);
+          aiText = response.output_text;
+        } catch (err) {
+          console.error("AI error:", err);
+          aiText =
+            "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
+        }
+
+        const aiMsg = await createMessage({
+          chatId: String(chat._id),
+          personaId: String(chat.personaId),
+          userId: String(user._id),
+          sender: MessageSenderEnum.AI,
+          text: aiText,
+        });
+
+        // Publish AI message
+        if (aiMsg) {
+          await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+            newMessage: {
+              id: String(aiMsg._id),
+              userId: aiMsg.userId,
+              sender: aiMsg.sender,
+              text: aiMsg.text,
+              timestamp: aiMsg.timestamp.getTime(),
+              metadata: aiMsg.metadata,
+            },
+          });
+        }
 
         return {
           id: String(chat._id),
@@ -181,7 +233,7 @@ export const chatResolvers: Resolvers = {
       const chat = await getChat(id);
       if (!chat) throw new Error("Chat not found");
 
-      if (chat.userId !== String(user._id)) {
+      if (!isChatOwner(chat, String(user._id))) {
         throw new Error("User not authorized");
       }
 
@@ -204,7 +256,7 @@ export const chatResolvers: Resolvers = {
       const chat = await getChat(id);
       if (!chat) throw new Error("Chat not found");
 
-      if (chat.userId !== String(user._id)) {
+      if (!isChatOwner(chat, String(user._id))) {
         throw new Error("User not authorized");
       }
 
