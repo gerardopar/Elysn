@@ -1,13 +1,32 @@
-import { createChat, getChat, getChats } from "../access-layer/chat";
-import { getUserByFirebaseUid } from "src/access-layer/user";
+import { openaiClient as openai } from "../services/openAi";
+
+import mongoose from "mongoose";
+
+import {
+  createChat,
+  getChat,
+  getChats,
+  deleteChat,
+  updateChat as updateChatRecord,
+} from "../access-layer/chat";
+import { getOrCreatePersona } from "../access-layer/persona";
 import { createMessage } from "../access-layer/message";
+import { getUserByFirebaseUid } from "src/access-layer/user";
 
 import {
   Resolvers,
+  QueryChatArgs,
   MutationCreateChatArgs,
   MutationCreateChatWithMessageArgs,
-  QueryChatArgs,
+  MutationDeleteChatArgs,
+  MutationUpdateChatArgs,
 } from "../graphql/__generated__/graphql";
+
+import { isChatOwner } from "../helpers/chat.helpers";
+import { createResponse } from "@elysn/core";
+
+import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
+import { MessageSenderEnum } from "@elysn/shared";
 
 export const chatResolvers: Resolvers = {
   Query: {
@@ -19,10 +38,11 @@ export const chatResolvers: Resolvers = {
 
       const chats = await getChats(String(user._id));
 
-      // TODO: implement pagination
+      // TODO: implement  pagination
       return chats.map((chat) => ({
         id: String(chat._id),
         userId: chat.userId,
+        personaId: chat.personaId,
         title: chat.title,
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
@@ -38,13 +58,14 @@ export const chatResolvers: Resolvers = {
       const chat = await getChat(id);
       if (!chat) return null;
 
-      if (chat.userId !== String(user._id)) {
+      if (!isChatOwner(chat, String(user._id))) {
         throw new Error("User not authorized");
       }
 
       return {
         id: String(chat._id),
         userId: chat.userId,
+        personaId: chat.personaId,
         title: chat.title,
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
@@ -63,23 +84,40 @@ export const chatResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
-      const chat = await createChat({
-        userId: String(user._id),
-        title: title?.trim() || "New Chat",
-        topic: topic?.trim() || null,
-      });
+      const session = await mongoose.startSession();
+      session.startTransaction();
 
-      return {
-        id: String(chat._id),
-        userId: chat.userId,
-        title: chat.title,
-        topic: chat.topic,
-        createdAt: chat.createdAt.getTime(),
-        updatedAt: chat.updatedAt.getTime(),
-      };
+      try {
+        const persona = await getOrCreatePersona(String(user._id), session);
+
+        const chat = await createChat(
+          {
+            userId: String(user._id),
+            personaId: String(persona._id),
+            title: title?.trim() || "New Chat",
+            topic: topic?.trim() || null,
+          },
+          session
+        );
+
+        return {
+          id: String(chat._id),
+          userId: chat.userId,
+          personaId: chat.personaId,
+          title: chat.title,
+          topic: chat.topic,
+          createdAt: chat.createdAt.getTime(),
+          updatedAt: chat.updatedAt.getTime(),
+        };
+      } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+      } finally {
+        session.endSession();
+      }
     },
 
-    // TODO: implement session / transaction
     createChatWithMessage: async (
       _parent,
       args: MutationCreateChatWithMessageArgs,
@@ -94,27 +132,145 @@ export const chatResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
-      const chat = await createChat({
-        userId: String(user._id),
-        title: title?.trim() || "New Chat",
-        topic: topic?.trim() || null,
-      });
+      const session = await mongoose.startSession();
+      session.startTransaction();
 
-      await createMessage({
-        chatId: String(chat._id),
-        userId: String(user._id),
-        sender: message.sender,
-        text: message.text,
-        metadata: message.metadata,
-      });
+      try {
+        const persona = await getOrCreatePersona(String(user._id), session);
+
+        const chat = await createChat(
+          {
+            userId: String(user._id),
+            personaId: String(persona._id),
+            title: title?.trim() || "New Chat",
+            topic: topic?.trim() || null,
+          },
+          session
+        );
+
+        const createdMessage = await createMessage(
+          {
+            chatId: String(chat._id),
+            userId: String(user._id),
+            personaId: String(persona._id),
+            sender: message.sender,
+            text: message.text,
+          },
+          session
+        );
+
+        // Publish user message
+        await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+          newMessage: {
+            id: String(createdMessage._id),
+            userId: createdMessage.userId,
+            sender: createdMessage.sender,
+            text: createdMessage.text,
+            timestamp: createdMessage.timestamp.getTime(),
+            metadata: createdMessage.metadata,
+          },
+        });
+
+        await session.commitTransaction();
+
+        const payload = createResponse(persona, [], message.text);
+
+        let aiText = "";
+        try {
+          const response = await openai.responses.create(payload);
+          aiText = response.output_text;
+        } catch (err) {
+          console.error("AI error:", err);
+          aiText =
+            "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
+        }
+
+        const aiMsg = await createMessage({
+          chatId: String(chat._id),
+          personaId: String(chat.personaId),
+          userId: String(user._id),
+          sender: MessageSenderEnum.AI,
+          text: aiText,
+        });
+
+        // Publish AI message
+        if (aiMsg) {
+          await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+            newMessage: {
+              id: String(aiMsg._id),
+              userId: aiMsg.userId,
+              sender: aiMsg.sender,
+              text: aiMsg.text,
+              timestamp: aiMsg.timestamp.getTime(),
+              metadata: aiMsg.metadata,
+            },
+          });
+        }
+
+        return {
+          id: String(chat._id),
+          userId: chat.userId,
+          personaId: chat.personaId,
+          title: chat.title,
+          topic: chat.topic,
+          createdAt: chat.createdAt.getTime(),
+          updatedAt: chat.updatedAt.getTime(),
+        };
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+
+    deleteChat: async (_parent, { id }: MutationDeleteChatArgs, ctx) => {
+      if (!ctx.user?.uid) throw new Error("Must be authenticated");
+
+      const user = await getUserByFirebaseUid(ctx.user.uid);
+      if (!user) throw new Error("User not found");
+
+      const chat = await getChat(id);
+      if (!chat) throw new Error("Chat not found");
+
+      if (!isChatOwner(chat, String(user._id))) {
+        throw new Error("User not authorized");
+      }
+
+      try {
+        await deleteChat(id);
+      } catch (error) {
+        console.error("Error deleting chat:", error);
+        throw new Error("Failed to delete chat");
+      }
+
+      return true;
+    },
+
+    updateChat: async (_parent, { id, input }: MutationUpdateChatArgs, ctx) => {
+      if (!ctx.user?.uid) throw new Error("Must be authenticated");
+
+      const user = await getUserByFirebaseUid(ctx.user.uid);
+      if (!user) throw new Error("User not found");
+
+      const chat = await getChat(id);
+      if (!chat) throw new Error("Chat not found");
+
+      if (!isChatOwner(chat, String(user._id))) {
+        throw new Error("User not authorized");
+      }
+
+      const updatedChat = await updateChatRecord(id, input);
+      if (!updatedChat) throw new Error("Chat not found");
 
       return {
-        id: String(chat._id),
-        userId: chat.userId,
-        title: chat.title,
-        topic: chat.topic,
-        createdAt: chat.createdAt.getTime(),
-        updatedAt: chat.updatedAt.getTime(),
+        id: String(updatedChat._id),
+        userId: updatedChat.userId,
+        personaId: updatedChat.personaId,
+        title: updatedChat.title,
+        topic: updatedChat.topic,
+        createdAt: updatedChat.createdAt.getTime(),
+        updatedAt: updatedChat.updatedAt.getTime(),
       };
     },
   },

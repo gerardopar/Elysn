@@ -1,3 +1,5 @@
+import { openaiClient as openai } from "../services/openAi";
+
 import { getUserByFirebaseUid } from "src/access-layer/user";
 
 import {
@@ -6,8 +8,13 @@ import {
   updateMessage,
   getMessages,
   getMessage,
+  getRecentMessages,
 } from "../access-layer/message";
 import { getChat } from "../access-layer/chat";
+import { getPersona } from "src/access-layer/persona";
+
+import { MessageSenderEnum } from "@elysn/shared";
+import { createResponse } from "@elysn/core";
 
 import {
   Resolvers,
@@ -68,21 +75,25 @@ export const messageResolvers: Resolvers = {
     ) => {
       if (!ctx?.user?.uid) throw new Error("Must be authenticated");
 
-      const user = await getUserByFirebaseUid(ctx?.user?.uid);
+      const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
       const chat = await getChat(input?.chatId!);
       if (!chat) throw new Error("Chat not found");
 
+      // Save user message
       const message = await createMessage({
-        chatId: String(chat?._id),
-        userId: String(user?._id),
-        sender: input?.sender,
-        text: input?.text,
-        metadata: input?.metadata,
+        chatId: String(chat._id),
+        personaId: String(chat.personaId),
+        userId: String(user._id),
+        sender: input.sender,
+        text: input.text,
       });
 
-      await pubsub.publish(`${MESSAGE_CHANNEL}_${String(chat?._id)}`, {
+      if (!message) throw new Error("Failed to create message");
+
+      // Publish user message
+      await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
         newMessage: {
           id: String(message._id),
           userId: message.userId,
@@ -93,14 +104,56 @@ export const messageResolvers: Resolvers = {
         },
       });
 
+      const persona = await getPersona(String(chat.personaId));
+      if (!persona) throw new Error("Persona not found");
+
+      let recentMessages = await getRecentMessages(String(chat._id));
+
+      recentMessages = [...recentMessages, message];
+
+      // AI response
+      const payload = createResponse(persona, recentMessages, input.text);
+
+      let aiText = "";
+      try {
+        const response = await openai.responses.create(payload);
+        aiText = response.output_text;
+      } catch (err) {
+        console.error("AI error:", err);
+        aiText =
+          "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
+      }
+
+      const aiMsg = await createMessage({
+        chatId: String(chat._id),
+        personaId: String(chat.personaId),
+        userId: String(user._id),
+        sender: MessageSenderEnum.AI,
+        text: aiText,
+      });
+
+      // Publish AI message
+      if (aiMsg) {
+        await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+          newMessage: {
+            id: String(aiMsg._id),
+            userId: aiMsg.userId,
+            sender: aiMsg.sender,
+            text: aiMsg.text,
+            timestamp: aiMsg.timestamp.getTime(),
+            metadata: aiMsg.metadata,
+          },
+        });
+      }
+
       return {
-        id: String(message?._id),
-        chatId: String(message?.chatId),
-        userId: message?.userId,
-        sender: message?.sender,
-        text: message?.text,
-        timestamp: message?.timestamp.getTime(),
-        metadata: message?.metadata,
+        id: String(message._id),
+        chatId: String(message.chatId),
+        userId: message.userId,
+        sender: message.sender,
+        text: message.text,
+        timestamp: message.timestamp.getTime(),
+        metadata: message.metadata,
       };
     },
     updateMessage: async (_parent, args: MutationUpdateMessageArgs, ctx) => {

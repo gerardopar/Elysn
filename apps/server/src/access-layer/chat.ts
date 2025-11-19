@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { Chat } from "../models/chat";
 import { Message } from "../models/message";
 
@@ -19,22 +21,67 @@ export const getChat = async (id: string) => {
 /**
  * Create a new chat for a user.
  */
-export const createChat = async ({
-  userId,
-  title,
-  topic,
-}: {
-  userId: string;
-  title?: string;
-  topic?: string | null;
-}) => {
+export const createChat = async (
+  {
+    userId,
+    personaId,
+    title,
+    topic,
+  }: {
+    userId: string;
+    personaId: string;
+    title?: string;
+    topic?: string | null;
+  },
+  session?: mongoose.ClientSession
+) => {
   const chat = new Chat({
     userId,
+    personaId,
     title: title?.trim() || "New Chat",
     topic: topic?.trim() || null,
   });
-  await chat.save();
-  return chat;
+
+  if (session) {
+    return await chat.save({ session });
+  }
+
+  return await chat.save();
+};
+
+/**
+ * Update an existing chat's properties.
+ */
+export const updateChat = async (
+  id: string,
+  {
+    title,
+    topic,
+  }: {
+    title?: string | null;
+    topic?: string | null;
+  }
+) => {
+  const update: Record<string, unknown> = {};
+
+  if (title !== undefined) {
+    const trimmed = title?.trim();
+    update.title = trimmed && trimmed.length > 0 ? trimmed : "New Chat";
+  }
+
+  if (topic !== undefined) {
+    const trimmed = topic?.trim();
+    update.topic = trimmed && trimmed.length > 0 ? trimmed : null;
+  }
+
+  return Chat.findByIdAndUpdate(
+    id,
+    { $set: update },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 };
 
 /**

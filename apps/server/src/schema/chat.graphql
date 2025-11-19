@@ -1,8 +1,10 @@
 type Chat {
   id: ID!
   userId: ID!
+  personaId: ID!
   title: String
   topic: String
+  summary: String
   createdAt: Float!
   updatedAt: Float!
 }
@@ -18,9 +20,16 @@ input CreateChatWithMessageInput {
   message: MessageInput!
 }
 
+input UpdateChatInput {
+  title: String
+  topic: String
+}
+
 extend type Mutation {
   createChat(input: CreateChatInput!): Chat!
   createChatWithMessage(input: CreateChatWithMessageInput!): Chat!
+  deleteChat(id: ID!): Boolean!
+  updateChat(id: ID!, input: UpdateChatInput!): Chat!
 }
 
 extend type Query {

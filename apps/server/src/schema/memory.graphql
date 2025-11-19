@@ -1,7 +1,0 @@
-type Memory {
-  userId: ID!
-  lastTopic: String
-  lastMessage: String
-  history: [Message!]!
-  updatedAt: Float!
-}

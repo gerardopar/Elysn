@@ -3,14 +3,22 @@ enum MessageSenderEnum {
   AI
 }
 
+type MessageMetadata {
+  emotion: String
+  intent: String
+  memoryTag: String
+  isMemoryWorthy: Boolean
+}
+
 type Message {
   id: ID!
   userId: ID!
   chatId: ID
+  personaId: ID
   sender: MessageSenderEnum!
   text: String!
   timestamp: Float!
-  metadata: JSON
+  metadata: MessageMetadata
 }
 
 input MessageInput {
@@ -18,7 +26,6 @@ input MessageInput {
   sender: MessageSenderEnum!
   text: String!
   timestamp: Float!
-  metadata: JSON
 }
 
 extend type Query {

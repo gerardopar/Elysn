@@ -2,10 +2,10 @@ import React from "react";
 
 import Message from "./Message";
 
-import { type Message as MessageT } from "@elysn/shared";
+import type { GetMessagesQuery } from "@graphql/__generated__/graphql";
 
 export const Messages: React.FC<{
-  messages: MessageT[] | null | undefined;
+  messages: GetMessagesQuery["messages"];
 }> = ({ messages }) => {
   if (messages?.length === 0) return <></>;
   return (

@@ -16,6 +16,7 @@ const GET_MESSAGES_QUERY: TypedDocumentNode<
     messages(chatId: $chatId) {
       id
       chatId
+      personaId
       text
       sender
       timestamp

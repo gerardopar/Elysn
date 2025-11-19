@@ -19,6 +19,8 @@ export type Chat = {
   __typename: 'Chat';
   createdAt: Scalars['Float']['output'];
   id: Scalars['ID']['output'];
+  personaId: Scalars['ID']['output'];
+  summary: Maybe<Scalars['String']['output']>;
   title: Maybe<Scalars['String']['output']>;
   topic: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['Float']['output'];
@@ -36,20 +38,12 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type Memory = {
-  __typename: 'Memory';
-  history: Array<Message>;
-  lastMessage: Maybe<Scalars['String']['output']>;
-  lastTopic: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['Float']['output'];
-  userId: Scalars['ID']['output'];
-};
-
 export type Message = {
   __typename: 'Message';
-  chatId: Maybe<Scalars['ID']['output']>;
+  chatId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
-  metadata: Maybe<Scalars['JSON']['output']>;
+  metadata: Maybe<MessageMetadata>;
+  personaId: Scalars['ID']['output'];
   sender: MessageSenderEnum;
   text: Scalars['String']['output'];
   timestamp: Scalars['Float']['output'];
@@ -58,10 +52,17 @@ export type Message = {
 
 export type MessageInput = {
   chatId?: InputMaybe<Scalars['ID']['input']>;
-  metadata?: InputMaybe<Scalars['JSON']['input']>;
   sender: MessageSenderEnum;
   text: Scalars['String']['input'];
   timestamp: Scalars['Float']['input'];
+};
+
+export type MessageMetadata = {
+  __typename: 'MessageMetadata';
+  emotion: Maybe<Scalars['String']['output']>;
+  intent: Maybe<Scalars['String']['output']>;
+  isMemoryWorthy: Maybe<Scalars['Boolean']['output']>;
+  memoryTag: Maybe<Scalars['String']['output']>;
 };
 
 export enum MessageSenderEnum {
@@ -76,9 +77,12 @@ export type Mutation = {
   createChatWithMessage: Chat;
   createMessage: Message;
   createUser: User;
+  deleteChat: Scalars['Boolean']['output'];
   deleteMessage: Message;
   deleteUser: User;
+  updateChat: Chat;
   updateMessage: Message;
+  updatePersona: Persona;
   updateUser: User;
   upsertUser: User;
 };
@@ -107,6 +111,11 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationDeleteChatArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteMessageArgs = {
   id: Scalars['ID']['input'];
 };
@@ -117,9 +126,21 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationUpdateChatArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateChatInput;
+};
+
+
 export type MutationUpdateMessageArgs = {
   id: Scalars['ID']['input'];
   input: MessageInput;
+};
+
+
+export type MutationUpdatePersonaArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdatePersonaInput;
 };
 
 
@@ -137,6 +158,72 @@ export type MutationUpsertUserArgs = {
   picture?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Persona = {
+  __typename: 'Persona';
+  avatarUrl: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['Float']['output'];
+  emotion: Maybe<PersonaEmotion>;
+  id: Scalars['ID']['output'];
+  memoryIndex: Maybe<PersonaMemoryIndex>;
+  meta: Maybe<PersonaMeta>;
+  name: Maybe<Scalars['String']['output']>;
+  persona: Maybe<PersonaData>;
+  relationship: Maybe<PersonaRelationship>;
+  settings: Maybe<PersonaSettings>;
+  state: Maybe<PersonaState>;
+  updatedAt: Scalars['Float']['output'];
+};
+
+export type PersonaData = {
+  __typename: 'PersonaData';
+  archetype: Maybe<Scalars['String']['output']>;
+  baseSystemPrompt: Maybe<Scalars['String']['output']>;
+  coreTraits: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  dynamicSystemPrompt: Maybe<Scalars['String']['output']>;
+  tone: Maybe<Scalars['String']['output']>;
+};
+
+export type PersonaEmotion = {
+  __typename: 'PersonaEmotion';
+  current: Maybe<Scalars['String']['output']>;
+  lastUpdated: Maybe<Scalars['Float']['output']>;
+};
+
+export type PersonaMemoryIndex = {
+  __typename: 'PersonaMemoryIndex';
+  longTermMemories: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  shortTermSummary: Maybe<Scalars['String']['output']>;
+};
+
+export type PersonaMeta = {
+  __typename: 'PersonaMeta';
+  interactions: Maybe<Scalars['Int']['output']>;
+  tokensUsed: Maybe<Scalars['Int']['output']>;
+  version: Maybe<Scalars['String']['output']>;
+};
+
+export type PersonaRelationship = {
+  __typename: 'PersonaRelationship';
+  closeness: Maybe<Scalars['Float']['output']>;
+  history: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  trust: Maybe<Scalars['Float']['output']>;
+};
+
+export type PersonaSettings = {
+  __typename: 'PersonaSettings';
+  memoryRetention: Maybe<Scalars['Float']['output']>;
+  model: Maybe<Scalars['String']['output']>;
+  openness: Maybe<Scalars['Float']['output']>;
+  temperature: Maybe<Scalars['Float']['output']>;
+};
+
+export type PersonaState = {
+  __typename: 'PersonaState';
+  attention: Maybe<Scalars['Float']['output']>;
+  availability: Maybe<Scalars['String']['output']>;
+  energy: Maybe<Scalars['Float']['output']>;
+};
+
 export type Query = {
   __typename: 'Query';
   chat: Maybe<Chat>;
@@ -146,6 +233,8 @@ export type Query = {
   hello: Maybe<Scalars['String']['output']>;
   message: Maybe<Message>;
   messages: Maybe<Array<Message>>;
+  persona: Maybe<Persona>;
+  personas: Maybe<Array<Persona>>;
   users: Maybe<Array<User>>;
 };
 
@@ -174,6 +263,11 @@ export type QueryMessagesArgs = {
   chatId: Scalars['ID']['input'];
 };
 
+
+export type QueryPersonaArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type Subscription = {
   __typename: 'Subscription';
   _empty: Maybe<Scalars['String']['output']>;
@@ -183,6 +277,16 @@ export type Subscription = {
 
 export type SubscriptionNewMessageArgs = {
   chatId: Scalars['ID']['input'];
+};
+
+export type UpdateChatInput = {
+  title?: InputMaybe<Scalars['String']['input']>;
+  topic?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdatePersonaInput = {
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type User = {
@@ -211,12 +315,27 @@ export type CreateChatWithMessageMutationVariables = Exact<{
 
 export type CreateChatWithMessageMutation = { createChatWithMessage: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } };
 
+export type DeleteChatMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteChatMutation = { deleteChat: boolean };
+
+export type UpdateChatMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateChatInput;
+}>;
+
+
+export type UpdateChatMutation = { updateChat: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } };
+
 export type CreateMessageMutationVariables = Exact<{
   input: MessageInput;
 }>;
 
 
-export type CreateMessageMutation = { createMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+export type CreateMessageMutation = { createMessage: { __typename: 'Message', id: string, chatId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
 
 export type UpdateMessageMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -224,14 +343,14 @@ export type UpdateMessageMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMessageMutation = { updateMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+export type UpdateMessageMutation = { updateMessage: { __typename: 'Message', id: string, chatId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
 
 export type DeleteMessageMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteMessageMutation = { deleteMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+export type DeleteMessageMutation = { deleteMessage: { __typename: 'Message', id: string, chatId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
 
 export type CreateUserMutationVariables = Exact<{
   firebaseUid: Scalars['String']['input'];
@@ -277,7 +396,7 @@ export type GetMessagesQueryVariables = Exact<{
 }>;
 
 
-export type GetMessagesQuery = { messages: Array<{ __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string }> | null };
+export type GetMessagesQuery = { messages: Array<{ __typename: 'Message', id: string, chatId: string, personaId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string }> | null };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -289,4 +408,4 @@ export type NewMessageSubscriptionVariables = Exact<{
 }>;
 
 
-export type NewMessageSubscription = { newMessage: { __typename: 'Message', id: string, userId: string, sender: MessageSenderEnum, text: string, timestamp: number, metadata: unknown | null } };
+export type NewMessageSubscription = { newMessage: { __typename: 'Message', id: string, userId: string, sender: MessageSenderEnum, text: string, timestamp: number } };

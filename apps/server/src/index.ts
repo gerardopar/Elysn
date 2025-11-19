@@ -69,6 +69,7 @@ export const startServer = async () => {
     "/graphql",
     cors(),
     bodyParser.json(),
+    // Cast to any to work around Express v4/v5 RequestHandler type mismatch
     expressMiddleware(server, {
       context: async ({ req }) => {
         const authHeader = req.headers.authorization || "";
@@ -86,7 +87,7 @@ export const startServer = async () => {
 
         return { user };
       },
-    })
+    }) as any
   );
 
   // Start everything
