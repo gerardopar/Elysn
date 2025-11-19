@@ -21,6 +21,16 @@ export const createPersona = async (
 };
 
 /**
+ * Get or create persona
+ */
+export const getOrCreatePersona = async (userId: string, session?: any) => {
+  const existing = await Persona.findOne({ userId }).session(session);
+  if (existing) return existing;
+
+  return createPersona(userId, session);
+};
+
+/**
  * Get persona by ID
  */
 export const getPersona = async (personaId: string) => {
