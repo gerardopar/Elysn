@@ -15,10 +15,10 @@ export const ChatsListItem: React.FC<{
 }> = ({ chat }) => {
   const history = useHistory();
 
-  const { open } = useModal<ChatsListItemOptionsProps>(
+  const { open, close } = useModal<ChatsListItemOptionsProps>(
     ChatsListItemOptions,
     {
-      dismiss: () => {},
+      dismiss: () => close(),
       chat,
     },
     {
