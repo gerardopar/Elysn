@@ -14,6 +14,7 @@ type Message {
   id: ID!
   userId: ID!
   chatId: ID
+  personaId: ID
   sender: MessageSenderEnum!
   text: String!
   timestamp: Float!

@@ -45,6 +45,7 @@ export type Message = {
   chatId?: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   metadata?: Maybe<MessageMetadata>;
+  personaId?: Maybe<Scalars['ID']['output']>;
   sender: MessageSenderEnum;
   text: Scalars['String']['output'];
   timestamp: Scalars['Float']['output'];
@@ -453,6 +454,7 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
   chatId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   metadata?: Resolver<Maybe<ResolversTypes['MessageMetadata']>, ParentType, ContextType>;
+  personaId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   sender?: Resolver<ResolversTypes['MessageSenderEnum'], ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   timestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
