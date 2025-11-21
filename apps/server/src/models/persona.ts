@@ -43,7 +43,12 @@ const PersonaSchema = new Schema<Persona>(
     },
 
     memoryIndex: {
-      longTermMemories: { type: [String], default: [] },
+      longTermMemories: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "LongTermMemory",
+        },
+      ],
       shortTermSummary: { type: String, default: null },
     },
 
