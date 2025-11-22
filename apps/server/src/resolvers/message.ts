@@ -26,7 +26,10 @@ import {
   QueryMessageArgs,
 } from "../graphql/__generated__/graphql";
 
+import { extractLongTermMemory } from "../helpers/longTermMemory";
+
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
+import { sanitizeText } from "src/helpers/string.helpers";
 
 export const messageResolvers: Resolvers = {
   Query: {
@@ -78,10 +81,10 @@ export const messageResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
-      const chat = await getChat(input?.chatId!);
+      const chat = await getChat(String(input.chatId));
       if (!chat) throw new Error("Chat not found");
 
-      // Save user message
+      // save user message
       const message = await createMessage({
         chatId: String(chat._id),
         personaId: String(chat.personaId),
@@ -89,10 +92,9 @@ export const messageResolvers: Resolvers = {
         sender: input.sender,
         text: input.text,
       });
-
       if (!message) throw new Error("Failed to create message");
 
-      // Publish user message
+      // save and publish user message
       await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
         newMessage: {
           id: String(message._id),
@@ -104,26 +106,39 @@ export const messageResolvers: Resolvers = {
         },
       });
 
+      // save and extract long-term memory
+      try {
+        const mem = await extractLongTermMemory({
+          messageId: String(message._id),
+          personaId: String(chat.personaId),
+        });
+
+        console.log("Memory extraction result", mem);
+      } catch (error) {
+        console.error("Failed to extract long-term memory:", error);
+      }
+
+      // load and use persona AFTER memory update
       const persona = await getPersona(String(chat.personaId));
       if (!persona) throw new Error("Persona not found");
 
+      // load recent chat messages
       let recentMessages = await getRecentMessages(String(chat._id));
+      recentMessages = [...recentMessages.slice(-10), message];
 
-      recentMessages = [...recentMessages, message];
-
-      // AI response
-      const payload = createResponse(persona, recentMessages, input.text);
-
+      // run AI generation
       let aiText = "";
       try {
-        const response = await openai.responses.create(payload);
-        aiText = response.output_text;
+        const payload = createResponse(persona, recentMessages, input.text);
+        const aiResponse = await openai.responses.create(payload);
+        aiText = sanitizeText(aiResponse.output_text);
       } catch (err) {
         console.error("AI error:", err);
         aiText =
           "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
       }
 
+      // save AI message
       const aiMsg = await createMessage({
         chatId: String(chat._id),
         personaId: String(chat.personaId),
@@ -131,20 +146,19 @@ export const messageResolvers: Resolvers = {
         sender: MessageSenderEnum.AI,
         text: aiText,
       });
+      if (!aiMsg) throw new Error("Failed to save AI message");
 
-      // Publish AI message
-      if (aiMsg) {
-        await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
-          newMessage: {
-            id: String(aiMsg._id),
-            userId: aiMsg.userId,
-            sender: aiMsg.sender,
-            text: aiMsg.text,
-            timestamp: aiMsg.timestamp.getTime(),
-            metadata: aiMsg.metadata,
-          },
-        });
-      }
+      // 8. Publish AI message
+      await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+        newMessage: {
+          id: String(aiMsg._id),
+          userId: aiMsg.userId,
+          sender: aiMsg.sender,
+          text: aiMsg.text,
+          timestamp: aiMsg.timestamp.getTime(),
+          metadata: aiMsg.metadata,
+        },
+      });
 
       return {
         id: String(message._id),
