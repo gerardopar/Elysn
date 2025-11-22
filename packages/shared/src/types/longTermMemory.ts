@@ -10,6 +10,10 @@ export enum LongTermMemoryCategoryEnum {
   Milestone = "milestone",
 }
 
+export const longTermMemoryCategoryEnum = Object.values(
+  LongTermMemoryCategoryEnum
+) as [string, ...string[]];
+
 export interface LongTermMemory {
   personaId: string;
   category: LongTermMemoryCategoryEnum;
@@ -19,3 +23,12 @@ export interface LongTermMemory {
   lastUpdated: Date;
   createdAt: Date;
 }
+
+export type LongTermMemoryExtractionResponse = {
+  shouldWriteMemory: boolean;
+  memory: {
+    category: LongTermMemoryCategoryEnum;
+    value: string;
+    importance: number;
+  } | null;
+};
