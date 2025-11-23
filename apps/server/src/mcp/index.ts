@@ -36,22 +36,3 @@ export const setupMcpServer = async () => {
 
   return mcpServer;
 };
-
-// const res = await fetch("http://localhost:4000/mcp", {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/json",
-//     Accept: "application/json, text/event-stream",
-//   },
-//   body: JSON.stringify({
-//     jsonrpc: "2.0",
-//     id: 1,
-//     method: "tools/call",
-//     params: {
-//       name: "add",
-//       arguments: { a: 2, b: 3 },
-//     },
-//   }),
-// });
-// console.log(await res.json().then((res) => res));
-// console.log(await res.json());
