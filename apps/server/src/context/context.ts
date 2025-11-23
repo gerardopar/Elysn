@@ -1,5 +1,13 @@
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { DecodedIdToken } from "firebase-admin/auth";
 import { Request } from "express";
+
 import { firebaseAdmin } from "../firebase/firebase";
+
+export interface GraphQLContext {
+  user: DecodedIdToken | null;
+  mcpServer: McpServer;
+}
 
 export const getContext = async ({ req }: { req: Request }) => {
   const authHeader = req.headers.authorization || "";
