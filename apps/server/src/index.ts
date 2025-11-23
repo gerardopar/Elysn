@@ -20,6 +20,11 @@ import { firebaseAdmin } from "./firebase/firebase";
 import { loadSchema } from "@graphql-tools/load";
 import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
 
+// MCP
+import { z } from "zod";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+
 const schemaPath = path.resolve("src/schema/**/*.graphql");
 
 export const startServer = async () => {
@@ -34,7 +39,53 @@ export const startServer = async () => {
 
   // Express + HTTP server
   const app = express();
+  app.use(express.json());
   const httpServer = http.createServer(app);
+
+  // MCP
+  const mcpServer = new McpServer({
+    name: "demo-server",
+    version: "1.0.0",
+  });
+
+  mcpServer.registerTool(
+    "add",
+    {
+      title: "Addition Tool",
+      description: "Add two numbers",
+      // @ts-expect-error zod types are not compatible with MCP types
+      inputSchema: z.object({
+        a: z.number(),
+        b: z.number(),
+      }),
+      // @ts-expect-error zod types are not compatible with MCP types
+      outputSchema: z.object({
+        result: z.number(),
+      }),
+    },
+    async ({ a, b }: { a: number; b: number }) => {
+      const output = { result: a + b };
+      return {
+        content: [{ type: "text", text: JSON.stringify(output) }],
+        structuredContent: output,
+      };
+    }
+  );
+
+  app.post("/mcp", async (req, res) => {
+    // Create a new transport for each request to prevent request ID collisions
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true,
+    });
+
+    res.on("close", () => {
+      transport.close();
+    });
+
+    await mcpServer.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  });
 
   // WebSocket server for subscriptions
   const wsServer = new WebSocketServer({
