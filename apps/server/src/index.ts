@@ -110,7 +110,7 @@ export const startServer = async () => {
 
         return { user, mcpServer };
       },
-    })
+    }) as any
   );
 
   // Start everything
