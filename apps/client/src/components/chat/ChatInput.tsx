@@ -6,6 +6,7 @@ import {
   IonItem,
   IonFooter,
   IonToolbar,
+  IonSpinner,
 } from "@ionic/react";
 import PaperPlaneIcon from "@components/svgs/PaperPlaneIcon";
 
@@ -18,7 +19,8 @@ const ChatInput: React.FC<{
   setInput: (value: string) => void;
   handleSubmit: () => void;
   mode?: "default" | "fixed";
-}> = ({ input, setInput, handleSubmit, mode = "default" }) => {
+  isLoading?: boolean;
+}> = ({ input, setInput, handleSubmit, mode = "default", isLoading }) => {
   const placeholder = useMemo(() => getRandomString(INPUT_PLACEHOLDERS), []);
 
   const inputForm = (
@@ -48,6 +50,9 @@ const ChatInput: React.FC<{
           className="rounded-full bg-secondary-dark pl-[24px]! pr-[56px]! w-full text-[16px] py-1! focus:border-none!"
           value={input}
           onIonInput={(e) => setInput(e.detail.value!)}
+          style={{
+            "--highlight-color-focused": "var(--color-primary-light)",
+          }}
         />
         <IonButton
           className="absolute right-[6px] top-1/2 -translate-y-1/2 min-h-[40px] min-w-[40px] h-[40px] w-[40px] p-0! m-0! z-10"
@@ -62,7 +67,11 @@ const ChatInput: React.FC<{
           }}
           disabled={input.trim() === ""}
         >
-          <PaperPlaneIcon className="text-primary-dark" size="small" />
+          {isLoading ? (
+            <IonSpinner name="crescent" color="primary-dark" />
+          ) : (
+            <PaperPlaneIcon className="text-primary-dark" size="small" />
+          )}
         </IonButton>
       </IonItem>
     </form>
