@@ -49,7 +49,6 @@ const PersonaSchema = new Schema<Persona>(
           ref: "LongTermMemory",
         },
       ],
-      shortTermSummary: { type: String, default: null },
     },
 
     meta: {

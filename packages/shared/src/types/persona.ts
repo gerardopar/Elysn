@@ -37,7 +37,6 @@ export type Persona = {
 
   memoryIndex: {
     longTermMemories: string[];
-    shortTermSummary: string | null;
   };
 
   meta: {

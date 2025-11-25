@@ -10,7 +10,8 @@ const ChatSchema = new Schema<Chat>(
     personaId: { type: String, required: true },
     title: { type: String },
     topic: { type: String },
-    summary: { type: String },
+    shortTermSummary: { type: String, default: "" },
+    lastSummaryUpdate: { type: Date },
   },
   { timestamps: true }
 );

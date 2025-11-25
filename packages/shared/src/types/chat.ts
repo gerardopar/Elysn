@@ -4,7 +4,8 @@ export type Chat = {
   personaId: string;
   title?: string;
   topic?: string;
-  summary?: string;
+  shortTermSummary?: string;
+  lastSummaryUpdate?: number;
   createdAt: number;
   updatedAt: number;
 };
