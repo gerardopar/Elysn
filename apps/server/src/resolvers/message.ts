@@ -1,5 +1,3 @@
-import { openaiClient as openai } from "../services/openAi";
-
 import { getUserByFirebaseUid } from "src/access-layer/user";
 
 import {
@@ -13,9 +11,6 @@ import {
 import { getChat } from "../access-layer/chat";
 import { getPersona } from "src/access-layer/persona";
 
-import { MessageSenderEnum } from "@elysn/shared";
-import { createResponse } from "@elysn/core";
-
 import {
   Resolvers,
   MutationCreateMessageArgs,
@@ -26,10 +21,10 @@ import {
   QueryMessageArgs,
 } from "../graphql/__generated__/graphql";
 
+import { createPersonaMessage } from "../helpers/persona.helpers";
 import { extractLongTermMemory } from "../helpers/longTermMemory";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
-import { sanitizeText } from "src/helpers/string.helpers";
 
 export const messageResolvers: Resolvers = {
   Query: {
@@ -126,29 +121,17 @@ export const messageResolvers: Resolvers = {
       let recentMessages = await getRecentMessages(String(chat._id));
       recentMessages = [...recentMessages.slice(-10), message];
 
-      // run AI generation
-      let aiText = "";
-      try {
-        const payload = createResponse(persona, recentMessages, input.text);
-        const aiResponse = await openai.responses.create(payload);
-        aiText = sanitizeText(aiResponse.output_text);
-      } catch (err) {
-        console.error("AI error:", err);
-        aiText =
-          "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
-      }
-
-      // save AI message
-      const aiMsg = await createMessage({
-        chatId: String(chat._id),
-        personaId: String(chat.personaId),
-        userId: String(user._id),
-        sender: MessageSenderEnum.AI,
-        text: aiText,
-      });
+      // update short term summary
+      const aiMsg = await createPersonaMessage(
+        chat,
+        persona,
+        user,
+        recentMessages,
+        input.text
+      );
       if (!aiMsg) throw new Error("Failed to save AI message");
 
-      // 8. Publish AI message
+      // Publish AI message
       await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
         newMessage: {
           id: String(aiMsg._id),
