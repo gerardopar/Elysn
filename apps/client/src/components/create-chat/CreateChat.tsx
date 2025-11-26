@@ -19,7 +19,8 @@ export const CreateChat: React.FC = () => {
 
   const [input, setInput] = useState<string>("");
 
-  const [createChatWithMessage] = useCreateChatWithMessageMutation();
+  const [createChatWithMessage, { loading }] =
+    useCreateChatWithMessageMutation();
 
   const handleCreateChatWithMessage = async () => {
     const result = chatInputSchema.safeParse({ input });
@@ -71,6 +72,7 @@ export const CreateChat: React.FC = () => {
             input={input}
             setInput={setInput}
             handleSubmit={handleCreateChatWithMessage}
+            isLoading={loading}
           />
         </div>
       </IonContent>
@@ -81,6 +83,7 @@ export const CreateChat: React.FC = () => {
           setInput={setInput}
           handleSubmit={handleCreateChatWithMessage}
           mode="fixed"
+          isLoading={loading}
         />
       )}
     </>
