@@ -20,6 +20,7 @@ export type Chat = {
   createdAt: Scalars['Float']['output'];
   id: Scalars['ID']['output'];
   lastMessage: Maybe<Message>;
+  messagesCount: Scalars['Int']['output'];
   personaId: Scalars['ID']['output'];
   summary: Maybe<Scalars['String']['output']>;
   title: Maybe<Scalars['String']['output']>;
@@ -301,8 +302,6 @@ export type User = {
   picture: Maybe<Scalars['String']['output']>;
   updatedAt: Maybe<Scalars['Float']['output']>;
 };
-
-export type NewChatFragment = { __typename: 'Chat', id: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number, lastMessage: { __typename: 'Message', id: string, text: string } | null };
 
 export type CreateChatMutationVariables = Exact<{
   input: CreateChatInput;
