@@ -12,6 +12,7 @@ const ChatSchema = new Schema<Chat>(
     topic: { type: String },
     shortTermSummary: { type: String, default: "" },
     lastSummaryUpdate: { type: Date },
+    messagesCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

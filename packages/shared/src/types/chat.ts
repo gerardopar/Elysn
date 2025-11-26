@@ -1,3 +1,5 @@
+import { Message } from "./message";
+
 export type Chat = {
   id: string;
   userId: string;
@@ -8,4 +10,6 @@ export type Chat = {
   lastSummaryUpdate?: number;
   createdAt: number;
   updatedAt: number;
+  messagesCount: number;
+  lastMessage?: Message;
 };

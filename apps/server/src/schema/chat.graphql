@@ -8,6 +8,7 @@ type Chat {
   createdAt: Float!
   updatedAt: Float!
   lastMessage: Message
+  messagesCount: Int!
 }
 
 input CreateChatInput {

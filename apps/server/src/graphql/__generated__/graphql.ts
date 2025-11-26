@@ -22,6 +22,7 @@ export type Chat = {
   createdAt: Scalars['Float']['output'];
   id: Scalars['ID']['output'];
   lastMessage?: Maybe<Message>;
+  messagesCount: Scalars['Int']['output'];
   personaId: Scalars['ID']['output'];
   summary?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
@@ -440,6 +441,7 @@ export type ChatResolvers<ContextType = any, ParentType extends ResolversParentT
   createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
+  messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   personaId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   summary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

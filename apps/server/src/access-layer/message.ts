@@ -42,13 +42,16 @@ export const createMessage = async (
     // Also update the chat timestamp WITH session
     await Chat.findByIdAndUpdate(
       chatId,
-      { $set: { updatedAt: new Date() } },
+      { $set: { updatedAt: new Date() }, $inc: { messagesCount: 1 } },
       { session }
     );
   } else {
     await message.save();
 
-    await Chat.findByIdAndUpdate(chatId, { $set: { updatedAt: new Date() } });
+    await Chat.findByIdAndUpdate(chatId, {
+      $set: { updatedAt: new Date() },
+      $inc: { messagesCount: 1 },
+    });
   }
 
   return message;

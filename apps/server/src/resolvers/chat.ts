@@ -48,6 +48,7 @@ export const chatResolvers: Resolvers = {
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
         updatedAt: chat.updatedAt.getTime(),
+        messagesCount: chat.messagesCount,
       }));
     },
     chat: async (_parent, { id }: QueryChatArgs, ctx) => {
@@ -71,6 +72,7 @@ export const chatResolvers: Resolvers = {
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
         updatedAt: chat.updatedAt.getTime(),
+        messagesCount: chat.messagesCount,
       };
     },
   },
@@ -109,6 +111,7 @@ export const chatResolvers: Resolvers = {
           topic: chat.topic,
           createdAt: chat.createdAt.getTime(),
           updatedAt: chat.updatedAt.getTime(),
+          messagesCount: chat.messagesCount,
         };
       } catch (error) {
         await session.abortTransaction();
@@ -216,6 +219,7 @@ export const chatResolvers: Resolvers = {
           topic: chat.topic,
           createdAt: chat.createdAt.getTime(),
           updatedAt: chat.updatedAt.getTime(),
+          messagesCount: chat.messagesCount,
         };
       } catch (error) {
         await session.abortTransaction();
@@ -272,6 +276,7 @@ export const chatResolvers: Resolvers = {
         topic: updatedChat.topic,
         createdAt: updatedChat.createdAt.getTime(),
         updatedAt: updatedChat.updatedAt.getTime(),
+        messagesCount: updatedChat.messagesCount,
       };
     },
   },
