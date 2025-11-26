@@ -108,3 +108,13 @@ export const deleteChat = async (id: string) => {
     throw error;
   }
 };
+
+/**
+ * Fetch the last message of a chat.
+ */
+export const getLastChatMessage = async (chatId: string) => {
+  const lastMessage = await Message.findOne({ chatId })
+    .sort({ timestamp: -1 })
+    .lean();
+  return lastMessage;
+};

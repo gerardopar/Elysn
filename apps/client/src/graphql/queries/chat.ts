@@ -21,6 +21,10 @@ const GET_CHATS_QUERY: TypedDocumentNode<
       topic
       createdAt
       updatedAt
+      lastMessage {
+        id
+        text
+      }
     }
   }
 `;

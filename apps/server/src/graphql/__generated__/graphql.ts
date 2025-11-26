@@ -21,6 +21,7 @@ export type Chat = {
   __typename?: 'Chat';
   createdAt: Scalars['Float']['output'];
   id: Scalars['ID']['output'];
+  lastMessage?: Maybe<Message>;
   personaId: Scalars['ID']['output'];
   summary?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
@@ -438,6 +439,7 @@ export type ResolversParentTypes = {
 export type ChatResolvers<ContextType = any, ParentType extends ResolversParentTypes['Chat'] = ResolversParentTypes['Chat']> = {
   createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  lastMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
   personaId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   summary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

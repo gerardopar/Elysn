@@ -8,6 +8,7 @@ import {
   getChats,
   deleteChat,
   updateChat as updateChatRecord,
+  getLastChatMessage,
 } from "../access-layer/chat";
 import { getOrCreatePersona } from "../access-layer/persona";
 import { createMessage } from "../access-layer/message";
@@ -271,6 +272,24 @@ export const chatResolvers: Resolvers = {
         topic: updatedChat.topic,
         createdAt: updatedChat.createdAt.getTime(),
         updatedAt: updatedChat.updatedAt.getTime(),
+      };
+    },
+  },
+  Chat: {
+    lastMessage: async (parent: { id: string }) => {
+      const msg = await getLastChatMessage(parent.id);
+
+      if (!msg) return null;
+
+      return {
+        id: String(msg._id),
+        chatId: msg.chatId,
+        userId: msg.userId,
+        personaId: msg.personaId,
+        sender: msg.sender,
+        text: msg.text,
+        timestamp: msg.timestamp.getTime(),
+        metadata: msg.metadata,
       };
     },
   },
