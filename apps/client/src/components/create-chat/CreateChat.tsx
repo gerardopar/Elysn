@@ -35,6 +35,19 @@ export const CreateChat: React.FC = () => {
           },
         },
       },
+      update: (cache, { data }) => {
+        if (!data?.createChatWithMessage) return;
+
+        const newChat = data.createChatWithMessage;
+
+        cache.modify({
+          fields: {
+            chats(existingChats = []) {
+              return [newChat, ...existingChats];
+            },
+          },
+        });
+      },
       onCompleted: ({ createChatWithMessage }) => {
         if (createChatWithMessage?.id) {
           history.push(`/chat/${createChatWithMessage.id}`);

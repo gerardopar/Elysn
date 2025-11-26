@@ -302,6 +302,8 @@ export type User = {
   updatedAt: Maybe<Scalars['Float']['output']>;
 };
 
+export type NewChatFragment = { __typename: 'Chat', id: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number, lastMessage: { __typename: 'Message', id: string, text: string } | null };
+
 export type CreateChatMutationVariables = Exact<{
   input: CreateChatInput;
 }>;
@@ -314,7 +316,7 @@ export type CreateChatWithMessageMutationVariables = Exact<{
 }>;
 
 
-export type CreateChatWithMessageMutation = { createChatWithMessage: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } };
+export type CreateChatWithMessageMutation = { createChatWithMessage: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number, lastMessage: { __typename: 'Message', id: string, text: string } | null } };
 
 export type DeleteChatMutationVariables = Exact<{
   id: Scalars['ID']['input'];
