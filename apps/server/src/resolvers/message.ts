@@ -6,10 +6,8 @@ import {
   updateMessage,
   getMessages,
   getMessage,
-  getRecentMessages,
 } from "../access-layer/message";
 import { getChat } from "../access-layer/chat";
-import { getPersona } from "src/access-layer/persona";
 
 import {
   Resolvers,
@@ -20,6 +18,7 @@ import {
   QueryMessagesArgs,
   QueryMessageArgs,
   Message,
+  MessageSenderEnum,
 } from "../graphql/__generated__/graphql";
 
 import { createPersonaMessage } from "../helpers/persona.helpers";
@@ -95,6 +94,8 @@ export const messageResolvers: Resolvers = {
         newMessage: {
           id: String(message._id),
           userId: message.userId,
+          personaId: message.personaId,
+          chatId: message.chatId,
           sender: message.sender,
           text: message.text,
           timestamp: message.timestamp.getTime(),
@@ -102,38 +103,10 @@ export const messageResolvers: Resolvers = {
         },
       });
 
-      // load and use persona AFTER memory update
-      const persona = await getPersona(String(chat.personaId));
-      if (!persona) throw new Error("Persona not found");
-
-      // load recent chat messages
-      let recentMessages = await getRecentMessages(String(chat._id));
-      recentMessages = [...recentMessages.slice(-10), message];
-
-      const aiMsg = await createPersonaMessage(
-        chat,
-        persona,
-        user,
-        recentMessages,
-        input.text
-      );
-      if (!aiMsg) throw new Error("Failed to save AI message");
-
-      // Publish AI message
-      pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
-        newMessage: {
-          id: String(aiMsg._id),
-          userId: aiMsg.userId,
-          sender: aiMsg.sender,
-          text: aiMsg.text,
-          timestamp: aiMsg.timestamp.getTime(),
-          metadata: aiMsg.metadata,
-        },
-      });
-
       return {
         id: String(message._id),
         chatId: String(message.chatId),
+        personaId: String(message.personaId),
         userId: message.userId,
         sender: message.sender,
         text: message.text,
@@ -180,14 +153,35 @@ export const messageResolvers: Resolvers = {
       subscribe: (_parent, { chatId }: SubscriptionNewMessageArgs) => {
         return pubsub.asyncIterableIterator(`${MESSAGE_CHANNEL}_${chatId}`);
       },
+
       resolve: async (payload: { newMessage: Message }) => {
         const msg = payload.newMessage;
 
-        extractLongTermMemory({
-          messageId: msg.id,
-          personaId: msg.personaId!,
-        }).catch(console.error);
+        // AI messages do NOT trigger anything
+        if (msg.sender === MessageSenderEnum.AI) return msg;
 
+        // USER messages → trigger memory pipeline + AI reply
+        if (msg.sender === MessageSenderEnum.USER) {
+          // Long-term memory extraction (async)
+          extractLongTermMemory({
+            messageId: msg.id,
+            personaId: msg.personaId!,
+          }).catch((error) => {
+            console.warn("Failed to extract long-term memory:", error);
+          });
+
+          // AI reply generation (async, NON-BLOCKING)
+          createPersonaMessage(
+            String(msg.chatId),
+            String(msg.personaId),
+            String(msg.userId),
+            msg.text
+          ).catch((err) => {
+            console.error("AI reply error:", err);
+          });
+        }
+
+        // Return the message immediately to the client
         return msg;
       },
     },

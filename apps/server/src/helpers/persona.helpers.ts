@@ -6,10 +6,16 @@ import { Chat } from "../models/chat";
 import { User } from "../models/user";
 
 import { sanitizeText } from "./string.helpers";
-import { createMessage } from "../access-layer/message";
+
+import { getUser } from "../access-layer/user";
+import { getChat } from "../access-layer/chat";
+import { getPersona } from "../access-layer/persona";
+import { createMessage, getRecentMessages } from "../access-layer/message";
 
 import { createResponse } from "@elysn/core";
 import { MessageSenderEnum } from "@elysn/shared";
+
+import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
 
 export const personaExists = async (userId: string): Promise<boolean> => {
   const persona = await Persona.findOne({ userId });
@@ -27,31 +33,63 @@ export const getExistingPersona = async (
 };
 
 export const createPersonaMessage = async (
-  chat: Chat,
-  persona: Persona,
-  user: User,
-  recentMessages: Message[],
-  text: string
+  chat: Chat | string,
+  persona: Persona | string,
+  user: User | string,
+  userMessageText: string
 ) => {
-  // run AI generation
+  const _chat = typeof chat === "string" ? await getChat(chat) : chat;
+  const _persona =
+    typeof persona === "string" ? await getPersona(persona) : persona;
+  const _user = typeof user === "string" ? await getUser(user) : user;
+
+  if (!_chat || !_persona || !_user) {
+    throw new Error("Missing chat, persona, or user for AI generation");
+  }
+
+  // Fetch last messages from DB
+  let recentMessages = await getRecentMessages(String(_chat?._id));
+  recentMessages = recentMessages.slice(-10);
+
+  // Append the current user message manually
+  recentMessages.push({
+    sender: MessageSenderEnum.USER,
+    text: userMessageText,
+  } as Message);
+
+  // AI generation
   let aiText = "";
   try {
-    const payload = createResponse(persona, recentMessages, text);
+    const payload = createResponse(_persona, recentMessages, userMessageText);
     const aiResponse = await openai.responses.create(payload);
     aiText = sanitizeText(aiResponse.output_text);
   } catch (err) {
     console.error("AI error:", err);
     aiText =
-      "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
+      "I’m sorry… I lost track of what I was thinking. Could you rephrase that?";
   }
 
-  // save AI message
+  // Save AI message
   const aiMsg = await createMessage({
-    chatId: String(chat._id),
-    personaId: String(chat.personaId),
-    userId: String(user._id),
+    chatId: String(_chat?._id),
+    personaId: String(_persona?._id),
+    userId: String(_user?._id),
     sender: MessageSenderEnum.AI,
     text: aiText,
+  });
+
+  // Publish it to GraphQL subscriptions
+  pubsub.publish(`${MESSAGE_CHANNEL}_${_chat?._id}`, {
+    newMessage: {
+      id: aiMsg.id,
+      chatId: aiMsg.chatId,
+      userId: aiMsg.userId,
+      personaId: aiMsg.personaId,
+      sender: aiMsg.sender,
+      text: aiMsg.text,
+      timestamp: aiMsg.timestamp.getTime(),
+      metadata: aiMsg.metadata,
+    },
   });
 
   return aiMsg;
