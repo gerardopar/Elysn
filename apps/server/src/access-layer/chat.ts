@@ -15,7 +15,7 @@ export const getChats = async (userId: string) => {
  * Fetch a single chat by ID.
  */
 export const getChat = async (id: string) => {
-  return Chat.findById(id);
+  return Chat.findById(id).lean();
 };
 
 /**
