@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import { IonItem } from "@ionic/react";
 import EllispsesIcon from "../svgs/EllispsesIcon";
@@ -14,10 +14,19 @@ export const ChatsListItem: React.FC<{
   chat: GetChatsQuery["chats"][number];
 }> = ({ chat }) => {
   const history = useHistory();
+  const { chatId: activeChatId } = useParams<{ chatId: string }>(); // active chat id
+
+  // if the deleted chat is the active chat, redirect to /chat
+  const onDelete = () => {
+    if (chat?.id === activeChatId) {
+      history.replace(`/chat`);
+    }
+  };
 
   const { open, close } = useModal<ChatsListItemOptionsProps>(
     ChatsListItemOptions,
     {
+      onDelete,
       dismiss: () => close(),
       chat,
     },
