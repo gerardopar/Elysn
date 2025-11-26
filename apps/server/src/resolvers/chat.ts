@@ -1,5 +1,3 @@
-import { openaiClient as openai } from "../services/openAi";
-
 import mongoose from "mongoose";
 
 import {
@@ -24,10 +22,8 @@ import {
 } from "../graphql/__generated__/graphql";
 
 import { isChatOwner } from "../helpers/chat.helpers";
-import { createResponse } from "@elysn/core";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
-import { MessageSenderEnum } from "@elysn/shared";
 
 export const chatResolvers: Resolvers = {
   Query: {
@@ -168,6 +164,8 @@ export const chatResolvers: Resolvers = {
           newMessage: {
             id: String(createdMessage._id),
             userId: createdMessage.userId,
+            personaId: createdMessage.personaId,
+            chatId: createdMessage.chatId,
             sender: createdMessage.sender,
             text: createdMessage.text,
             timestamp: createdMessage.timestamp.getTime(),
@@ -176,40 +174,6 @@ export const chatResolvers: Resolvers = {
         });
 
         await session.commitTransaction();
-
-        const payload = createResponse(persona, [], message.text);
-
-        let aiText = "";
-        try {
-          const response = await openai.responses.create(payload);
-          aiText = response.output_text;
-        } catch (err) {
-          console.error("AI error:", err);
-          aiText =
-            "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
-        }
-
-        const aiMsg = await createMessage({
-          chatId: String(chat._id),
-          personaId: String(chat.personaId),
-          userId: String(user._id),
-          sender: MessageSenderEnum.AI,
-          text: aiText,
-        });
-
-        // Publish AI message
-        if (aiMsg) {
-          await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
-            newMessage: {
-              id: String(aiMsg._id),
-              userId: aiMsg.userId,
-              sender: aiMsg.sender,
-              text: aiMsg.text,
-              timestamp: aiMsg.timestamp.getTime(),
-              metadata: aiMsg.metadata,
-            },
-          });
-        }
 
         return {
           id: String(chat._id),
