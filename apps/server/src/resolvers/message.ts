@@ -19,6 +19,7 @@ import {
   SubscriptionNewMessageArgs,
   QueryMessagesArgs,
   QueryMessageArgs,
+  Message,
 } from "../graphql/__generated__/graphql";
 
 import { createPersonaMessage } from "../helpers/persona.helpers";
@@ -90,7 +91,7 @@ export const messageResolvers: Resolvers = {
       if (!message) throw new Error("Failed to create message");
 
       // save and publish user message
-      await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+      pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
         newMessage: {
           id: String(message._id),
           userId: message.userId,
@@ -101,18 +102,6 @@ export const messageResolvers: Resolvers = {
         },
       });
 
-      // save and extract long-term memory
-      try {
-        const mem = await extractLongTermMemory({
-          messageId: String(message._id),
-          personaId: String(chat.personaId),
-        });
-
-        console.log("Memory extraction result", mem);
-      } catch (error) {
-        console.error("Failed to extract long-term memory:", error);
-      }
-
       // load and use persona AFTER memory update
       const persona = await getPersona(String(chat.personaId));
       if (!persona) throw new Error("Persona not found");
@@ -121,7 +110,6 @@ export const messageResolvers: Resolvers = {
       let recentMessages = await getRecentMessages(String(chat._id));
       recentMessages = [...recentMessages.slice(-10), message];
 
-      // update short term summary
       const aiMsg = await createPersonaMessage(
         chat,
         persona,
@@ -132,7 +120,7 @@ export const messageResolvers: Resolvers = {
       if (!aiMsg) throw new Error("Failed to save AI message");
 
       // Publish AI message
-      await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+      pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
         newMessage: {
           id: String(aiMsg._id),
           userId: aiMsg.userId,
@@ -189,9 +177,18 @@ export const messageResolvers: Resolvers = {
 
   Subscription: {
     newMessage: {
-      // Subscription resolver — returns async iterator tied to chatId
       subscribe: (_parent, { chatId }: SubscriptionNewMessageArgs) => {
         return pubsub.asyncIterableIterator(`${MESSAGE_CHANNEL}_${chatId}`);
+      },
+      resolve: async (payload: { newMessage: Message }) => {
+        const msg = payload.newMessage;
+
+        extractLongTermMemory({
+          messageId: msg.id,
+          personaId: msg.personaId!,
+        }).catch(console.error);
+
+        return msg;
       },
     },
   },
