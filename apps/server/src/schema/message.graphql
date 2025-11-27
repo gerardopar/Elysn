@@ -3,13 +3,6 @@ enum MessageSenderEnum {
   AI
 }
 
-type MessageMetadata {
-  emotion: String
-  intent: String
-  memoryTag: String
-  isMemoryWorthy: Boolean
-}
-
 type Message {
   id: ID!
   userId: ID!
@@ -19,6 +12,13 @@ type Message {
   text: String!
   timestamp: Float!
   metadata: MessageMetadata
+}
+
+type MessageMetadata {
+  emotion: String
+  intent: String
+  memoryTag: String
+  isMemoryWorthy: Boolean
 }
 
 input MessageInput {

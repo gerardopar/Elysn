@@ -1,3 +1,8 @@
+export enum MemoryTypeEnum {
+  LTM = "LTM",
+  STM = "STM",
+}
+
 export enum LongTermMemoryCategoryEnum {
   Preference = "preference",
   Biographical = "biographical",
@@ -14,15 +19,29 @@ export const longTermMemoryCategoryEnum = Object.values(
   LongTermMemoryCategoryEnum
 ) as [string, ...string[]];
 
-export interface LongTermMemory {
-  personaId: string;
-  category: LongTermMemoryCategoryEnum;
-  value: string;
-  importance: number;
-  messageId?: string;
+export type Memory = {
+  personaId: string; // owner of memory
+  chatId: string; // optional for chat-scoped memory
+
+  type: MemoryTypeEnum;
+
+  category: LongTermMemoryCategoryEnum; // long term memory category
+
+  value: string; // memory
+
+  importance: number; // 0-1 weighting
+  weight: number;
+  sentiment: number;
+  emotion: string;
+  topics: string[];
+
+  messageId?: string; // message where the memory was extracted
+  fromMessageCount?: number;
+  toMessageCount?: number;
+
   lastUpdated: Date;
   createdAt: Date;
-}
+};
 
 export type LongTermMemoryExtractionResponse = {
   shouldWriteMemory: boolean;

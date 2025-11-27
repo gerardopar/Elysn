@@ -22,7 +22,6 @@ export type Chat = {
   lastMessage: Maybe<Message>;
   messagesCount: Scalars['Int']['output'];
   personaId: Scalars['ID']['output'];
-  summary: Maybe<Scalars['String']['output']>;
   title: Maybe<Scalars['String']['output']>;
   topic: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['Float']['output'];
@@ -166,7 +165,6 @@ export type Persona = {
   createdAt: Scalars['Float']['output'];
   emotion: Maybe<PersonaEmotion>;
   id: Scalars['ID']['output'];
-  memoryIndex: Maybe<PersonaMemoryIndex>;
   meta: Maybe<PersonaMeta>;
   name: Maybe<Scalars['String']['output']>;
   persona: Maybe<PersonaData>;
@@ -174,6 +172,7 @@ export type Persona = {
   settings: Maybe<PersonaSettings>;
   state: Maybe<PersonaState>;
   updatedAt: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export type PersonaData = {
@@ -189,12 +188,6 @@ export type PersonaEmotion = {
   __typename: 'PersonaEmotion';
   current: Maybe<Scalars['String']['output']>;
   lastUpdated: Maybe<Scalars['Float']['output']>;
-};
-
-export type PersonaMemoryIndex = {
-  __typename: 'PersonaMemoryIndex';
-  longTermMemories: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  shortTermSummary: Maybe<Scalars['String']['output']>;
 };
 
 export type PersonaMeta = {

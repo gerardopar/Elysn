@@ -42,15 +42,6 @@ const PersonaSchema = new Schema<Persona>(
       memoryRetention: { type: Number, default: 0.8 },
     },
 
-    memoryIndex: {
-      longTermMemories: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "LongTermMemory",
-        },
-      ],
-    },
-
     meta: {
       version: { type: String, default: "1.0.0" },
       interactions: { type: Number, default: 0 },

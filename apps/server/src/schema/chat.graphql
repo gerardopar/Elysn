@@ -4,7 +4,6 @@ type Chat {
   personaId: ID!
   title: String
   topic: String
-  summary: String
   createdAt: Float!
   updatedAt: Float!
   lastMessage: Message

@@ -24,7 +24,6 @@ export type Chat = {
   lastMessage?: Maybe<Message>;
   messagesCount: Scalars['Int']['output'];
   personaId: Scalars['ID']['output'];
-  summary?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   topic?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['Float']['output'];
@@ -168,7 +167,6 @@ export type Persona = {
   createdAt: Scalars['Float']['output'];
   emotion?: Maybe<PersonaEmotion>;
   id: Scalars['ID']['output'];
-  memoryIndex?: Maybe<PersonaMemoryIndex>;
   meta?: Maybe<PersonaMeta>;
   name?: Maybe<Scalars['String']['output']>;
   persona?: Maybe<PersonaData>;
@@ -176,6 +174,7 @@ export type Persona = {
   settings?: Maybe<PersonaSettings>;
   state?: Maybe<PersonaState>;
   updatedAt: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export type PersonaData = {
@@ -191,12 +190,6 @@ export type PersonaEmotion = {
   __typename?: 'PersonaEmotion';
   current?: Maybe<Scalars['String']['output']>;
   lastUpdated?: Maybe<Scalars['Float']['output']>;
-};
-
-export type PersonaMemoryIndex = {
-  __typename?: 'PersonaMemoryIndex';
-  longTermMemories?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  shortTermSummary?: Maybe<Scalars['String']['output']>;
 };
 
 export type PersonaMeta = {
@@ -394,7 +387,6 @@ export type ResolversTypes = {
   Persona: ResolverTypeWrapper<Persona>;
   PersonaData: ResolverTypeWrapper<PersonaData>;
   PersonaEmotion: ResolverTypeWrapper<PersonaEmotion>;
-  PersonaMemoryIndex: ResolverTypeWrapper<PersonaMemoryIndex>;
   PersonaMeta: ResolverTypeWrapper<PersonaMeta>;
   PersonaRelationship: ResolverTypeWrapper<PersonaRelationship>;
   PersonaSettings: ResolverTypeWrapper<PersonaSettings>;
@@ -424,7 +416,6 @@ export type ResolversParentTypes = {
   Persona: Persona;
   PersonaData: PersonaData;
   PersonaEmotion: PersonaEmotion;
-  PersonaMemoryIndex: PersonaMemoryIndex;
   PersonaMeta: PersonaMeta;
   PersonaRelationship: PersonaRelationship;
   PersonaSettings: PersonaSettings;
@@ -443,7 +434,6 @@ export type ChatResolvers<ContextType = any, ParentType extends ResolversParentT
   lastMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   personaId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  summary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   topic?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -493,7 +483,6 @@ export type PersonaResolvers<ContextType = any, ParentType extends ResolversPare
   createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   emotion?: Resolver<Maybe<ResolversTypes['PersonaEmotion']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  memoryIndex?: Resolver<Maybe<ResolversTypes['PersonaMemoryIndex']>, ParentType, ContextType>;
   meta?: Resolver<Maybe<ResolversTypes['PersonaMeta']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   persona?: Resolver<Maybe<ResolversTypes['PersonaData']>, ParentType, ContextType>;
@@ -501,6 +490,7 @@ export type PersonaResolvers<ContextType = any, ParentType extends ResolversPare
   settings?: Resolver<Maybe<ResolversTypes['PersonaSettings']>, ParentType, ContextType>;
   state?: Resolver<Maybe<ResolversTypes['PersonaState']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
 };
 
 export type PersonaDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaData'] = ResolversParentTypes['PersonaData']> = {
@@ -514,11 +504,6 @@ export type PersonaDataResolvers<ContextType = any, ParentType extends Resolvers
 export type PersonaEmotionResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaEmotion'] = ResolversParentTypes['PersonaEmotion']> = {
   current?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   lastUpdated?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-};
-
-export type PersonaMemoryIndexResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaMemoryIndex'] = ResolversParentTypes['PersonaMemoryIndex']> = {
-  longTermMemories?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
-  shortTermSummary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
 export type PersonaMetaResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaMeta'] = ResolversParentTypes['PersonaMeta']> = {
@@ -584,7 +569,6 @@ export type Resolvers<ContextType = any> = {
   Persona?: PersonaResolvers<ContextType>;
   PersonaData?: PersonaDataResolvers<ContextType>;
   PersonaEmotion?: PersonaEmotionResolvers<ContextType>;
-  PersonaMemoryIndex?: PersonaMemoryIndexResolvers<ContextType>;
   PersonaMeta?: PersonaMetaResolvers<ContextType>;
   PersonaRelationship?: PersonaRelationshipResolvers<ContextType>;
   PersonaSettings?: PersonaSettingsResolvers<ContextType>;

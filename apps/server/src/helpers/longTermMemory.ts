@@ -1,11 +1,13 @@
 import { openaiClient as openai } from "src/services/openAi";
 import { OpenAI } from "openai";
 
-import { Persona } from "../models/persona";
-import { LongTermMemory } from "../models/longTermMemory";
+import { Memory } from "../models/memory";
 
 import { extractLongTermMemoryResponse } from "@elysn/core";
-import { LongTermMemoryExtractionResponse } from "@elysn/shared";
+import {
+  LongTermMemoryExtractionResponse,
+  MemoryTypeEnum,
+} from "@elysn/shared";
 
 import { getMessage } from "../access-layer/message";
 
@@ -17,7 +19,7 @@ export const extractLongTermMemory = async ({
 }: {
   messageId: string;
   personaId: string;
-}): Promise<LongTermMemory | null> => {
+}): Promise<Memory | null> => {
   if (!messageId || !personaId) return null;
   const message = await getMessage(messageId);
 
@@ -69,7 +71,7 @@ export const saveLongTermMemory = async ({
   personaId: string;
   messageId: string;
   extractedMemory: LongTermMemoryExtractionResponse;
-}): Promise<LongTermMemory | null> => {
+}): Promise<Memory | null> => {
   try {
     // Should never be called if the flag is false, but double-check:
     if (!extractedMemory.shouldWriteMemory || !extractedMemory.memory) {
@@ -78,21 +80,15 @@ export const saveLongTermMemory = async ({
 
     const { category, value, importance } = extractedMemory.memory;
 
-    const memory = await LongTermMemory.create({
+    const memory = await Memory.create({
       personaId,
+      type: MemoryTypeEnum.LTM,
       messageId,
       category,
       value,
       importance,
     });
 
-    // 2. Push memory ID into persona index
-    await Persona.updateOne(
-      { _id: personaId },
-      { $push: { "memoryIndex.longTermMemories": memory._id } }
-    );
-
-    // 3. Return saved memory
     return memory;
   } catch (err) {
     console.error("[saveLongTermMemory] Failed to save memory:", err);
