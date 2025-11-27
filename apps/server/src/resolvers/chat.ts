@@ -22,6 +22,7 @@ import {
 } from "../graphql/__generated__/graphql";
 
 import { isChatOwner } from "../helpers/chat.helpers";
+import { createPersonaMessage } from "../helpers/persona.helpers";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
 
@@ -159,7 +160,9 @@ export const chatResolvers: Resolvers = {
           session
         );
 
-        // Publish user message
+        await session.commitTransaction();
+
+        // Publish user message to any active subscribers
         await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
           newMessage: {
             id: String(createdMessage._id),
@@ -173,7 +176,17 @@ export const chatResolvers: Resolvers = {
           },
         });
 
-        await session.commitTransaction();
+        // Trigger AI response directly instead of relying on subscription's resolve function.
+        // Why: When creating a new chat, no WebSocket subscribers exist yet since the client
+        // hasn't navigated to the chat view. The subscription's resolve function only runs
+        // when there are active subscribers, so we must trigger AI generation directly here.
+        // The AI message will still be published via pubsub for any future subscribers.
+        await createPersonaMessage(
+          String(chat._id),
+          String(persona._id),
+          String(user._id),
+          createdMessage.text
+        );
 
         return {
           id: String(chat._id),
