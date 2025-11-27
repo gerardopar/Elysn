@@ -2,7 +2,6 @@ import { openaiClient as openai } from "src/services/openAi";
 import { OpenAI } from "openai";
 
 import { Memory } from "../models/memory";
-import { Message } from "../models/message";
 
 import {
   extractLongTermMemoryResponse,
@@ -11,12 +10,43 @@ import {
 import {
   LongTermMemoryExtractionResponse,
   MemoryTypeEnum,
-  MessageSenderEnum,
 } from "@elysn/shared";
 
-import { getMessage } from "../access-layer/message";
+import { getChat } from "../access-layer/chat";
+import { getMessage, getRecentMessages } from "../access-layer/message";
 
 import { sanitizeJSON } from "./string.helpers";
+
+export const maybeExtractShortTermMemory = async (
+  chatId: string,
+  personaId: string
+) => {
+  const chat = await getChat(chatId);
+  if (!chat) return null;
+
+  const recentMessages = await getRecentMessages(chatId, 50);
+  if (recentMessages.length === 0) return null;
+
+  const payload = extractShortTermMemoryResponse(chat, recentMessages);
+  if (!payload) return null;
+
+  const response = await openai.responses.create(payload);
+  const summary = response.output_text?.trim();
+  if (!summary) return null;
+
+  const saved = await Memory.create({
+    personaId,
+    chatId,
+    type: MemoryTypeEnum.STM_TRAIL,
+    value: summary,
+    importance: 0.6,
+    weight: 1.0,
+    fromMessageCount: chat.messagesCount - recentMessages.length + 1,
+    toMessageCount: chat.messagesCount,
+  });
+
+  return saved;
+};
 
 export const extractLongTermMemory = async ({
   messageId,
@@ -78,7 +108,6 @@ export const saveLongTermMemory = async ({
   extractedMemory: LongTermMemoryExtractionResponse;
 }): Promise<Memory | null> => {
   try {
-    // Should never be called if the flag is false, but double-check:
     if (!extractedMemory.shouldWriteMemory || !extractedMemory.memory) {
       return null;
     }

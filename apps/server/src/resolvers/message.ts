@@ -22,7 +22,10 @@ import {
 } from "../graphql/__generated__/graphql";
 
 import { createPersonaMessage } from "../helpers/persona.helpers";
-import { extractLongTermMemory } from "../helpers/memory.helpers";
+import {
+  extractLongTermMemory,
+  maybeExtractShortTermMemory,
+} from "../helpers/memory.helpers";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
 
@@ -150,38 +153,44 @@ export const messageResolvers: Resolvers = {
 
   Subscription: {
     newMessage: {
-      subscribe: (_parent, { chatId }: SubscriptionNewMessageArgs) => {
+      subscribe: (_parent, { chatId }) => {
         return pubsub.asyncIterableIterator(`${MESSAGE_CHANNEL}_${chatId}`);
       },
 
       resolve: async (payload: { newMessage: Message }) => {
         const msg = payload.newMessage;
 
-        // AI messages do NOT trigger anything
         if (msg.sender === MessageSenderEnum.AI) return msg;
 
         // USER messages → trigger memory pipeline + AI reply
         if (msg.sender === MessageSenderEnum.USER) {
-          // Long-term memory extraction (async)
-          extractLongTermMemory({
-            messageId: msg.id,
-            personaId: msg.personaId!,
-          }).catch((error) => {
-            console.warn("Failed to extract long-term memory:", error);
-          });
-
-          // AI reply generation (async, NON-BLOCKING)
+          // AI reply
           createPersonaMessage(
             String(msg.chatId),
             String(msg.personaId),
             String(msg.userId),
             msg.text
-          ).catch((err) => {
-            console.error("AI reply error:", err);
-          });
+          ).catch((error) =>
+            console.warn("Failed to create persona message", error)
+          );
+
+          // STM extraction
+          maybeExtractShortTermMemory(
+            String(msg.chatId),
+            String(msg.personaId!)
+          ).catch((error) =>
+            console.warn("Failed to extract short term memory", error)
+          );
+
+          // LTM extraction
+          extractLongTermMemory({
+            messageId: msg.id,
+            personaId: msg.personaId!,
+          }).catch((error) =>
+            console.warn("Failed to extract long term memory", error)
+          );
         }
 
-        // Return the message immediately to the client
         return msg;
       },
     },
