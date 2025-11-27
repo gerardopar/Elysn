@@ -2,11 +2,16 @@ import { openaiClient as openai } from "src/services/openAi";
 import { OpenAI } from "openai";
 
 import { Memory } from "../models/memory";
+import { Message } from "../models/message";
 
-import { extractLongTermMemoryResponse } from "@elysn/core";
+import {
+  extractLongTermMemoryResponse,
+  extractShortTermMemoryResponse,
+} from "@elysn/core";
 import {
   LongTermMemoryExtractionResponse,
   MemoryTypeEnum,
+  MessageSenderEnum,
 } from "@elysn/shared";
 
 import { getMessage } from "../access-layer/message";

@@ -1,6 +1,7 @@
 export enum MemoryTypeEnum {
   LTM = "LTM",
   STM = "STM",
+  STM_TRAIL = "STM_TRAIL",
 }
 
 export enum LongTermMemoryCategoryEnum {
