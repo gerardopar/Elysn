@@ -22,7 +22,7 @@ import {
 } from "../graphql/__generated__/graphql";
 
 import { createPersonaMessage } from "../helpers/persona.helpers";
-import { extractLongTermMemory } from "../helpers/memory";
+import { extractLongTermMemory } from "../helpers/memory.helpers";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
 
