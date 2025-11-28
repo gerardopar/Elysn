@@ -11,6 +11,10 @@ import { getUser } from "../access-layer/user";
 import { getChat } from "../access-layer/chat";
 import { getPersona } from "../access-layer/persona";
 import { createMessage, getRecentMessages } from "../access-layer/message";
+import {
+  getLongTermMemories,
+  getLatestShortTermMemory,
+} from "../access-layer/memory";
 
 import { createResponse } from "@elysn/core";
 import { MessageSenderEnum } from "@elysn/shared";
@@ -57,10 +61,24 @@ export const createPersonaMessage = async (
     text: userMessageText,
   } as Message);
 
+  // Get memory
+  const longTermMemories = await getLongTermMemories(String(_persona?._id));
+
+  const recentStm = await getLatestShortTermMemory(
+    String(_persona?._id),
+    String(_chat?._id)
+  );
+
   // AI generation
   let aiText = "";
   try {
-    const payload = createResponse(_persona, recentMessages, userMessageText);
+    const payload = createResponse(
+      _persona,
+      recentMessages,
+      userMessageText,
+      longTermMemories,
+      recentStm
+    );
     const aiResponse = await openai.responses.create(payload);
     aiText = sanitizeText(aiResponse.output_text);
   } catch (err) {

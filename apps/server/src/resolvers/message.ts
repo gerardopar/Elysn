@@ -153,7 +153,7 @@ export const messageResolvers: Resolvers = {
 
   Subscription: {
     newMessage: {
-      subscribe: (_parent, { chatId }) => {
+      subscribe: (_parent, { chatId }: SubscriptionNewMessageArgs) => {
         return pubsub.asyncIterableIterator(`${MESSAGE_CHANNEL}_${chatId}`);
       },
 
