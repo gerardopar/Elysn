@@ -34,7 +34,7 @@ const ChatInput: React.FC<{
         color="primary-dark"
       >
         <div
-          className={`w-full bg-secondary-dark rounded-[16px] flex items-center justify-center gap-2 px-2`}
+          className={`w-full bg-secondary-dark rounded-[16px] flex items-end justify-center gap-2 px-2 pb-2`}
         >
           <IonTextarea
             mode="ios"
@@ -42,7 +42,7 @@ const ChatInput: React.FC<{
             inputMode="text"
             autoGrow
             placeholder={placeholder}
-            className="flex-1 text-[16px] focus:border-none! focus:outline-none! ion-no-padding mt-[16px] pl-[12px]!"
+            className="flex-1 text-[16px] focus:border-none! focus:outline-none! ion-no-padding mt-[16px] pl-[12px]! max-h-[240px] overflow-auto"
             value={input}
             onIonInput={(e) => setInput(e.detail.value!)}
             style={{
