@@ -18,7 +18,12 @@ import { connectRedis } from "./cache/redisClient";
 import { resolvers } from "./resolvers/resolvers";
 import { firebaseAdmin } from "./firebase/firebase";
 import { loadSchema } from "@graphql-tools/load";
+import { GraphQLContext } from "./context/context";
 import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
+
+// MCP
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { setupMcpServer } from "./mcp";
 
 const schemaPath = path.resolve("src/schema/**/*.graphql");
 
@@ -34,7 +39,25 @@ export const startServer = async () => {
 
   // Express + HTTP server
   const app = express();
+  app.use(express.json());
   const httpServer = http.createServer(app);
+
+  // MCP
+  const mcpServer = await setupMcpServer();
+
+  app.post("/mcp", async (req, res) => {
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true,
+    });
+
+    res.on("close", () => {
+      transport.close();
+    });
+
+    await mcpServer.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  });
 
   // WebSocket server for subscriptions
   const wsServer = new WebSocketServer({
@@ -46,7 +69,7 @@ export const startServer = async () => {
   const serverCleanup = useServer({ schema }, wsServer);
 
   // Apollo server
-  const server = new ApolloServer({
+  const server = new ApolloServer<GraphQLContext>({
     schema,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
@@ -71,7 +94,7 @@ export const startServer = async () => {
     bodyParser.json(),
     // Cast to any to work around Express v4/v5 RequestHandler type mismatch
     expressMiddleware(server, {
-      context: async ({ req }) => {
+      context: async ({ req }): Promise<GraphQLContext> => {
         const authHeader = req.headers.authorization || "";
         let user = null;
 
@@ -85,7 +108,7 @@ export const startServer = async () => {
           }
         }
 
-        return { user };
+        return { user, mcpServer };
       },
     }) as any
   );

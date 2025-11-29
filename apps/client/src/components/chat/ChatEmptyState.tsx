@@ -9,7 +9,8 @@ export const ChatEmptyState: React.FC<{
   setInput: (value: string) => void;
   handleSubmit: () => void;
   mode?: "default" | "fixed";
-}> = ({ input, setInput, handleSubmit }) => {
+  isLoading?: boolean;
+}> = ({ input, setInput, handleSubmit, isLoading }) => {
   const { isMobile } = useDeviceWidth();
 
   const containerStyles = isMobile ? "mb-[100px]" : "mb-[300px]";
@@ -27,6 +28,7 @@ export const ChatEmptyState: React.FC<{
           input={input}
           setInput={setInput}
           handleSubmit={handleSubmit}
+          isLoading={isLoading}
         />
       )}
     </div>

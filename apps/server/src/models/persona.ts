@@ -42,11 +42,6 @@ const PersonaSchema = new Schema<Persona>(
       memoryRetention: { type: Number, default: 0.8 },
     },
 
-    memoryIndex: {
-      longTermMemories: { type: [String], default: [] },
-      shortTermSummary: { type: String, default: null },
-    },
-
     meta: {
       version: { type: String, default: "1.0.0" },
       interactions: { type: Number, default: 0 },

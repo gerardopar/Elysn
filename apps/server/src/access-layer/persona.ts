@@ -34,8 +34,7 @@ export const getOrCreatePersona = async (userId: string, session?: any) => {
  * Get persona by ID
  */
 export const getPersona = async (personaId: string) => {
-  if (!mongoose.Types.ObjectId.isValid(personaId)) return null;
-  return Persona.findById(personaId);
+  return Persona.findById(personaId).lean();
 };
 
 /**

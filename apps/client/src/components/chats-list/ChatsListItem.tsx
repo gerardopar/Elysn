@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import { IonItem } from "@ionic/react";
 import EllispsesIcon from "../svgs/EllispsesIcon";
@@ -7,17 +7,26 @@ import ChatsListItemOptions from "./ChatsListItemOptions";
 
 import { useModal } from "@hooks/useModal";
 
-import type { GetChatQuery } from "@graphql/__generated__/graphql";
+import type { GetChatsQuery } from "@graphql/__generated__/graphql";
 import type { ChatsListItemOptionsProps } from "./ChatsListItemOptions";
 
 export const ChatsListItem: React.FC<{
-  chat: GetChatQuery["chat"];
+  chat: GetChatsQuery["chats"][number];
 }> = ({ chat }) => {
   const history = useHistory();
+  const { chatId: activeChatId } = useParams<{ chatId: string }>(); // active chat id
+
+  // if the deleted chat is the active chat, redirect to /chat
+  const onDelete = () => {
+    if (chat?.id === activeChatId) {
+      history.replace(`/chat`);
+    }
+  };
 
   const { open, close } = useModal<ChatsListItemOptionsProps>(
     ChatsListItemOptions,
     {
+      onDelete,
       dismiss: () => close(),
       chat,
     },
@@ -34,6 +43,9 @@ export const ChatsListItem: React.FC<{
     history.push(`/chat/${chat?.id}`);
   };
 
+  const title = chat?.title;
+  const lastMessageText = chat?.lastMessage?.text;
+
   return (
     <IonItem
       color="secondary-gray"
@@ -41,9 +53,12 @@ export const ChatsListItem: React.FC<{
       className="w-full! pl-2 cursor-pointer flex! items-center! justify-between! relative"
       onClick={(e) => handleChatClick(e)}
     >
-      <span className="text-primary-light text-sm font-roboto">
-        {chat?.title}
-      </span>
+      <div className="text-primary-light flex flex-col text-sm font-roboto">
+        <p className="line-clamp-1 font-semibold">{title}</p>
+        <p className="text-xs text-french-gray-2 line-clamp-1">
+          {lastMessageText}
+        </p>
+      </div>
 
       <button
         id="open-popover"

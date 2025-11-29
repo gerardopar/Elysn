@@ -12,11 +12,13 @@ import { useDeleteChatMutation } from "@graphql/mutations/chat";
 import type { GetChatQuery } from "@graphql/__generated__/graphql";
 
 export type ChatsListItemOptionsProps = {
+  onDelete: () => void;
   dismiss: () => void;
   chat: GetChatQuery["chat"];
 };
 
 const ChatsListItemOptions: React.FC<ChatsListItemOptionsProps> = ({
+  onDelete,
   dismiss,
   chat,
 }) => {
@@ -46,7 +48,10 @@ const ChatsListItemOptions: React.FC<ChatsListItemOptionsProps> = ({
           });
         },
       });
-      if (data?.deleteChat) dismiss();
+      if (data?.deleteChat) {
+        dismiss();
+        onDelete();
+      }
     } catch (error) {
       // TODO: show error toast
       console.error(error);

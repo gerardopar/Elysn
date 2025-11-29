@@ -47,6 +47,10 @@ export const CREATE_CHAT_WITH_MESSAGE_MUTATION: TypedDocumentNode<
       topic
       createdAt
       updatedAt
+      lastMessage {
+        id
+        text
+      }
     }
   }
 `;

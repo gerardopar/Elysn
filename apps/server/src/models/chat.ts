@@ -10,7 +10,7 @@ const ChatSchema = new Schema<Chat>(
     personaId: { type: String, required: true },
     title: { type: String },
     topic: { type: String },
-    summary: { type: String },
+    messagesCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

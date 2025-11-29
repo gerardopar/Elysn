@@ -21,4 +21,6 @@ export const resolvers: Resolvers = {
   Subscription: {
     ...messageResolvers.Subscription,
   },
+  // Type-level field resolvers
+  Chat: chatResolvers.Chat,
 };

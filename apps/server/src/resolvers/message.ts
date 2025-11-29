@@ -1,5 +1,3 @@
-import { openaiClient as openai } from "../services/openAi";
-
 import { getUserByFirebaseUid } from "src/access-layer/user";
 
 import {
@@ -8,13 +6,8 @@ import {
   updateMessage,
   getMessages,
   getMessage,
-  getRecentMessages,
 } from "../access-layer/message";
 import { getChat } from "../access-layer/chat";
-import { getPersona } from "src/access-layer/persona";
-
-import { MessageSenderEnum } from "@elysn/shared";
-import { createResponse } from "@elysn/core";
 
 import {
   Resolvers,
@@ -24,7 +17,15 @@ import {
   SubscriptionNewMessageArgs,
   QueryMessagesArgs,
   QueryMessageArgs,
+  Message,
+  MessageSenderEnum,
 } from "../graphql/__generated__/graphql";
+
+import { createPersonaMessage } from "../helpers/persona.helpers";
+import {
+  extractLongTermMemory,
+  maybeExtractShortTermMemory,
+} from "../helpers/memory.helpers";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
 
@@ -78,10 +79,10 @@ export const messageResolvers: Resolvers = {
       const user = await getUserByFirebaseUid(ctx.user.uid);
       if (!user) throw new Error("User not found");
 
-      const chat = await getChat(input?.chatId!);
+      const chat = await getChat(String(input.chatId));
       if (!chat) throw new Error("Chat not found");
 
-      // Save user message
+      // save user message
       const message = await createMessage({
         chatId: String(chat._id),
         personaId: String(chat.personaId),
@@ -89,14 +90,15 @@ export const messageResolvers: Resolvers = {
         sender: input.sender,
         text: input.text,
       });
-
       if (!message) throw new Error("Failed to create message");
 
-      // Publish user message
-      await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
+      // save and publish user message
+      pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
         newMessage: {
           id: String(message._id),
           userId: message.userId,
+          personaId: message.personaId,
+          chatId: message.chatId,
           sender: message.sender,
           text: message.text,
           timestamp: message.timestamp.getTime(),
@@ -104,51 +106,10 @@ export const messageResolvers: Resolvers = {
         },
       });
 
-      const persona = await getPersona(String(chat.personaId));
-      if (!persona) throw new Error("Persona not found");
-
-      let recentMessages = await getRecentMessages(String(chat._id));
-
-      recentMessages = [...recentMessages, message];
-
-      // AI response
-      const payload = createResponse(persona, recentMessages, input.text);
-
-      let aiText = "";
-      try {
-        const response = await openai.responses.create(payload);
-        aiText = response.output_text;
-      } catch (err) {
-        console.error("AI error:", err);
-        aiText =
-          "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
-      }
-
-      const aiMsg = await createMessage({
-        chatId: String(chat._id),
-        personaId: String(chat.personaId),
-        userId: String(user._id),
-        sender: MessageSenderEnum.AI,
-        text: aiText,
-      });
-
-      // Publish AI message
-      if (aiMsg) {
-        await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
-          newMessage: {
-            id: String(aiMsg._id),
-            userId: aiMsg.userId,
-            sender: aiMsg.sender,
-            text: aiMsg.text,
-            timestamp: aiMsg.timestamp.getTime(),
-            metadata: aiMsg.metadata,
-          },
-        });
-      }
-
       return {
         id: String(message._id),
         chatId: String(message.chatId),
+        personaId: String(message.personaId),
         userId: message.userId,
         sender: message.sender,
         text: message.text,
@@ -192,9 +153,45 @@ export const messageResolvers: Resolvers = {
 
   Subscription: {
     newMessage: {
-      // Subscription resolver — returns async iterator tied to chatId
       subscribe: (_parent, { chatId }: SubscriptionNewMessageArgs) => {
         return pubsub.asyncIterableIterator(`${MESSAGE_CHANNEL}_${chatId}`);
+      },
+
+      resolve: async (payload: { newMessage: Message }) => {
+        const msg = payload.newMessage;
+
+        if (msg.sender === MessageSenderEnum.AI) return msg;
+
+        // USER messages → trigger memory pipeline + AI reply
+        if (msg.sender === MessageSenderEnum.USER) {
+          // AI reply
+          createPersonaMessage(
+            String(msg.chatId),
+            String(msg.personaId),
+            String(msg.userId),
+            msg.text
+          ).catch((error) =>
+            console.warn("Failed to create persona message", error)
+          );
+
+          // STM extraction
+          maybeExtractShortTermMemory(
+            String(msg.chatId),
+            String(msg.personaId!)
+          ).catch((error) =>
+            console.warn("Failed to extract short term memory", error)
+          );
+
+          // LTM extraction
+          extractLongTermMemory({
+            messageId: msg.id,
+            personaId: msg.personaId!,
+          }).catch((error) =>
+            console.warn("Failed to extract long term memory", error)
+          );
+        }
+
+        return msg;
       },
     },
   },

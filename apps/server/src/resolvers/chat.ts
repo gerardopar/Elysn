@@ -1,5 +1,3 @@
-import { openaiClient as openai } from "../services/openAi";
-
 import mongoose from "mongoose";
 
 import {
@@ -8,6 +6,7 @@ import {
   getChats,
   deleteChat,
   updateChat as updateChatRecord,
+  getLastChatMessage,
 } from "../access-layer/chat";
 import { getOrCreatePersona } from "../access-layer/persona";
 import { createMessage } from "../access-layer/message";
@@ -23,10 +22,9 @@ import {
 } from "../graphql/__generated__/graphql";
 
 import { isChatOwner } from "../helpers/chat.helpers";
-import { createResponse } from "@elysn/core";
+import { createPersonaMessage } from "../helpers/persona.helpers";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
-import { MessageSenderEnum } from "@elysn/shared";
 
 export const chatResolvers: Resolvers = {
   Query: {
@@ -47,6 +45,7 @@ export const chatResolvers: Resolvers = {
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
         updatedAt: chat.updatedAt.getTime(),
+        messagesCount: chat.messagesCount,
       }));
     },
     chat: async (_parent, { id }: QueryChatArgs, ctx) => {
@@ -70,6 +69,7 @@ export const chatResolvers: Resolvers = {
         topic: chat.topic || null,
         createdAt: chat.createdAt.getTime(),
         updatedAt: chat.updatedAt.getTime(),
+        messagesCount: chat.messagesCount,
       };
     },
   },
@@ -108,6 +108,7 @@ export const chatResolvers: Resolvers = {
           topic: chat.topic,
           createdAt: chat.createdAt.getTime(),
           updatedAt: chat.updatedAt.getTime(),
+          messagesCount: chat.messagesCount,
         };
       } catch (error) {
         await session.abortTransaction();
@@ -159,11 +160,15 @@ export const chatResolvers: Resolvers = {
           session
         );
 
-        // Publish user message
+        await session.commitTransaction();
+
+        // Publish user message to any active subscribers
         await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
           newMessage: {
             id: String(createdMessage._id),
             userId: createdMessage.userId,
+            personaId: createdMessage.personaId,
+            chatId: createdMessage.chatId,
             sender: createdMessage.sender,
             text: createdMessage.text,
             timestamp: createdMessage.timestamp.getTime(),
@@ -171,41 +176,17 @@ export const chatResolvers: Resolvers = {
           },
         });
 
-        await session.commitTransaction();
-
-        const payload = createResponse(persona, [], message.text);
-
-        let aiText = "";
-        try {
-          const response = await openai.responses.create(payload);
-          aiText = response.output_text;
-        } catch (err) {
-          console.error("AI error:", err);
-          aiText =
-            "I’m sorry… I lost my train of thought for a moment. Could you say that again?";
-        }
-
-        const aiMsg = await createMessage({
-          chatId: String(chat._id),
-          personaId: String(chat.personaId),
-          userId: String(user._id),
-          sender: MessageSenderEnum.AI,
-          text: aiText,
-        });
-
-        // Publish AI message
-        if (aiMsg) {
-          await pubsub.publish(`${MESSAGE_CHANNEL}_${chat._id}`, {
-            newMessage: {
-              id: String(aiMsg._id),
-              userId: aiMsg.userId,
-              sender: aiMsg.sender,
-              text: aiMsg.text,
-              timestamp: aiMsg.timestamp.getTime(),
-              metadata: aiMsg.metadata,
-            },
-          });
-        }
+        // Trigger AI response directly instead of relying on subscription's resolve function.
+        // Why: When creating a new chat, no WebSocket subscribers exist yet since the client
+        // hasn't navigated to the chat view. The subscription's resolve function only runs
+        // when there are active subscribers, so we must trigger AI generation directly here.
+        // The AI message will still be published via pubsub for any future subscribers.
+        await createPersonaMessage(
+          String(chat._id),
+          String(persona._id),
+          String(user._id),
+          createdMessage.text
+        );
 
         return {
           id: String(chat._id),
@@ -215,6 +196,7 @@ export const chatResolvers: Resolvers = {
           topic: chat.topic,
           createdAt: chat.createdAt.getTime(),
           updatedAt: chat.updatedAt.getTime(),
+          messagesCount: chat.messagesCount,
         };
       } catch (error) {
         await session.abortTransaction();
@@ -271,6 +253,25 @@ export const chatResolvers: Resolvers = {
         topic: updatedChat.topic,
         createdAt: updatedChat.createdAt.getTime(),
         updatedAt: updatedChat.updatedAt.getTime(),
+        messagesCount: updatedChat.messagesCount,
+      };
+    },
+  },
+  Chat: {
+    lastMessage: async (parent: { id: string }) => {
+      const msg = await getLastChatMessage(parent.id);
+
+      if (!msg) return null;
+
+      return {
+        id: String(msg._id),
+        chatId: msg.chatId,
+        userId: msg.userId,
+        personaId: msg.personaId,
+        sender: msg.sender,
+        text: msg.text,
+        timestamp: msg.timestamp.getTime(),
+        metadata: msg.metadata,
       };
     },
   },

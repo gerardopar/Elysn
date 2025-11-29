@@ -19,8 +19,9 @@ export type Chat = {
   __typename: 'Chat';
   createdAt: Scalars['Float']['output'];
   id: Scalars['ID']['output'];
+  lastMessage: Maybe<Message>;
+  messagesCount: Scalars['Int']['output'];
   personaId: Scalars['ID']['output'];
-  summary: Maybe<Scalars['String']['output']>;
   title: Maybe<Scalars['String']['output']>;
   topic: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['Float']['output'];
@@ -40,10 +41,10 @@ export type CreateChatWithMessageInput = {
 
 export type Message = {
   __typename: 'Message';
-  chatId: Scalars['ID']['output'];
+  chatId: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   metadata: Maybe<MessageMetadata>;
-  personaId: Scalars['ID']['output'];
+  personaId: Maybe<Scalars['ID']['output']>;
   sender: MessageSenderEnum;
   text: Scalars['String']['output'];
   timestamp: Scalars['Float']['output'];
@@ -164,7 +165,6 @@ export type Persona = {
   createdAt: Scalars['Float']['output'];
   emotion: Maybe<PersonaEmotion>;
   id: Scalars['ID']['output'];
-  memoryIndex: Maybe<PersonaMemoryIndex>;
   meta: Maybe<PersonaMeta>;
   name: Maybe<Scalars['String']['output']>;
   persona: Maybe<PersonaData>;
@@ -172,6 +172,7 @@ export type Persona = {
   settings: Maybe<PersonaSettings>;
   state: Maybe<PersonaState>;
   updatedAt: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export type PersonaData = {
@@ -187,12 +188,6 @@ export type PersonaEmotion = {
   __typename: 'PersonaEmotion';
   current: Maybe<Scalars['String']['output']>;
   lastUpdated: Maybe<Scalars['Float']['output']>;
-};
-
-export type PersonaMemoryIndex = {
-  __typename: 'PersonaMemoryIndex';
-  longTermMemories: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  shortTermSummary: Maybe<Scalars['String']['output']>;
 };
 
 export type PersonaMeta = {
@@ -313,7 +308,7 @@ export type CreateChatWithMessageMutationVariables = Exact<{
 }>;
 
 
-export type CreateChatWithMessageMutation = { createChatWithMessage: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number } };
+export type CreateChatWithMessageMutation = { createChatWithMessage: { __typename: 'Chat', id: string, userId: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number, lastMessage: { __typename: 'Message', id: string, text: string } | null } };
 
 export type DeleteChatMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -335,7 +330,7 @@ export type CreateMessageMutationVariables = Exact<{
 }>;
 
 
-export type CreateMessageMutation = { createMessage: { __typename: 'Message', id: string, chatId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+export type CreateMessageMutation = { createMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
 
 export type UpdateMessageMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -343,14 +338,14 @@ export type UpdateMessageMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMessageMutation = { updateMessage: { __typename: 'Message', id: string, chatId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+export type UpdateMessageMutation = { updateMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
 
 export type DeleteMessageMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteMessageMutation = { deleteMessage: { __typename: 'Message', id: string, chatId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
+export type DeleteMessageMutation = { deleteMessage: { __typename: 'Message', id: string, chatId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string } };
 
 export type CreateUserMutationVariables = Exact<{
   firebaseUid: Scalars['String']['input'];
@@ -375,7 +370,7 @@ export type UpsertUserMutation = { upsertUser: { __typename: 'User', id: string,
 export type GetChatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetChatsQuery = { chats: Array<{ __typename: 'Chat', id: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number }> };
+export type GetChatsQuery = { chats: Array<{ __typename: 'Chat', id: string, title: string | null, topic: string | null, createdAt: number, updatedAt: number, lastMessage: { __typename: 'Message', id: string, text: string } | null }> };
 
 export type GetChatQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -396,7 +391,7 @@ export type GetMessagesQueryVariables = Exact<{
 }>;
 
 
-export type GetMessagesQuery = { messages: Array<{ __typename: 'Message', id: string, chatId: string, personaId: string, text: string, sender: MessageSenderEnum, timestamp: number, userId: string }> | null };
+export type GetMessagesQuery = { messages: Array<{ __typename: 'Message', id: string, chatId: string | null, personaId: string | null, text: string, sender: MessageSenderEnum, timestamp: number, userId: string }> | null };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 

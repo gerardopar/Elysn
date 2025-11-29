@@ -23,7 +23,7 @@ export const ChatView: React.FC = () => {
   const [input, setInput] = useState<string>("");
   const [isAtBottom, setIsAtBottom] = useState(true);
 
-  const [createMessage] = useCreateMessageMutation();
+  const [createMessage, { loading }] = useCreateMessageMutation();
   const { data } = useGetMessagesQuery({ chatId: chatId! });
   useNewMessageSubscription(chatId!);
 
@@ -83,6 +83,7 @@ export const ChatView: React.FC = () => {
         input={input}
         setInput={setInput}
         handleSubmit={handleCreateMessage}
+        isLoading={loading}
         mode="fixed"
       />
     </>

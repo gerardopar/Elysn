@@ -24,26 +24,39 @@ export const NEW_MESSAGE_SUBSCRIPTION: TypedDocumentNode<
 
 export const useNewMessageSubscription = (chatId: string) => {
   return useSubscription(NEW_MESSAGE_SUBSCRIPTION, {
-    variables: {
-      chatId,
-    },
+    variables: { chatId },
+
     onData: ({ client, data }) => {
       const newMessage = data?.data?.newMessage;
       if (!newMessage) return;
 
+      const chatCacheId = client.cache.identify({
+        __typename: "Chat",
+        id: chatId,
+      });
+
       client.cache.modify({
         fields: {
-          messages(existingMessageRefs = [], { toReference }) {
-            const newRef = toReference(newMessage as any);
-            // avoid duplicates:
-            if (
-              existingMessageRefs.some(
-                (ref: any) => ref.__ref === newRef?.__ref
-              )
-            ) {
-              return existingMessageRefs;
+          messages(existing = [], { toReference }) {
+            const ref = toReference(newMessage);
+            if (existing.some((e: any) => e.__ref === ref?.__ref)) {
+              return existing;
             }
-            return [...existingMessageRefs, newRef];
+            return [...existing, ref];
+          },
+        },
+      });
+
+      client.cache.modify({
+        id: chatCacheId,
+        fields: {
+          lastMessage() {
+            return {
+              __typename: "Message",
+              id: newMessage.id,
+              text: newMessage.text,
+              timestamp: newMessage.timestamp,
+            };
           },
         },
       });
