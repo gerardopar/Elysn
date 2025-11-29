@@ -2,7 +2,7 @@ export type Message = {
   id: string;
   userId: string;
   chatId: string | null | undefined;
-  personaId: string;
+  personaId?: string | null | undefined;
   sender: MessageSenderEnum;
   text: string;
   timestamp: number;
