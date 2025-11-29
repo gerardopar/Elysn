@@ -112,7 +112,7 @@ export const saveLongTermMemory = async ({
       return null;
     }
 
-    const { category, value, importance } = extractedMemory.memory;
+    const { category, value, importance, topics } = extractedMemory.memory;
 
     const memory = await Memory.create({
       personaId,
@@ -121,6 +121,7 @@ export const saveLongTermMemory = async ({
       category,
       value,
       importance,
+      topics,
     });
 
     return memory;

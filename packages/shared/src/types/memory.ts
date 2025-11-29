@@ -50,5 +50,6 @@ export type LongTermMemoryExtractionResponse = {
     category: LongTermMemoryCategoryEnum;
     value: string;
     importance: number;
+    topics: string[];
   } | null;
 };
