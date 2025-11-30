@@ -6,6 +6,7 @@ import {
   updateMessage,
   getMessages,
   getMessage,
+  updateMessageTopics,
 } from "../access-layer/message";
 import { getChat } from "../access-layer/chat";
 
@@ -23,6 +24,7 @@ import {
 
 import { createPersonaMessage } from "../helpers/persona.helpers";
 import {
+  extractTopics,
   extractLongTermMemory,
   maybeExtractShortTermMemory,
 } from "../helpers/memory.helpers";
@@ -164,12 +166,19 @@ export const messageResolvers: Resolvers = {
 
         // USER messages → trigger memory pipeline + AI reply
         if (msg.sender === MessageSenderEnum.USER) {
+          // extract topics from message
+          const extractedTopics = await extractTopics(msg?.text);
+          if (extractedTopics) {
+            await updateMessageTopics(String(msg?.id), extractedTopics);
+          }
+
           // AI reply
           createPersonaMessage(
             String(msg.chatId),
             String(msg.personaId),
             String(msg.userId),
-            msg.text
+            msg.id,
+            extractedTopics
           ).catch((error) =>
             console.warn("Failed to create persona message", error)
           );

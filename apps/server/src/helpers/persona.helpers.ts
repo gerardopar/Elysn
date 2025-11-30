@@ -9,11 +9,12 @@ import { sanitizeText } from "./string.helpers";
 
 import { getUser } from "../access-layer/user";
 import { getChat } from "../access-layer/chat";
+import { getMessage } from "../access-layer/message";
 import { getPersona } from "../access-layer/persona";
 import { createMessage, getRecentMessages } from "../access-layer/message";
 import {
-  getLongTermMemories,
   getLatestShortTermMemory,
+  getMetadataFilteredLongTermMemories,
 } from "../access-layer/memory";
 
 import { createResponse } from "@elysn/core";
@@ -40,16 +41,18 @@ export const createPersonaMessage = async (
   chat: Chat | string,
   persona: Persona | string,
   user: User | string,
-  userMessageText: string
+  message: Message | string,
+  topics?: string[] | null
 ) => {
   const _chat = typeof chat === "string" ? await getChat(chat) : chat;
   const _persona =
     typeof persona === "string" ? await getPersona(persona) : persona;
   const _user = typeof user === "string" ? await getUser(user) : user;
+  const _message =
+    typeof message === "string" ? await getMessage(message) : message;
 
-  if (!_chat || !_persona || !_user) {
-    throw new Error("Missing chat, persona, or user for AI generation");
-  }
+  if (!_chat || !_persona || !_user || !_message)
+    throw new Error("Missing data for AI generation");
 
   // Fetch last messages from DB
   let recentMessages = await getRecentMessages(String(_chat?._id));
@@ -58,11 +61,14 @@ export const createPersonaMessage = async (
   // Append the current user message manually
   recentMessages.push({
     sender: MessageSenderEnum.USER,
-    text: userMessageText,
+    text: _message?.text,
   } as Message);
 
   // Get memory
-  const longTermMemories = await getLongTermMemories(String(_persona?._id));
+  const longTermMemories = await getMetadataFilteredLongTermMemories(
+    String(_persona?._id),
+    topics || []
+  );
 
   const recentStm = await getLatestShortTermMemory(
     String(_persona?._id),
@@ -75,7 +81,7 @@ export const createPersonaMessage = async (
     const payload = createResponse(
       _persona,
       recentMessages,
-      userMessageText,
+      _message?.text ?? "",
       longTermMemories,
       recentStm
     );

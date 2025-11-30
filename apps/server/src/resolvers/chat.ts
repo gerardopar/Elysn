@@ -9,7 +9,7 @@ import {
   getLastChatMessage,
 } from "../access-layer/chat";
 import { getOrCreatePersona } from "../access-layer/persona";
-import { createMessage } from "../access-layer/message";
+import { createMessage, updateMessageTopics } from "../access-layer/message";
 import { getUserByFirebaseUid } from "src/access-layer/user";
 
 import {
@@ -22,6 +22,7 @@ import {
 } from "../graphql/__generated__/graphql";
 
 import { isChatOwner } from "../helpers/chat.helpers";
+import { extractTopics } from "src/helpers/memory.helpers";
 import { createPersonaMessage } from "../helpers/persona.helpers";
 
 import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
@@ -176,6 +177,11 @@ export const chatResolvers: Resolvers = {
           },
         });
 
+        const topics = await extractTopics(createdMessage.text);
+        if (topics) {
+          await updateMessageTopics(String(createdMessage._id), topics);
+        }
+
         // Trigger AI response directly instead of relying on subscription's resolve function.
         // Why: When creating a new chat, no WebSocket subscribers exist yet since the client
         // hasn't navigated to the chat view. The subscription's resolve function only runs
@@ -185,7 +191,8 @@ export const chatResolvers: Resolvers = {
           String(chat._id),
           String(persona._id),
           String(user._id),
-          createdMessage.text
+          createdMessage.id,
+          topics
         );
 
         return {
