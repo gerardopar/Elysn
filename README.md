@@ -10,6 +10,7 @@ Elysn is an AI-native chat platform built around realtime GraphQL, OpenAI-backed
 - `packages/shared` – Lightweight shared types (chat, message, user, memory).
 - `pnpm-workspace.yaml` – Monorepo wiring for all packages/apps.
 
+```text
 elysn/
 ├── apps/
 │ ├── server/ # Express + Apollo GraphQL API
@@ -29,6 +30,7 @@ elysn/
 │ └── shared/ # Reusable TS types & enums
 │
 └── pnpm-workspace.yaml # Monorepo wiring
+```
 
 ## Tech Stack
 
