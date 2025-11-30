@@ -27,6 +27,7 @@ const MessageSchema = new Schema<Message>(
           intent: { type: String },
           memoryTag: { type: String },
           isMemoryWorthy: { type: Boolean },
+          topics: { type: [String], default: [] },
         },
         { _id: false }
       ),

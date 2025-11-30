@@ -6,14 +6,26 @@ export type Message = {
   sender: MessageSenderEnum;
   text: string;
   timestamp: number;
-  metadata?: any;
+  metadata?: {
+    emotion?: string;
+    intent?: string;
+    memoryTag?: string;
+    isMemoryWorthy?: boolean;
+    topics?: string[];
+  };
 };
 
 export type MessageInput = {
   chatId?: string;
   sender: MessageSenderEnum;
   text: string;
-  metadata?: any;
+  metadata?: {
+    emotion?: string;
+    intent?: string;
+    memoryTag?: string;
+    isMemoryWorthy?: boolean;
+    topics?: string[];
+  };
 };
 
 export enum MessageSenderEnum {
