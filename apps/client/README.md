@@ -1,73 +1,101 @@
-# React + TypeScript + Vite
+# Elysn Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend application for Elysn, built with React, Ionic, and Vite. It is designed as a cross-platform application (Web, iOS, Android) with a focus on performance and modern UI/UX.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Core**: [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/)
+- **UI Framework**: [Ionic React](https://ionicframework.com/docs/react), [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand) (via [zustand-x](https://github.com/udecode/zustand-x))
+- **Data Fetching**: [Apollo Client](https://www.apollographql.com/docs/react/) (GraphQL)
+- **Mobile Runtime**: [Capacitor](https://capacitorjs.com/)
+- **Animation**: [Framer Motion](https://www.framer.com/motion/), [Lottie React](https://github.com/Gamote/lottie-react)
+- **3D Graphics**: [Three.js](https://threejs.org/)
+- **Utilities**: [Lodash](https://lodash.com/), [Moment.js](https://momentjs.com/), [Nanoid](https://github.com/ai/nanoid)
 
-## React Compiler
+## Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/components`: Reusable UI components.
+- `src/pages`: Application views/routes.
+- `src/hooks`: Custom React hooks.
+- `src/stores`: Global state stores (Zustand).
+- `src/graphql`: GraphQL operations (queries, mutations, subscriptions) and generated types.
+- `src/theme`: Global theme variables and Ionic configuration.
+- `src/styles`: Global CSS and SCSS files.
+- `src/router`: Routing configuration.
+- `src/firebase`: Firebase client configuration.
+- `src/helpers`: Utility functions.
+- `src/assets`: Static assets (images, icons).
 
-## Expanding the ESLint configuration
+## Setup & Configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js (Latest LTS recommended)
+- pnpm (Package manager)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1.  Navigate to the project root (or `apps/client`).
+2.  Install dependencies:
+    ```bash
+    pnpm i
+    ```
+
+## Development Workflow
+
+### Running Locally
+
+Start the development server with hot module replacement (HMR):
+
+```bash
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at `http://localhost:5173` (default Vite port).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### GraphQL Code Generation
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The project uses `graphql-codegen` to generate TypeScript types from your GraphQL operations.
+Whenever you modify `.graphql` files or GraphQL operations in code:
+
+1.  Ensure the backend server is running (usually at `http://localhost:4000/graphql`).
+2.  Run the codegen command:
+    ```bash
+    pnpm codegen
+    ```
+    Or run in watch mode:
+    ```bash
+    pnpm codegen:watch
+    ```
+
+### Building for Production
+
+To build the application for production deployment:
+
+```bash
+pnpm build
 ```
+
+This compiles the TypeScript code and bundles the assets into the `dist` directory.
+
+### Mobile Development (Capacitor)
+
+To sync the web build with native projects (iOS/Android):
+
+```bash
+npx cap sync
+```
+
+To open the native IDEs:
+
+```bash
+npx cap open ios
+npx cap open android
+```
+
+## Key Features
+
+- **Real-time Updates**: Uses GraphQL Subscriptions (via `graphql-ws`) for live data updates.
+- **PWA Ready**: Includes PWA elements for camera and other native features on the web.
+- **Responsive Design**: Built with Ionic and Tailwind to work seamlessly across mobile and desktop.
