@@ -25,7 +25,11 @@ import {
 import { createResponse } from "@elysn/core";
 import { MessageSenderEnum } from "@elysn/shared";
 
-import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
+import {
+  pubsub,
+  MESSAGE_CHANNEL,
+  PERSONA_STATUS_CHANNEL,
+} from "../pubsub/pubsub";
 
 export const personaExists = async (userId: string): Promise<boolean> => {
   const persona = await Persona.findOne({ userId });
@@ -124,6 +128,14 @@ export const createPersonaMessage = async (
       text: aiMsg.text,
       timestamp: aiMsg.timestamp.getTime(),
       metadata: aiMsg.metadata,
+    },
+  });
+
+  // Publish persona status
+  pubsub.publish(`${PERSONA_STATUS_CHANNEL}_${_chat._id}`, {
+    personaStatus: {
+      typing: false,
+      chatId: _chat._id,
     },
   });
 

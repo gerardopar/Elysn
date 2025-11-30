@@ -64,3 +64,12 @@ extend type Query {
 extend type Mutation {
   updatePersona(id: ID!, input: UpdatePersonaInput!): Persona!
 }
+
+type PersonaStatus {
+  typing: Boolean!
+  chatId: ID!
+}
+
+type Subscription {
+  personaStatus(chatId: ID!): PersonaStatus!
+}

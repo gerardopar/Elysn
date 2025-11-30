@@ -1,6 +1,7 @@
 import { userResolvers } from "./user";
 import { chatResolvers } from "./chat";
 import { messageResolvers } from "./message";
+import { personaResolvers } from "./persona";
 
 import { Resolvers } from "../graphql/__generated__/graphql";
 
@@ -20,6 +21,7 @@ export const resolvers: Resolvers = {
   },
   Subscription: {
     ...messageResolvers.Subscription,
+    ...personaResolvers.Subscription,
   },
   // Type-level field resolvers
   Chat: chatResolvers.Chat,
