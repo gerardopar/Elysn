@@ -221,6 +221,12 @@ export type PersonaState = {
   energy?: Maybe<Scalars['Float']['output']>;
 };
 
+export type PersonaStatus = {
+  __typename?: 'PersonaStatus';
+  chatId: Scalars['ID']['output'];
+  typing: Scalars['Boolean']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   chat?: Maybe<Chat>;
@@ -269,10 +275,16 @@ export type Subscription = {
   __typename?: 'Subscription';
   _empty?: Maybe<Scalars['String']['output']>;
   newMessage: Message;
+  personaStatus: PersonaStatus;
 };
 
 
 export type SubscriptionNewMessageArgs = {
+  chatId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionPersonaStatusArgs = {
   chatId: Scalars['ID']['input'];
 };
 
@@ -391,6 +403,7 @@ export type ResolversTypes = {
   PersonaRelationship: ResolverTypeWrapper<PersonaRelationship>;
   PersonaSettings: ResolverTypeWrapper<PersonaSettings>;
   PersonaState: ResolverTypeWrapper<PersonaState>;
+  PersonaStatus: ResolverTypeWrapper<PersonaStatus>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -420,6 +433,7 @@ export type ResolversParentTypes = {
   PersonaRelationship: PersonaRelationship;
   PersonaSettings: PersonaSettings;
   PersonaState: PersonaState;
+  PersonaStatus: PersonaStatus;
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
   Subscription: Record<PropertyKey, never>;
@@ -531,6 +545,11 @@ export type PersonaStateResolvers<ContextType = any, ParentType extends Resolver
   energy?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
 };
 
+export type PersonaStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaStatus'] = ResolversParentTypes['PersonaStatus']> = {
+  chatId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  typing?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, RequireFields<QueryChatArgs, 'id'>>;
   chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
@@ -547,6 +566,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   _empty?: SubscriptionResolver<Maybe<ResolversTypes['String']>, "_empty", ParentType, ContextType>;
   newMessage?: SubscriptionResolver<ResolversTypes['Message'], "newMessage", ParentType, ContextType, RequireFields<SubscriptionNewMessageArgs, 'chatId'>>;
+  personaStatus?: SubscriptionResolver<ResolversTypes['PersonaStatus'], "personaStatus", ParentType, ContextType, RequireFields<SubscriptionPersonaStatusArgs, 'chatId'>>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -573,6 +593,7 @@ export type Resolvers<ContextType = any> = {
   PersonaRelationship?: PersonaRelationshipResolvers<ContextType>;
   PersonaSettings?: PersonaSettingsResolvers<ContextType>;
   PersonaState?: PersonaStateResolvers<ContextType>;
+  PersonaStatus?: PersonaStatusResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

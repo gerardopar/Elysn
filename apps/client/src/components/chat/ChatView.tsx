@@ -10,6 +10,7 @@ import { useScrollToBottom } from "@hooks/useScrollToBottom";
 import { useGetMessagesQuery } from "@graphql/queries/message";
 import { useCreateMessageMutation } from "@graphql/mutations/message";
 import { useNewMessageSubscription } from "@graphql/subscriptions/message";
+import { usePersonaStatusSubscription } from "@graphql/subscriptions/persona";
 
 import { MessageSenderEnum } from "@elysn/shared";
 import { chatInputSchema } from "../chat/chat.helpers";
@@ -25,7 +26,12 @@ export const ChatView: React.FC = () => {
 
   const [createMessage, { loading }] = useCreateMessageMutation();
   const { data } = useGetMessagesQuery({ chatId: chatId! });
+
+  // subscriptions
   useNewMessageSubscription(chatId!);
+
+  const { data: personaStatusData } = usePersonaStatusSubscription(chatId!);
+  const personaTypingStatus = personaStatusData?.personaStatus?.typing ?? false;
 
   const messages = data?.messages || [];
 
@@ -73,7 +79,10 @@ export const ChatView: React.FC = () => {
           onScroll={handleScroll}
           className="w-full h-full bg-primary-dark ion-padding overflow-y-auto flex justify-center pt-[60px]"
         >
-          <Messages messages={messages} />
+          <Messages
+            messages={messages}
+            personaTypingStatus={personaTypingStatus}
+          />
         </div>
 
         {!isAtBottom && <ScrollToBottomButton containerRef={containerRef} />}

@@ -6,6 +6,7 @@ import { Memory } from "../models/memory";
 import {
   extractLongTermMemoryResponse,
   extractShortTermMemoryResponse,
+  extractMessageTopics,
 } from "@elysn/core";
 import {
   LongTermMemoryExtractionResponse,
@@ -112,7 +113,7 @@ export const saveLongTermMemory = async ({
       return null;
     }
 
-    const { category, value, importance } = extractedMemory.memory;
+    const { category, value, importance, topics } = extractedMemory.memory;
 
     const memory = await Memory.create({
       personaId,
@@ -121,6 +122,7 @@ export const saveLongTermMemory = async ({
       category,
       value,
       importance,
+      topics,
     });
 
     return memory;
@@ -128,4 +130,26 @@ export const saveLongTermMemory = async ({
     console.error("[saveLongTermMemory] Failed to save memory:", err);
     return null;
   }
+};
+
+export const extractTopics = async (
+  messageText: string
+): Promise<string[] | null> => {
+  if (!messageText) return null;
+
+  const payload = extractMessageTopics(messageText);
+
+  if (!payload) return null;
+
+  const response: OpenAI.Responses.Response = await openai.responses.create(
+    payload
+  );
+
+  if (!response || !response.output_text) return null;
+  const sanitizedOutput = sanitizeJSON(response.output_text);
+  const extractedTopics: { topics: string[] } = JSON.parse(sanitizedOutput);
+
+  if (!extractedTopics?.topics) return null;
+
+  return extractedTopics.topics;
 };

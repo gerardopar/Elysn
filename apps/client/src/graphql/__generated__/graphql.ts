@@ -219,6 +219,12 @@ export type PersonaState = {
   energy: Maybe<Scalars['Float']['output']>;
 };
 
+export type PersonaStatus = {
+  __typename: 'PersonaStatus';
+  chatId: Scalars['ID']['output'];
+  typing: Scalars['Boolean']['output'];
+};
+
 export type Query = {
   __typename: 'Query';
   chat: Maybe<Chat>;
@@ -267,10 +273,16 @@ export type Subscription = {
   __typename: 'Subscription';
   _empty: Maybe<Scalars['String']['output']>;
   newMessage: Message;
+  personaStatus: PersonaStatus;
 };
 
 
 export type SubscriptionNewMessageArgs = {
+  chatId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionPersonaStatusArgs = {
   chatId: Scalars['ID']['input'];
 };
 
@@ -404,3 +416,10 @@ export type NewMessageSubscriptionVariables = Exact<{
 
 
 export type NewMessageSubscription = { newMessage: { __typename: 'Message', id: string, userId: string, sender: MessageSenderEnum, text: string, timestamp: number } };
+
+export type PersonaStatusSubscriptionVariables = Exact<{
+  chatId: Scalars['ID']['input'];
+}>;
+
+
+export type PersonaStatusSubscription = { personaStatus: { __typename: 'PersonaStatus', typing: boolean, chatId: string } };

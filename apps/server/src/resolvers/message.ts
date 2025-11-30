@@ -27,7 +27,11 @@ import {
   maybeExtractShortTermMemory,
 } from "../helpers/memory.helpers";
 
-import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
+import {
+  pubsub,
+  MESSAGE_CHANNEL,
+  PERSONA_STATUS_CHANNEL,
+} from "../pubsub/pubsub";
 
 export const messageResolvers: Resolvers = {
   Query: {
@@ -164,12 +168,20 @@ export const messageResolvers: Resolvers = {
 
         // USER messages → trigger memory pipeline + AI reply
         if (msg.sender === MessageSenderEnum.USER) {
+          // publish persona status
+          pubsub.publish(`${PERSONA_STATUS_CHANNEL}_${msg.chatId}`, {
+            personaStatus: {
+              typing: true,
+              chatId: msg.chatId,
+            },
+          });
+
           // AI reply
           createPersonaMessage(
             String(msg.chatId),
             String(msg.personaId),
             String(msg.userId),
-            msg.text
+            msg.id
           ).catch((error) =>
             console.warn("Failed to create persona message", error)
           );

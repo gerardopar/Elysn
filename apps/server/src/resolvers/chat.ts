@@ -8,8 +8,8 @@ import {
   updateChat as updateChatRecord,
   getLastChatMessage,
 } from "../access-layer/chat";
-import { getOrCreatePersona } from "../access-layer/persona";
 import { createMessage } from "../access-layer/message";
+import { getOrCreatePersona } from "../access-layer/persona";
 import { getUserByFirebaseUid } from "src/access-layer/user";
 
 import {
@@ -185,7 +185,7 @@ export const chatResolvers: Resolvers = {
           String(chat._id),
           String(persona._id),
           String(user._id),
-          createdMessage.text
+          String(createdMessage._id)
         );
 
         return {

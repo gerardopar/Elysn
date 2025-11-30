@@ -96,3 +96,14 @@ export const getMessages = async (chatId: string, limit: number = 100) => {
 export const getMessage = async (id: string) => {
   return Message.findById(id).lean();
 };
+
+export const updateMessageTopics = async (id: string, topics: string[]) => {
+  const message = await getMessage(id);
+  if (!message) return null;
+
+  return Message.findByIdAndUpdate(
+    id,
+    { metadata: { ...message.metadata, topics } },
+    { new: true }
+  );
+};
