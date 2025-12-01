@@ -19,6 +19,7 @@ type MessageMetadata {
   intent: String
   memoryTag: String
   isMemoryWorthy: Boolean
+  embedding: [Float]
 }
 
 input MessageInput {

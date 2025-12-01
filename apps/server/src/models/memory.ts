@@ -32,6 +32,10 @@ const MemorySchema = new Schema({
   sentiment: { type: Number }, // -1 to 1
   emotion: { type: String }, // "stressed", "happy", etc.
   topics: [String],
+  embedding: {
+    type: [Number],
+    default: [],
+  },
 
   messageId: { type: String }, // where it came from
   fromMessageCount: Number,
