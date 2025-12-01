@@ -16,6 +16,7 @@ export const createMessage = async (
     sender,
     text,
     metadata,
+    embedding,
   }: {
     chatId: string;
     userId: string;
@@ -23,6 +24,7 @@ export const createMessage = async (
     sender: MessageSenderEnum;
     text: string;
     metadata?: Record<string, any> | null;
+    embedding?: number[] | null;
   },
   session?: mongoose.ClientSession
 ) => {
@@ -33,6 +35,7 @@ export const createMessage = async (
     sender,
     text: text.trim(),
     metadata,
+    embedding,
   });
 
   // Save message (in or out of transaction)
