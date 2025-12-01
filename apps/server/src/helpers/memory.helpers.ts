@@ -7,6 +7,7 @@ import {
   extractLongTermMemoryResponse,
   extractShortTermMemoryResponse,
   extractMessageTopics,
+  embeddingResponse,
 } from "@elysn/core";
 import {
   LongTermMemoryExtractionResponse,
@@ -115,6 +116,8 @@ export const saveLongTermMemory = async ({
 
     const { category, value, importance, topics } = extractedMemory.memory;
 
+    const embedding = await createMemoryEmbedding(value);
+
     const memory = await Memory.create({
       personaId,
       type: MemoryTypeEnum.LTM,
@@ -123,6 +126,7 @@ export const saveLongTermMemory = async ({
       value,
       importance,
       topics,
+      embedding,
     });
 
     return memory;
@@ -152,4 +156,20 @@ export const extractTopics = async (
   if (!extractedTopics?.topics) return null;
 
   return extractedTopics.topics;
+};
+
+export const createMemoryEmbedding = async (
+  text: string
+): Promise<number[] | null> => {
+  if (!text) return [];
+
+  const payload = embeddingResponse(text);
+
+  const embedding = await openai.embeddings.create(payload);
+
+  const vector = embedding?.data?.[0]?.embedding;
+
+  if (!vector) return [];
+
+  return vector;
 };
