@@ -60,6 +60,7 @@ export type MessageInput = {
 
 export type MessageMetadata = {
   __typename: 'MessageMetadata';
+  embedding: Maybe<Array<Maybe<Scalars['Float']['output']>>>;
   emotion: Maybe<Scalars['String']['output']>;
   intent: Maybe<Scalars['String']['output']>;
   isMemoryWorthy: Maybe<Scalars['Boolean']['output']>;

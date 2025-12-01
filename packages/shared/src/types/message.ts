@@ -12,6 +12,7 @@ export type Message = {
     memoryTag?: string;
     isMemoryWorthy?: boolean;
     topics?: string[];
+    embedding?: number[];
   };
 };
 
@@ -25,6 +26,7 @@ export type MessageInput = {
     memoryTag?: string;
     isMemoryWorthy?: boolean;
     topics?: string[];
+    embedding?: number[];
   };
 };
 

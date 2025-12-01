@@ -35,6 +35,7 @@ export type Memory = {
   sentiment: number;
   emotion: string;
   topics: string[];
+  embedding: number[];
 
   messageId?: string; // message where the memory was extracted
   fromMessageCount?: number;

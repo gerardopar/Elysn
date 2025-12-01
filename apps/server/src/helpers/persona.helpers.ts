@@ -6,7 +6,8 @@ import { Chat } from "../models/chat";
 import { User } from "../models/user";
 
 import { sanitizeText } from "./string.helpers";
-import { extractTopics } from "./memory.helpers";
+import { updateMessageEmbedding } from "./message.helpers";
+import { createMemoryEmbedding, extractTopics } from "./memory.helpers";
 
 import { getUser } from "../access-layer/user";
 import { getChat } from "../access-layer/chat";
@@ -19,7 +20,7 @@ import {
 } from "../access-layer/message";
 import {
   getLatestShortTermMemory,
-  getMetadataFilteredLongTermMemories,
+  getLongTermMemories,
 } from "../access-layer/memory";
 
 import { createResponse } from "@elysn/core";
@@ -63,10 +64,12 @@ export const createPersonaMessage = async (
     throw new Error("Missing data for AI generation");
 
   const extractedTopics = await extractTopics(_message?.text);
+  const embedding = await createMemoryEmbedding(_message?.text);
 
   if (extractedTopics) {
     // non-blocking
     updateMessageTopics(String(_message?._id), extractedTopics);
+    updateMessageEmbedding(String(_message?._id), embedding);
   }
 
   // Fetch last messages from DB
@@ -80,9 +83,10 @@ export const createPersonaMessage = async (
   } as Message);
 
   // Get memory
-  const longTermMemories = await getMetadataFilteredLongTermMemories(
+  const longTermMemories = await getLongTermMemories(
     String(_persona?._id),
-    extractedTopics || []
+    extractedTopics || [],
+    embedding
   );
 
   const recentStm = await getLatestShortTermMemory(

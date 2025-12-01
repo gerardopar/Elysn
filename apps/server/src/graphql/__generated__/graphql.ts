@@ -62,6 +62,7 @@ export type MessageInput = {
 
 export type MessageMetadata = {
   __typename?: 'MessageMetadata';
+  embedding?: Maybe<Array<Maybe<Scalars['Float']['output']>>>;
   emotion?: Maybe<Scalars['String']['output']>;
   intent?: Maybe<Scalars['String']['output']>;
   isMemoryWorthy?: Maybe<Scalars['Boolean']['output']>;
@@ -470,6 +471,7 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type MessageMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['MessageMetadata'] = ResolversParentTypes['MessageMetadata']> = {
+  embedding?: Resolver<Maybe<Array<Maybe<ResolversTypes['Float']>>>, ParentType, ContextType>;
   emotion?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   intent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   isMemoryWorthy?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;

@@ -1,6 +1,6 @@
 import { Memory } from "../models/memory";
 
-import { buildLongTermMemoryFilter } from "@elysn/core";
+import { buildLongTermMemoryFilter, getRelevantLTMMemories } from "@elysn/core";
 
 import { MemoryTypeEnum } from "@elysn/shared";
 
@@ -31,7 +31,20 @@ export const getMemoryByPersonaIdAndChatId = async (
   return memory;
 };
 
-export const getLongTermMemories = async (
+export const getLatestShortTermMemory = async (
+  personaId: string,
+  chatId: string
+): Promise<Memory | null> => {
+  const memory = await Memory.findOne({
+    personaId,
+    chatId,
+    type: MemoryTypeEnum.STM_TRAIL,
+  }).sort({ toMessageCount: -1 });
+
+  return memory || null;
+};
+
+export const getLongTermMemoriesSimple = async (
   personaId: string,
   limit = 10
 ): Promise<Memory[]> => {
@@ -53,7 +66,7 @@ export const getMetadataFilteredLongTermMemories = async (
   }
 ): Promise<Memory[]> => {
   const filter = buildLongTermMemoryFilter(personaId, topics, options);
-  const { limit = 10 } = options || {};
+  const { limit = 100 } = options || {};
 
   let memories = await Memory.find(filter)
     .sort({ importance: -1, lastUpdated: -1 })
@@ -70,15 +83,34 @@ export const getMetadataFilteredLongTermMemories = async (
   return memories;
 };
 
-export const getLatestShortTermMemory = async (
+export const getLongTermMemories = async (
   personaId: string,
-  chatId: string
-): Promise<Memory | null> => {
-  const memory = await Memory.findOne({
+  topics?: string[],
+  embedding?: number[] | null,
+  options?: {
+    minImportance?: number;
+    maxAgeMonths?: number;
+    limit?: number;
+  }
+): Promise<Memory[]> => {
+  // Get memories with metadata filtering
+  const memories = await getMetadataFilteredLongTermMemories(
     personaId,
-    chatId,
-    type: MemoryTypeEnum.STM_TRAIL,
-  }).sort({ toMessageCount: -1 });
+    topics,
+    options
+  );
 
-  return memory || null;
+  // get memories with embedding filtering
+  // @ts-expect-error expected type Memory[]
+  const relevantMemories: Memory[] = await getRelevantLTMMemories(
+    memories,
+    embedding,
+    options?.limit
+  );
+
+  if (relevantMemories.length > 0) {
+    return relevantMemories;
+  }
+
+  return memories;
 };

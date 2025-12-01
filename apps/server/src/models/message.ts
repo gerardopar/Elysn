@@ -28,6 +28,7 @@ const MessageSchema = new Schema<Message>(
           memoryTag: { type: String },
           isMemoryWorthy: { type: Boolean },
           topics: { type: [String], default: [] },
+          embedding: { type: [Number], default: [] },
         },
         { _id: false }
       ),
