@@ -9,6 +9,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
+      "@": path.resolve(__dirname, "src"),
       "@elysn/shared": path.resolve(__dirname, "../../packages/shared/src"),
       "@components": path.resolve(__dirname, "./src/components"),
       "@pages": path.resolve(__dirname, "./src/pages"),

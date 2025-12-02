@@ -10,6 +10,8 @@
 
     "baseUrl": ".",
     "paths": {
+      "@/*": ["src/*"],
+
       "@elysn/shared": ["../../packages/shared/src"],
       "@components/*": ["./src/components/*"],
       "@pages/*": ["./src/pages/*"],
