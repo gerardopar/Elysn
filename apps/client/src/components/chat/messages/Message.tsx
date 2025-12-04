@@ -33,15 +33,21 @@ export const Message: React.FC<MessageT> = ({ sender, text }) => {
   const messageStyles = isUser ? "bg-tertiary-gray" : "bg-primary-dark";
 
   return (
-    <div className={`w-full flex items-center ${containerStyles}`}>
-      <div
+    <motion.li
+      layout
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      className={`w-full flex items-center ${containerStyles}`}
+    >
+      <motion.div
+        layout
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
         className={`max-w-[540px] py-2 px-4 rounded-[16px] inline ${messageStyles}`}
       >
         <Response mode="static" className="text-white">
           {text}
         </Response>
-      </div>
-    </div>
+      </motion.div>
+    </motion.li>
   );
 };
 

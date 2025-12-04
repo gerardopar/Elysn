@@ -10,7 +10,6 @@ import type {
   NewMessageSubscription,
   NewMessageSubscriptionVariables,
 } from "../__generated__/graphql";
-import { MessageSenderEnum } from "@elysn/shared";
 
 export const NEW_MESSAGE_SUBSCRIPTION: TypedDocumentNode<
   NewMessageSubscription,
@@ -105,13 +104,11 @@ export const useNewMessageStream = (chatId: string) => {
       }
 
       if (evt.event === "error") {
-        console.warn("AI stream error:", evt.error);
+        console.error("AI stream error:", evt.error);
         setIsStreaming(false);
       }
 
       if (evt.event === "completed") {
-        // wait for final newMessage to arrive from regular subscription
-        // setIsStreaming(false);
       }
     },
   });
