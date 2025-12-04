@@ -33,9 +33,7 @@ export const ChatView: React.FC = () => {
   // subscriptions
   const { streamText, isStreaming, clear } = useNewMessageStream(chatId!);
 
-  useNewMessageSubscription(chatId!, () => {
-    clear();
-  });
+  useNewMessageSubscription(chatId!);
 
   const { data: personaStatusData } = usePersonaStatusSubscription(chatId!);
   const personaTypingStatus = personaStatusData?.personaStatus?.typing ?? false;
@@ -60,6 +58,14 @@ export const ChatView: React.FC = () => {
       scrollToBottom();
     }
   }, [streamText, isStreaming, isAtBottom, scrollToBottom]);
+
+  useEffect(() => {
+    const last = messages[messages.length - 1];
+    if (last?.sender === MessageSenderEnum.AI) {
+      clear(); // streaming bubble disappears only after final message is on screen
+    }
+  }, [messages]);
+
   const handleCreateMessage = async () => {
     const result = chatInputSchema.safeParse({ input });
     if (!result.success) return;

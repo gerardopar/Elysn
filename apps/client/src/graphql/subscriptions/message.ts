@@ -27,20 +27,13 @@ export const NEW_MESSAGE_SUBSCRIPTION: TypedDocumentNode<
   }
 `;
 
-export const useNewMessageSubscription = (
-  chatId: string,
-  onStreamCompleted?: () => void
-) => {
+export const useNewMessageSubscription = (chatId: string) => {
   return useSubscription(NEW_MESSAGE_SUBSCRIPTION, {
     variables: { chatId },
 
     onData: ({ client, data }) => {
       const newMessage = data?.data?.newMessage;
       if (!newMessage) return;
-
-      if (onStreamCompleted && newMessage.sender === MessageSenderEnum.AI) {
-        onStreamCompleted?.();
-      }
 
       const chatCacheId = client.cache.identify({
         __typename: "Chat",
