@@ -29,6 +29,7 @@ import { MessageSenderEnum } from "@elysn/shared";
 import {
   pubsub,
   MESSAGE_CHANNEL,
+  MESSAGE_STREAM_CHANNEL,
   PERSONA_STATUS_CHANNEL,
 } from "../pubsub/pubsub";
 
@@ -94,22 +95,77 @@ export const createPersonaMessage = async (
     String(_chat?._id)
   );
 
-  // AI generation
+  const streamPreference = true; // TODO: make this user config
+
+  const payload = createResponse(
+    _persona,
+    recentMessages,
+    _message?.text ?? "",
+    longTermMemories,
+    recentStm
+  );
+
   let aiText = "";
-  try {
-    const payload = createResponse(
-      _persona,
-      recentMessages,
-      _message?.text ?? "",
-      longTermMemories,
-      recentStm
-    );
-    const aiResponse = await openai.responses.create(payload);
-    aiText = sanitizeText(aiResponse.output_text);
-  } catch (err) {
-    console.error("AI error:", err);
-    aiText =
-      "I’m sorry… I lost track of what I was thinking. Could you rephrase that?";
+
+  if (streamPreference) {
+    const stream = await openai.responses.create({
+      ...payload,
+      stream: true,
+    });
+
+    for await (const event of stream) {
+      if (event.type === "response.output_text.delta") {
+        const chunk = event?.delta ?? "";
+        aiText += chunk;
+
+        pubsub.publish(`${MESSAGE_STREAM_CHANNEL}_${_chat?._id}`, {
+          newMessageStream: {
+            event: "token",
+            token: chunk,
+            outputText: null,
+            error: null,
+          },
+        });
+      }
+
+      if (event.type === "error") {
+        const message = event?.message ?? "Unknown error";
+
+        pubsub.publish(`${MESSAGE_STREAM_CHANNEL}_${_chat?._id}`, {
+          newMessageStream: {
+            event: "error",
+            token: null,
+            outputText: null,
+            error: message,
+          },
+        });
+      }
+
+      if (event.type === "response.completed") {
+        // streaming is done; aiText holds the full string from all deltas
+        pubsub.publish(`${MESSAGE_STREAM_CHANNEL}_${_chat?._id}`, {
+          newMessageStream: {
+            event: "completed",
+            token: null,
+            outputText: aiText,
+            error: null,
+          },
+        });
+      }
+    }
+  } else {
+    try {
+      const aiResponse = await openai.responses.create({
+        ...payload,
+        stream: false,
+      });
+
+      aiText = sanitizeText(aiResponse.output_text ?? "");
+    } catch (err) {
+      console.error("AI error:", err);
+      aiText =
+        "I’m sorry… I lost track of what I was thinking. Could you rephrase that?";
+    }
   }
 
   // Save AI message
@@ -121,7 +177,6 @@ export const createPersonaMessage = async (
     text: aiText,
   });
 
-  // Publish it to GraphQL subscriptions
   pubsub.publish(`${MESSAGE_CHANNEL}_${_chat?._id}`, {
     newMessage: {
       id: aiMsg.id,

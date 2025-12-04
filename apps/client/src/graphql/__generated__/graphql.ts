@@ -72,6 +72,14 @@ export enum MessageSenderEnum {
   USER = 'USER'
 }
 
+export type MessageStream = {
+  __typename: 'MessageStream';
+  error: Maybe<Scalars['String']['output']>;
+  event: Scalars['String']['output'];
+  outputText: Maybe<Scalars['String']['output']>;
+  token: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename: 'Mutation';
   _empty: Maybe<Scalars['String']['output']>;
@@ -274,11 +282,17 @@ export type Subscription = {
   __typename: 'Subscription';
   _empty: Maybe<Scalars['String']['output']>;
   newMessage: Message;
+  newMessageStream: MessageStream;
   personaStatus: PersonaStatus;
 };
 
 
 export type SubscriptionNewMessageArgs = {
+  chatId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionNewMessageStreamArgs = {
   chatId: Scalars['ID']['input'];
 };
 
@@ -417,6 +431,13 @@ export type NewMessageSubscriptionVariables = Exact<{
 
 
 export type NewMessageSubscription = { newMessage: { __typename: 'Message', id: string, userId: string, sender: MessageSenderEnum, text: string, timestamp: number } };
+
+export type NewMessageStreamSubscriptionVariables = Exact<{
+  chatId: Scalars['ID']['input'];
+}>;
+
+
+export type NewMessageStreamSubscription = { newMessageStream: { __typename: 'MessageStream', event: string, token: string | null, outputText: string | null, error: string | null } };
 
 export type PersonaStatusSubscriptionVariables = Exact<{
   chatId: Scalars['ID']['input'];
