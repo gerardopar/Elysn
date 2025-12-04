@@ -12,13 +12,23 @@ import PaperPlaneIcon from "@components/svgs/PaperPlaneIcon";
 import { INPUT_PLACEHOLDERS } from "./chat.helpers";
 import getRandomString from "@helpers/string.helpers";
 
-const ChatInput: React.FC<{
+export const ChatInput: React.FC<{
   input: string;
   setInput: (value: string) => void;
   handleSubmit: () => void;
   mode?: "default" | "fixed";
   isLoading?: boolean;
-}> = ({ input, setInput, handleSubmit, mode = "default", isLoading }) => {
+  onFocus?: () => void;
+  onBlur?: () => void;
+}> = ({
+  input,
+  setInput,
+  handleSubmit,
+  mode = "default",
+  isLoading,
+  onFocus,
+  onBlur,
+}) => {
   const placeholder = useMemo(() => getRandomString(INPUT_PLACEHOLDERS), []);
 
   const inputForm = (
@@ -50,6 +60,8 @@ const ChatInput: React.FC<{
               "--highlight-color": "var(--color-primary-light)",
             }}
             rows={1}
+            onIonFocus={onFocus}
+            onIonBlur={onBlur}
           />
           <button
             className="min-h-[40px] min-w-[40px] h-[40px] w-[40px] shrink-0 p-0! m-0! mb-1 z-10 bg-primary-light rounded-full! flex items-center justify-center"

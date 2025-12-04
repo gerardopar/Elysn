@@ -19,6 +19,7 @@ import {
   QueryMessageArgs,
   Message,
   MessageSenderEnum,
+  SubscriptionNewMessageStreamArgs,
 } from "../graphql/__generated__/graphql";
 
 import { createPersonaMessage } from "../helpers/persona.helpers";
@@ -31,6 +32,7 @@ import {
   pubsub,
   MESSAGE_CHANNEL,
   PERSONA_STATUS_CHANNEL,
+  MESSAGE_STREAM_CHANNEL,
 } from "../pubsub/pubsub";
 
 export const messageResolvers: Resolvers = {
@@ -176,7 +178,6 @@ export const messageResolvers: Resolvers = {
             },
           });
 
-          // AI reply
           createPersonaMessage(
             String(msg.chatId),
             String(msg.personaId),
@@ -204,6 +205,13 @@ export const messageResolvers: Resolvers = {
         }
 
         return msg;
+      },
+    },
+    newMessageStream: {
+      subscribe: (_parent, { chatId }: SubscriptionNewMessageStreamArgs) => {
+        return pubsub.asyncIterableIterator(
+          `${MESSAGE_STREAM_CHANNEL}_${chatId}`
+        );
       },
     },
   },

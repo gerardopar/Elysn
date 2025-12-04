@@ -11,7 +11,6 @@ import React from "react";
  * const containerRef = useRef<HTMLDivElement>(null);
  * const scrollToBottom = useScrollToBottom(containerRef);
  *
- * // Later in your component:
  * <div ref={containerRef} style={{ overflowY: 'auto', height: '400px' }}>
  *   {/* Content that can overflow *\/}
  * </div>

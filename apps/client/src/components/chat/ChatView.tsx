@@ -9,7 +9,10 @@ import ChatInput from "./ChatInput";
 import { useScrollToBottom } from "@hooks/useScrollToBottom";
 import { useGetMessagesQuery } from "@graphql/queries/message";
 import { useCreateMessageMutation } from "@graphql/mutations/message";
-import { useNewMessageSubscription } from "@graphql/subscriptions/message";
+import {
+  useNewMessageStream,
+  useNewMessageSubscription,
+} from "@graphql/subscriptions/message";
 import { usePersonaStatusSubscription } from "@graphql/subscriptions/persona";
 
 import { MessageSenderEnum } from "@elysn/shared";
@@ -28,6 +31,8 @@ export const ChatView: React.FC = () => {
   const { data } = useGetMessagesQuery({ chatId: chatId! });
 
   // subscriptions
+  const { streamText, isStreaming, clear } = useNewMessageStream(chatId!);
+
   useNewMessageSubscription(chatId!);
 
   const { data: personaStatusData } = usePersonaStatusSubscription(chatId!);
@@ -46,6 +51,19 @@ export const ChatView: React.FC = () => {
 
   useEffect(() => {
     if (isAtBottom) scrollToBottom();
+  }, [messages, isAtBottom, scrollToBottom]);
+
+  useEffect(() => {
+    if (isStreaming && isAtBottom) {
+      scrollToBottom();
+    }
+  }, [streamText, isStreaming, isAtBottom, scrollToBottom]);
+
+  useEffect(() => {
+    const last = messages[messages.length - 1];
+    if (last?.sender === MessageSenderEnum.AI) {
+      clear(); // streaming bubble disappears only after final message is on screen
+    }
   }, [messages]);
 
   const handleCreateMessage = async () => {
@@ -82,6 +100,8 @@ export const ChatView: React.FC = () => {
           <Messages
             messages={messages}
             personaTypingStatus={personaTypingStatus}
+            isStreaming={isStreaming}
+            streamText={streamText}
           />
         </div>
 

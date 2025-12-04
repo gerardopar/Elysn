@@ -14,6 +14,13 @@ type Message {
   metadata: MessageMetadata
 }
 
+type MessageStream {
+  token: String
+  event: String!
+  error: String
+  outputText: String
+}
+
 type MessageMetadata {
   emotion: String
   intent: String
@@ -42,4 +49,5 @@ extend type Mutation {
 
 extend type Subscription {
   newMessage(chatId: ID!): Message!
+  newMessageStream(chatId: ID!): MessageStream!
 }

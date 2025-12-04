@@ -82,12 +82,6 @@ export const useFirebase = () => {
       }
     } catch (error) {
       console.error("Sign in error:", error);
-      // Uncomment and use your error handling here
-      // if ((error as { message: string }).message) {
-      //   open(<ErrorToast message={(error as { message: string }).message} />, {
-      //     duration: DEFAULT_TOAST_DURATION,
-      //   });
-      // }
     }
   };
 

@@ -74,6 +74,14 @@ export enum MessageSenderEnum {
   USER = 'USER'
 }
 
+export type MessageStream = {
+  __typename?: 'MessageStream';
+  error?: Maybe<Scalars['String']['output']>;
+  event: Scalars['String']['output'];
+  outputText?: Maybe<Scalars['String']['output']>;
+  token?: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -276,11 +284,17 @@ export type Subscription = {
   __typename?: 'Subscription';
   _empty?: Maybe<Scalars['String']['output']>;
   newMessage: Message;
+  newMessageStream: MessageStream;
   personaStatus: PersonaStatus;
 };
 
 
 export type SubscriptionNewMessageArgs = {
+  chatId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionNewMessageStreamArgs = {
   chatId: Scalars['ID']['input'];
 };
 
@@ -396,6 +410,7 @@ export type ResolversTypes = {
   MessageInput: MessageInput;
   MessageMetadata: ResolverTypeWrapper<MessageMetadata>;
   MessageSenderEnum: MessageSenderEnum;
+  MessageStream: ResolverTypeWrapper<MessageStream>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Persona: ResolverTypeWrapper<Persona>;
   PersonaData: ResolverTypeWrapper<PersonaData>;
@@ -426,6 +441,7 @@ export type ResolversParentTypes = {
   Message: Message;
   MessageInput: MessageInput;
   MessageMetadata: MessageMetadata;
+  MessageStream: MessageStream;
   Mutation: Record<PropertyKey, never>;
   Persona: Persona;
   PersonaData: PersonaData;
@@ -476,6 +492,13 @@ export type MessageMetadataResolvers<ContextType = any, ParentType extends Resol
   intent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   isMemoryWorthy?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   memoryTag?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+};
+
+export type MessageStreamResolvers<ContextType = any, ParentType extends ResolversParentTypes['MessageStream'] = ResolversParentTypes['MessageStream']> = {
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  event?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  outputText?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -568,6 +591,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   _empty?: SubscriptionResolver<Maybe<ResolversTypes['String']>, "_empty", ParentType, ContextType>;
   newMessage?: SubscriptionResolver<ResolversTypes['Message'], "newMessage", ParentType, ContextType, RequireFields<SubscriptionNewMessageArgs, 'chatId'>>;
+  newMessageStream?: SubscriptionResolver<ResolversTypes['MessageStream'], "newMessageStream", ParentType, ContextType, RequireFields<SubscriptionNewMessageStreamArgs, 'chatId'>>;
   personaStatus?: SubscriptionResolver<ResolversTypes['PersonaStatus'], "personaStatus", ParentType, ContextType, RequireFields<SubscriptionPersonaStatusArgs, 'chatId'>>;
 };
 
@@ -587,6 +611,7 @@ export type Resolvers<ContextType = any> = {
   JSON?: GraphQLScalarType;
   Message?: MessageResolvers<ContextType>;
   MessageMetadata?: MessageMetadataResolvers<ContextType>;
+  MessageStream?: MessageStreamResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Persona?: PersonaResolvers<ContextType>;
   PersonaData?: PersonaDataResolvers<ContextType>;

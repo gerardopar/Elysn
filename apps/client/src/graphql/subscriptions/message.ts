@@ -1,8 +1,12 @@
+import { useState } from "react";
+
 import { gql } from "@apollo/client";
 import { useSubscription } from "@apollo/client/react";
 import type { TypedDocumentNode } from "@apollo/client";
 
 import type {
+  NewMessageStreamSubscription,
+  NewMessageStreamSubscriptionVariables,
   NewMessageSubscription,
   NewMessageSubscriptionVariables,
 } from "../__generated__/graphql";
@@ -62,4 +66,57 @@ export const useNewMessageSubscription = (chatId: string) => {
       });
     },
   });
+};
+
+export const NEW_MESSAGE_STREAM_SUB: TypedDocumentNode<
+  NewMessageStreamSubscription,
+  NewMessageStreamSubscriptionVariables
+> = gql`
+  subscription NewMessageStream($chatId: ID!) {
+    newMessageStream(chatId: $chatId) {
+      event
+      token
+      outputText
+      error
+    }
+  }
+`;
+
+export const useNewMessageStreamSubscription = (chatId: string) => {
+  return useSubscription(NEW_MESSAGE_STREAM_SUB, {
+    variables: { chatId },
+  });
+};
+
+export const useNewMessageStream = (chatId: string) => {
+  const [streamText, setStreamText] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+
+  useSubscription(NEW_MESSAGE_STREAM_SUB, {
+    variables: { chatId },
+    onData: ({ data }) => {
+      const evt = data?.data?.newMessageStream;
+      if (!evt) return;
+
+      if (evt.event === "token" && evt.token) {
+        setIsStreaming(true);
+        setStreamText((prev) => prev + evt.token);
+      }
+
+      if (evt.event === "error") {
+        console.error("AI stream error:", evt.error);
+        setIsStreaming(false);
+      }
+
+      if (evt.event === "completed") {
+      }
+    },
+  });
+
+  const clear = () => {
+    setIsStreaming(false);
+    setStreamText("");
+  };
+
+  return { streamText, isStreaming, clear };
 };
