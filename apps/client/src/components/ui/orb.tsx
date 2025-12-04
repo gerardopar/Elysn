@@ -6,9 +6,9 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
 export type AgentState = null | "thinking" | "listening" | "talking";
 
-type OrbMode = AgentState | "idle";
+export type OrbMode = AgentState | "idle";
 
-export const getOrbColors = (state: OrbMode): [string, string] => {
+export const getOrbColors = (): [string, string] => {
   return ["#dee2e6ff", "#212121"]; // platinum → primary dark
 };
 

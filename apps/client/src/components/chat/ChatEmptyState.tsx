@@ -26,7 +26,6 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
 }) => {
   const { user } = useCurrentUser();
   const { isMobile } = useDeviceWidth();
-  const containerStyles = isMobile ? "mb-[100px]" : "mb-[300px]";
 
   const [isFocused, setIsFocused] = useState(false);
   const [isUserTyping, setIsUserTyping] = useState(false);
@@ -52,10 +51,12 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
     return null;
   }, [isLoading, isSpeaking, isFocused, isUserTyping]);
 
-  const colors = useMemo(() => getOrbColors(rawState ?? "idle"), [rawState]);
-
   const userId = user?.uid ?? "";
   const seed = useMemo(() => hashStringToSeed(userId), [userId]);
+
+  const colors = useMemo(() => getOrbColors(), []);
+
+  const containerStyles = isMobile ? "mb-[100px]" : "mb-[300px]";
 
   return (
     <div
