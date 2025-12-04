@@ -63,7 +63,6 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
       className={`flex flex-col items-center justify-center w-full gap-4 ${containerStyles}`}
     >
       <div className="relative flex items-center justify-center">
-        {/* monochrome glow using your palette */}
         <div
           className="pointer-events-none absolute h-[260px] w-[260px] md:h-[320px] md:w-[320px] rounded-full blur-3xl"
           style={{
