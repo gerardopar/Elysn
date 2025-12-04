@@ -9,7 +9,10 @@ import ChatInput from "./ChatInput";
 import { useScrollToBottom } from "@hooks/useScrollToBottom";
 import { useGetMessagesQuery } from "@graphql/queries/message";
 import { useCreateMessageMutation } from "@graphql/mutations/message";
-import { useNewMessageSubscription } from "@graphql/subscriptions/message";
+import {
+  useNewMessageStream,
+  useNewMessageSubscription,
+} from "@graphql/subscriptions/message";
 import { usePersonaStatusSubscription } from "@graphql/subscriptions/persona";
 
 import { MessageSenderEnum } from "@elysn/shared";
@@ -28,7 +31,11 @@ export const ChatView: React.FC = () => {
   const { data } = useGetMessagesQuery({ chatId: chatId! });
 
   // subscriptions
-  useNewMessageSubscription(chatId!);
+  const { streamText, isStreaming, clear } = useNewMessageStream(chatId!);
+
+  useNewMessageSubscription(chatId!, () => {
+    clear();
+  });
 
   const { data: personaStatusData } = usePersonaStatusSubscription(chatId!);
   const personaTypingStatus = personaStatusData?.personaStatus?.typing ?? false;
@@ -46,8 +53,13 @@ export const ChatView: React.FC = () => {
 
   useEffect(() => {
     if (isAtBottom) scrollToBottom();
-  }, [messages]);
+  }, [messages, isAtBottom, scrollToBottom]);
 
+  useEffect(() => {
+    if (isStreaming && isAtBottom) {
+      scrollToBottom();
+    }
+  }, [streamText, isStreaming, isAtBottom, scrollToBottom]);
   const handleCreateMessage = async () => {
     const result = chatInputSchema.safeParse({ input });
     if (!result.success) return;
@@ -82,6 +94,8 @@ export const ChatView: React.FC = () => {
           <Messages
             messages={messages}
             personaTypingStatus={personaTypingStatus}
+            isStreaming={isStreaming}
+            streamText={streamText}
           />
         </div>
 

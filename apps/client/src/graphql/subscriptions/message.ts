@@ -10,6 +10,7 @@ import type {
   NewMessageSubscription,
   NewMessageSubscriptionVariables,
 } from "../__generated__/graphql";
+import { MessageSenderEnum } from "@elysn/shared";
 
 export const NEW_MESSAGE_SUBSCRIPTION: TypedDocumentNode<
   NewMessageSubscription,
@@ -34,12 +35,12 @@ export const useNewMessageSubscription = (
     variables: { chatId },
 
     onData: ({ client, data }) => {
-      if (onStreamCompleted) {
-        onStreamCompleted?.();
-      }
-
       const newMessage = data?.data?.newMessage;
       if (!newMessage) return;
+
+      if (onStreamCompleted && newMessage.sender === MessageSenderEnum.AI) {
+        onStreamCompleted?.();
+      }
 
       const chatCacheId = client.cache.identify({
         __typename: "Chat",
@@ -117,12 +118,15 @@ export const useNewMessageStream = (chatId: string) => {
 
       if (evt.event === "completed") {
         // wait for final newMessage to arrive from regular subscription
-        setIsStreaming(false);
+        // setIsStreaming(false);
       }
     },
   });
 
-  const clear = () => setStreamText("");
+  const clear = () => {
+    setIsStreaming(false);
+    setStreamText("");
+  };
 
   return { streamText, isStreaming, clear };
 };

@@ -1,21 +1,33 @@
 import React from "react";
 
-import Message from "./Message";
+import Message, { StreamingMessage } from "./Message";
 import MessageTypingBubble from "./MessageTypingBubble";
 
 import type { GetMessagesQuery } from "@graphql/__generated__/graphql";
+import { MessageSenderEnum } from "@elysn/shared";
 
 export const Messages: React.FC<{
   messages: GetMessagesQuery["messages"];
   personaTypingStatus: boolean;
-}> = ({ messages, personaTypingStatus }) => {
-  if (messages?.length === 0) return <></>;
+  isStreaming?: boolean;
+  streamText?: string;
+}> = ({ messages, personaTypingStatus, isStreaming, streamText }) => {
+  if (!messages?.length) return null;
+
   return (
     <ul className="w-full max-w-[768px] flex flex-col gap-2">
-      {messages?.map((message, index) => (
-        <Message key={index} {...message} />
+      {messages.map((message) => (
+        <Message key={message.id} {...message} />
       ))}
-      {personaTypingStatus && <MessageTypingBubble />}
+
+      {isStreaming && streamText && (
+        <StreamingMessage
+          sender={MessageSenderEnum.AI}
+          streamText={streamText}
+        />
+      )}
+
+      {personaTypingStatus && !isStreaming && <MessageTypingBubble />}
     </ul>
   );
 };
