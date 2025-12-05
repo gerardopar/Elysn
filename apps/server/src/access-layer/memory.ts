@@ -52,7 +52,7 @@ export const getLongTermMemoriesSimple = async (
     personaId,
     type: MemoryTypeEnum.LTM,
   })
-    .sort({ importance: -1 })
+    .sort({ "metadata.importance": -1 })
     .limit(limit);
 };
 
@@ -69,14 +69,14 @@ export const getMetadataFilteredLongTermMemories = async (
   const { limit = 100 } = options || {};
 
   let memories = await Memory.find(filter)
-    .sort({ importance: -1, lastUpdated: -1 })
+    .sort({ "metadata.importance": -1, lastUpdated: -1 })
     .limit(limit);
 
   //fall back - If no topic match,
   if (memories.length === 0 && topics?.length) {
     const fallbackFilter = buildLongTermMemoryFilter(personaId, [], options);
     memories = await Memory.find(fallbackFilter)
-      .sort({ importance: -1, lastUpdated: -1 })
+      .sort({ "metadata.importance": -1, lastUpdated: -1 })
       .limit(limit);
   }
 

@@ -16,7 +16,9 @@ import { User } from "../models/user";
 
 export const userResolvers: Resolvers = {
   Query: {
-    users: async (_parent, _args, _ctx) => {
+    users: async (_parent, _args, ctx) => {
+      if (!ctx?.user?.uid) throw new Error("Must be authenticated");
+
       const users = await User.find();
       return users.map((user) => ({
         firebaseUid: user.firebaseUid,
@@ -30,7 +32,9 @@ export const userResolvers: Resolvers = {
       }));
     },
 
-    getUser: async (_parent, args: QueryGetUserArgs, _ctx) => {
+    getUser: async (_parent, args: QueryGetUserArgs, ctx) => {
+      if (!ctx?.user?.uid) throw new Error("Must be authenticated");
+
       const user = await getUser(args.id);
       if (!user) return null;
 
@@ -47,6 +51,8 @@ export const userResolvers: Resolvers = {
     },
 
     getCurrentUser: async (_parent, _args, ctx) => {
+      if (!ctx?.user?.uid) throw new Error("Must be authenticated");
+
       const user = await getUserByFirebaseUid(ctx?.user?.uid);
 
       if (!user) return null;
@@ -65,7 +71,9 @@ export const userResolvers: Resolvers = {
   },
 
   Mutation: {
-    createUser: async (_parent, args: MutationCreateUserArgs, _ctx) => {
+    createUser: async (_parent, args: MutationCreateUserArgs, ctx) => {
+      if (!ctx?.user?.uid) throw new Error("Must be authenticated");
+
       const user = await createUser({
         name: args?.name || "",
         picture: args?.picture || "",
@@ -85,7 +93,9 @@ export const userResolvers: Resolvers = {
       };
     },
 
-    upsertUser: async (_parent, args: MutationUpsertUserArgs, _ctx) => {
+    upsertUser: async (_parent, args: MutationUpsertUserArgs, ctx) => {
+      if (!ctx?.user?.uid) throw new Error("Must be authenticated");
+
       const { firebaseUid, name, email, picture } = args;
 
       const user = await User.findOneAndUpdate(

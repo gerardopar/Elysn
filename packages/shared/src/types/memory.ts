@@ -20,24 +20,32 @@ export const longTermMemoryCategoryEnum = Object.values(
   LongTermMemoryCategoryEnum
 ) as [string, ...string[]];
 
+export type MemoryMetadata = {
+  importance: Number;
+  confidence: Number;
+  usageCount: Number;
+  lastReferencedAt: Date;
+  recencyWeight: Number;
+  sentiment: Number;
+  emotion: String;
+  source: String;
+};
+
 export type Memory = {
-  personaId: string; // owner of memory
-  chatId: string; // optional for chat-scoped memory
+  personaId: string;
+  chatId: string;
 
   type: MemoryTypeEnum;
 
-  category: LongTermMemoryCategoryEnum; // long term memory category
+  category: LongTermMemoryCategoryEnum;
 
-  value: string; // memory
+  value: string;
 
-  importance: number; // 0-1 weighting
-  weight: number;
-  sentiment: number;
-  emotion: string;
+  metadata: MemoryMetadata;
   topics: string[];
   embedding: number[];
 
-  messageId?: string; // message where the memory was extracted
+  messageId?: string;
   fromMessageCount?: number;
   toMessageCount?: number;
 

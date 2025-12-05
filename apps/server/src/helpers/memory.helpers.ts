@@ -41,8 +41,10 @@ export const maybeExtractShortTermMemory = async (
     chatId,
     type: MemoryTypeEnum.STM_TRAIL,
     value: summary,
-    importance: 0.6,
-    weight: 1.0,
+    metadata: {
+      importance: 0.6,
+      recencyWeight: 1.0,
+    },
     fromMessageCount: chat.messagesCount - recentMessages.length + 1,
     toMessageCount: chat.messagesCount,
   });
@@ -124,7 +126,9 @@ export const saveLongTermMemory = async ({
       messageId,
       category,
       value,
-      importance,
+      metadata: {
+        importance,
+      },
       topics,
       embedding,
     });
