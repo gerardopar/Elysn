@@ -4,6 +4,7 @@ import "dotenv/config";
 const envSchema = z.object({
   PORT: z.string().default("8080"),
   CORS_ORIGIN: z.string().default("http://localhost:5173"),
+  CRON_SECRET: z.string(),
   REDIS_URL: z.string(),
   REDIS_HOST: z.string(),
   REDIS_PORT: z.string(),
@@ -19,6 +20,7 @@ const envSchema = z.object({
   AWS_SECRET_ACCESS_KEY: z.string(),
   AWS_S3_BUCKET_NAME: z.string(),
   AWS_S3_BUCKET_REGION: z.string(),
+  OPENAI_API_KEY: z.string(),
 });
 
 export const env = envSchema.parse({

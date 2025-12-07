@@ -135,10 +135,10 @@ export const getLongTermMemories = async (
   // Reinforce only the memories actually used to build the context.
   if (reinforce && topRanked.length > 0) {
     // non-blocking
-    reinforceReferencedMemories(topRanked).catch((err) =>
+    reinforceReferencedMemories(topRanked as Memory[]).catch((err) =>
       console.warn("[getLongTermMemories] Reinforcement failed:", err)
     );
   }
 
-  return topRanked;
+  return topRanked as Memory[];
 };
