@@ -11,6 +11,7 @@ import {
 } from "@elysn/core";
 import {
   LongTermMemoryExtractionResponse,
+  ShortTermMemorySummaryResponse,
   MemoryTypeEnum,
 } from "@elysn/shared";
 
@@ -32,9 +33,29 @@ export const maybeExtractShortTermMemory = async (
   const payload = extractShortTermMemoryResponse(chat, recentMessages);
   if (!payload) return null;
 
-  const response = await openai.responses.create(payload);
-  const summary = response.output_text?.trim();
+  const response: OpenAI.Responses.Response = await openai.responses.create(
+    payload
+  );
+
+  if (!response || !response.output_text) return null;
+
+  const sanitized = sanitizeJSON(response.output_text);
+
+  let parsed: ShortTermMemorySummaryResponse;
+  try {
+    parsed = JSON.parse(sanitized);
+  } catch (err) {
+    console.warn(
+      "[maybeExtractShortTermMemory] Failed to parse STM JSON:",
+      err
+    );
+    return null;
+  }
+
+  const { summary, metadata } = parsed;
   if (!summary) return null;
+
+  const now = new Date();
 
   const saved = await Memory.create({
     personaId,
@@ -42,11 +63,13 @@ export const maybeExtractShortTermMemory = async (
     type: MemoryTypeEnum.STM_TRAIL,
     value: summary,
     metadata: {
-      importance: 0.6,
-      recencyWeight: 1.0,
+      ...metadata,
+      lastReferencedAt: now,
     },
     fromMessageCount: chat.messagesCount - recentMessages.length + 1,
     toMessageCount: chat.messagesCount,
+    createdAt: now,
+    lastUpdated: now,
   });
 
   return saved;
@@ -116,7 +139,8 @@ export const saveLongTermMemory = async ({
       return null;
     }
 
-    const { category, value, importance, topics } = extractedMemory.memory;
+    const { category, value, metadata, topics } = extractedMemory.memory;
+    const now = new Date();
 
     const embedding = await createMemoryEmbedding(value);
 
@@ -127,10 +151,13 @@ export const saveLongTermMemory = async ({
       category,
       value,
       metadata: {
-        importance,
+        ...metadata,
+        lastReferencedAt: now,
       },
       topics,
       embedding,
+      createdAt: now,
+      lastUpdated: now,
     });
 
     return memory;

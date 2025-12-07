@@ -73,3 +73,8 @@ export type LongTermMemoryExtractionResponse = {
     metadata: MemoryMetadata;
   } | null;
 };
+
+export type ShortTermMemorySummaryResponse = {
+  summary: string;
+  metadata: MemoryMetadata;
+};
