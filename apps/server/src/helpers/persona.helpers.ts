@@ -9,9 +9,6 @@ import { sanitizeText } from "./string.helpers";
 import { updateMessageEmbedding } from "./message.helpers";
 import { createMemoryEmbedding, extractTopics } from "./memory.helpers";
 
-import { getUser } from "../access-layer/user";
-import { getChat } from "../access-layer/chat";
-import { getPersona } from "../access-layer/persona";
 import {
   createMessage,
   getRecentMessages,
@@ -22,6 +19,9 @@ import {
   getLatestShortTermMemory,
   getLongTermMemories,
 } from "../access-layer/memory";
+import { getUser } from "../access-layer/user";
+import { getChat } from "../access-layer/chat";
+import { getPersona } from "../access-layer/persona";
 
 import { createResponse } from "@elysn/core";
 import { MessageSenderEnum } from "@elysn/shared";
@@ -54,12 +54,10 @@ export const createPersonaMessage = async (
   user: User | string,
   message: Message | string
 ) => {
-  const _chat = typeof chat === "string" ? await getChat(chat) : chat;
-  const _persona =
-    typeof persona === "string" ? await getPersona(persona) : persona;
-  const _user = typeof user === "string" ? await getUser(user) : user;
-  const _message =
-    typeof message === "string" ? await getMessage(message) : message;
+  const _chat = await getChat(chat);
+  const _user = await getUser(user);
+  const _persona = await getPersona(persona);
+  const _message = await getMessage(message);
 
   if (!_chat || !_persona || !_user || !_message)
     throw new Error("Missing data for AI generation");

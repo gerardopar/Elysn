@@ -1,8 +1,8 @@
 import { User } from "../models/user";
 
-export const getUser = async (id: string) => {
-  const user = await User.findById(id).lean();
-  return user;
+export const getUser = async (user: User | string) => {
+  if (user instanceof User || typeof user !== "string") return user;
+  return User.findById(user).lean();
 };
 
 export const getUserByFirebaseUid = async (firebaseUid: string) => {

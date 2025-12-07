@@ -14,8 +14,9 @@ export const getChats = async (userId: string) => {
 /**
  * Fetch a single chat by ID.
  */
-export const getChat = async (id: string) => {
-  return Chat.findById(id);
+export const getChat = async (chat: Chat | string) => {
+  if (chat instanceof Chat || typeof chat !== "string") return chat;
+  return Chat.findById(chat);
 };
 
 /**

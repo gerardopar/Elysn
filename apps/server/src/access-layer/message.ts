@@ -96,8 +96,9 @@ export const getMessages = async (chatId: string, limit: number = 100) => {
     .lean();
 };
 
-export const getMessage = async (id: string) => {
-  return Message.findById(id).lean();
+export const getMessage = async (message: Message | string) => {
+  if (message instanceof Message || typeof message !== "string") return message;
+  return Message.findById(message).lean();
 };
 
 export const updateMessageTopics = async (id: string, topics: string[]) => {
