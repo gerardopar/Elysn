@@ -4,6 +4,16 @@ export enum MemoryTypeEnum {
   STM_TRAIL = "STM_TRAIL",
 }
 
+export enum MemorySourceEnum {
+  USER = "USER",
+  AI = "AI",
+}
+
+export const memorySourceEnum = Object.values(MemorySourceEnum) as [
+  string,
+  ...string[]
+];
+
 export enum LongTermMemoryCategoryEnum {
   Preference = "preference",
   Biographical = "biographical",
@@ -21,14 +31,14 @@ export const longTermMemoryCategoryEnum = Object.values(
 ) as [string, ...string[]];
 
 export type MemoryMetadata = {
-  importance: Number;
-  confidence: Number;
-  usageCount: Number;
+  importance: number;
+  confidence: number;
+  usageCount: number;
   lastReferencedAt: Date;
-  recencyWeight: Number;
-  sentiment: Number;
-  emotion: String;
-  source: String;
+  recencyWeight: number;
+  sentiment: number;
+  emotion: string;
+  source: MemorySourceEnum;
 };
 
 export type Memory = {
@@ -56,9 +66,10 @@ export type Memory = {
 export type LongTermMemoryExtractionResponse = {
   shouldWriteMemory: boolean;
   memory: {
-    category: LongTermMemoryCategoryEnum;
     value: string;
-    importance: number;
     topics: string[];
+    category: LongTermMemoryCategoryEnum;
+
+    metadata: MemoryMetadata;
   } | null;
 };
