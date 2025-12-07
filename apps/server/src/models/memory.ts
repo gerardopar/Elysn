@@ -1,5 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
-import { LongTermMemoryCategoryEnum, MemoryTypeEnum } from "@elysn/shared";
+import {
+  LongTermMemoryCategoryEnum,
+  MemoryTypeEnum,
+  MemorySourceEnum,
+} from "@elysn/shared";
 import { type Memory as MemoryCore } from "@elysn/core";
 
 export interface Memory extends MemoryCore, Document {}
@@ -16,7 +20,11 @@ const MemoryMetadataSchema = new Schema(
     sentiment: { type: Number, default: 0 },
     emotion: { type: String },
 
-    source: { type: String, default: "user_message" },
+    source: {
+      type: String,
+      enum: Object.values(MemorySourceEnum),
+      default: "user",
+    },
   },
   { _id: false }
 );
