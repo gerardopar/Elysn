@@ -8,6 +8,7 @@ import {
   extractShortTermMemoryResponse,
   extractMessageTopics,
   embeddingResponse,
+  reinforceMemory,
 } from "@elysn/core";
 import {
   LongTermMemoryExtractionResponse,
@@ -129,9 +130,6 @@ export const extractLongTermMemory = async ({
   return null;
 };
 
-/**
- * Saves an extracted memory to the database and links it to the persona.
- */
 export const saveLongTermMemory = async ({
   personaId,
   messageId,
@@ -210,4 +208,41 @@ export const createMemoryEmbedding = async (
   if (!vector) return [];
 
   return vector;
+};
+
+export const reinforceReferencedMemories = async (memories: Memory[]) => {
+  const now = new Date();
+
+  for (const m of memories) {
+    const updatedMetadata = reinforceMemory(m.metadata, { now });
+
+    await Memory.updateOne(
+      { _id: m?._id },
+      {
+        $set: {
+          metadata: updatedMetadata,
+          lastUpdated: now,
+        },
+      }
+    );
+
+    // TODOS: Support converting short term memory to long term memory
+    // if (m?.type === MemoryTypeEnum.STM_TRAIL && !m?.category) {
+    //   const decision = shouldPromoteToLongTerm(
+    //     { ...m, metadata: updatedMetadata },
+    //     now
+    //   );
+
+    //   if (decision?.shouldPromote) {
+    //     await Memory.updateOne(
+    //       { _id: m?._id },
+    //       {
+    //         $set: {
+    //           type: MemoryTypeEnum.LTM,
+    //         },
+    //       }
+    //     );
+    //   }
+    // }
+  }
 };

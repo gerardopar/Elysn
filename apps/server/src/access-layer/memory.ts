@@ -1,8 +1,13 @@
 import { Memory } from "../models/memory";
 
-import { buildLongTermMemoryFilter, getRelevantLTMMemories } from "@elysn/core";
+import {
+  buildLongTermMemoryFilter,
+  getRelevantLTMMemories,
+  rankMemoriesByScore,
+} from "@elysn/core";
 
 import { MemoryTypeEnum } from "@elysn/shared";
+import { reinforceReferencedMemories } from "src/helpers/memory.helpers";
 
 export const getMemory = async (id: string): Promise<Memory | null> => {
   const memory = await Memory.findById(id);
@@ -87,30 +92,53 @@ export const getLongTermMemories = async (
   personaId: string,
   topics?: string[],
   embedding?: number[] | null,
-  options?: {
+  options: {
     minImportance?: number;
     maxAgeMonths?: number;
     limit?: number;
-  }
+    reinforce?: boolean;
+  } = {}
 ): Promise<Memory[]> => {
-  // Get memories with metadata filtering
-  const memories = await getMetadataFilteredLongTermMemories(
+  const {
+    minImportance = 0.3,
+    maxAgeMonths = 12,
+    limit = 10,
+    reinforce = true,
+  } = options;
+
+  // metadata-based filtering (broad pass)
+  const metadataFiltered = await getMetadataFilteredLongTermMemories(
     personaId,
     topics,
-    options
+    { minImportance, maxAgeMonths, limit } // passes options down
   );
 
-  // get memories with embedding filtering
-  // @ts-expect-error expected type Memory[]
-  const relevantMemories: Memory[] = await getRelevantLTMMemories(
-    memories,
-    embedding,
-    options?.limit
-  );
+  // semantic filtering (embedding similarity)
+  let embeddingRelevant: Memory[] = [];
 
-  if (relevantMemories.length > 0) {
-    return relevantMemories;
+  if (embedding && embedding.length > 0) {
+    // @ts-expect-error expected type Memory[]
+    embeddingRelevant = await getRelevantLTMMemories(
+      metadataFiltered,
+      embedding,
+      limit
+    );
   }
 
-  return memories;
+  const candidateMemories =
+    embeddingRelevant.length > 0 ? embeddingRelevant : metadataFiltered;
+
+  // Ranking phase: compute scoring, sort by score
+  const ranked = rankMemoriesByScore(candidateMemories);
+  const topRanked = ranked.slice(0, limit).map((r) => r.memory);
+
+  // Reinforce only the memories actually used to build the context.
+  if (reinforce && topRanked.length > 0) {
+    // non-blocking
+    reinforceReferencedMemories(topRanked).catch((err) =>
+      console.warn("[getLongTermMemories] Reinforcement failed:", err)
+    );
+  }
+
+  return topRanked;
 };
