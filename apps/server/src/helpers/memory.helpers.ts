@@ -41,9 +41,9 @@ export const maybeExtractShortTermMemory = async (
 
   const sanitized = sanitizeJSON(response.output_text);
 
-  let parsed: ShortTermMemorySummaryResponse;
+  let data: ShortTermMemorySummaryResponse;
   try {
-    parsed = JSON.parse(sanitized);
+    data = JSON.parse(sanitized);
   } catch (err) {
     console.warn(
       "[maybeExtractShortTermMemory] Failed to parse STM JSON:",
@@ -52,7 +52,7 @@ export const maybeExtractShortTermMemory = async (
     return null;
   }
 
-  const { summary, metadata } = parsed;
+  const { summary, metadata } = data;
   if (!summary) return null;
 
   const now = new Date();
@@ -100,17 +100,24 @@ export const extractLongTermMemory = async ({
     );
 
     if (!response || !response.output_text) return null;
-    const sanitizedOutput = sanitizeJSON(response.output_text);
-    const extractedMemory: LongTermMemoryExtractionResponse =
-      JSON.parse(sanitizedOutput);
 
-    if (!extractedMemory.shouldWriteMemory) return null;
+    const sanitized = sanitizeJSON(response.output_text);
+
+    let data: LongTermMemoryExtractionResponse;
+    try {
+      data = JSON.parse(sanitized);
+    } catch (err) {
+      console.warn("[extractLongTermMemory] Failed to parse LTM JSON:", err);
+      return null;
+    }
+
+    if (!data.shouldWriteMemory) return null;
 
     try {
       const savedMemory = await saveLongTermMemory({
         personaId,
         messageId,
-        extractedMemory,
+        extractedMemory: data,
       });
       return savedMemory;
     } catch (error) {
