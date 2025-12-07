@@ -25,6 +25,9 @@ import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { setupMcpServer } from "./mcp";
 
+// Jobs
+import { jobsRouter } from "./jobs/jobsRouter";
+
 const schemaPath = path.resolve("src/schema/**/*.graphql");
 
 export const startServer = async () => {
@@ -112,6 +115,9 @@ export const startServer = async () => {
       },
     }) as any
   );
+
+  // Jobs
+  app.use("/jobs", jobsRouter);
 
   // Start everything
   const PORT = Number(process.env.PORT) || 4000;
