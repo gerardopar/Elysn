@@ -1,0 +1,11 @@
+[build]
+# We MUST manually init submodules because Railway does not do this automatically.
+command = """
+  git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+  git submodule sync --recursive
+  git submodule update --init --recursive
+
+  # Now install workspaces + build everything
+  pnpm install --frozen-lockfile
+  pnpm build
+"""
