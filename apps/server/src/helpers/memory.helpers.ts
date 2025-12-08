@@ -4,16 +4,20 @@ import { OpenAI } from "openai";
 import { Memory } from "../models/memory";
 
 import {
-  extractLongTermMemoryResponse,
+  EMBED_BASE_SIMILARITY_THRESHOLD,
+  EMBED_CROSS_CATEGORY_THRESHOLD,
   extractShortTermMemoryResponse,
+  extractLongTermMemoryResponse,
   extractMessageTopics,
   embeddingResponse,
+  cosineSimilarity,
   reinforceMemory,
 } from "@elysn/core";
 import {
   LongTermMemoryExtractionResponse,
   ShortTermMemorySummaryResponse,
   MemoryTypeEnum,
+  MemorySourceEnum,
 } from "@elysn/shared";
 
 import { getChat } from "../access-layer/chat";
@@ -119,6 +123,7 @@ export const extractLongTermMemory = async ({
         personaId,
         messageId,
         extractedMemory: data,
+        messageEmbedding: message?.metadata?.embedding,
       });
       return savedMemory;
     } catch (error) {
@@ -133,10 +138,12 @@ export const extractLongTermMemory = async ({
 export const saveLongTermMemory = async ({
   personaId,
   messageId,
+  messageEmbedding,
   extractedMemory,
 }: {
   personaId: string;
   messageId: string;
+  messageEmbedding?: number[] | null;
   extractedMemory: LongTermMemoryExtractionResponse;
 }): Promise<Memory | null> => {
   try {
@@ -147,7 +154,39 @@ export const saveLongTermMemory = async ({
     const { category, value, metadata, topics } = extractedMemory.memory;
     const now = new Date();
 
-    const embedding = await createMemoryEmbedding(value);
+    const embedding = messageEmbedding || (await createMemoryEmbedding(value));
+
+    const duplicate = await findSimilarMemory(personaId, embedding!, category);
+
+    if (duplicate?.match) {
+      const existing = duplicate.match;
+
+      await Memory.updateOne(
+        { _id: existing._id },
+        {
+          $set: {
+            "metadata.importance": Math.max(
+              existing.metadata.importance,
+              metadata.importance
+            ),
+            "metadata.confidence": Math.max(
+              existing.metadata.confidence,
+              metadata.confidence
+            ),
+            "metadata.usageCount": (existing.metadata.usageCount ?? 0) + 1,
+            "metadata.lastReferencedAt": now,
+            "metadata.recencyWeight": 1.0,
+            embedding,
+            topics: Array.from(
+              new Set([...(existing.topics || []), ...topics])
+            ),
+            lastUpdated: now,
+          },
+        }
+      );
+
+      return Memory.findById(existing._id);
+    }
 
     const memory = await Memory.create({
       personaId,
@@ -158,6 +197,9 @@ export const saveLongTermMemory = async ({
       metadata: {
         ...metadata,
         lastReferencedAt: now,
+        recencyWeight: 1.0,
+        usageCount: 0,
+        source: MemorySourceEnum.USER,
       },
       topics,
       embedding,
@@ -245,4 +287,46 @@ export const reinforceReferencedMemories = async (memories: Memory[]) => {
     //   }
     // }
   }
+};
+
+/**
+ * Finds the most semantically similar existing memory to the incoming embedding.
+ * Searches across all LTM for that persona.
+ */
+export const findSimilarMemory = async (
+  personaId: string,
+  incomingEmbedding: number[],
+  category: string
+) => {
+  const candidates = await Memory.find({
+    personaId,
+    type: MemoryTypeEnum.LTM,
+  }).lean();
+
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const m of candidates) {
+    if (!m.embedding || m.embedding.length === 0) continue;
+
+    const score = cosineSimilarity(incomingEmbedding, m.embedding);
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = m;
+    }
+  }
+
+  if (!bestMatch) return null;
+
+  const isSameCategory = bestMatch.category === category;
+  const threshold = isSameCategory
+    ? EMBED_BASE_SIMILARITY_THRESHOLD
+    : EMBED_CROSS_CATEGORY_THRESHOLD;
+
+  if (bestScore >= threshold) {
+    return { match: bestMatch, score: bestScore };
+  }
+
+  return null;
 };
