@@ -4,14 +4,20 @@ import { OpenAI } from "openai";
 import { Memory } from "../models/memory";
 
 import {
-  extractLongTermMemoryResponse,
+  EMBED_BASE_SIMILARITY_THRESHOLD,
+  EMBED_CROSS_CATEGORY_THRESHOLD,
   extractShortTermMemoryResponse,
+  extractLongTermMemoryResponse,
   extractMessageTopics,
   embeddingResponse,
+  cosineSimilarity,
+  reinforceMemory,
 } from "@elysn/core";
 import {
   LongTermMemoryExtractionResponse,
+  ShortTermMemorySummaryResponse,
   MemoryTypeEnum,
+  MemorySourceEnum,
 } from "@elysn/shared";
 
 import { getChat } from "../access-layer/chat";
@@ -32,19 +38,43 @@ export const maybeExtractShortTermMemory = async (
   const payload = extractShortTermMemoryResponse(chat, recentMessages);
   if (!payload) return null;
 
-  const response = await openai.responses.create(payload);
-  const summary = response.output_text?.trim();
+  const response: OpenAI.Responses.Response = await openai.responses.create(
+    payload
+  );
+
+  if (!response || !response.output_text) return null;
+
+  const sanitized = sanitizeJSON(response.output_text);
+
+  let data: ShortTermMemorySummaryResponse;
+  try {
+    data = JSON.parse(sanitized);
+  } catch (err) {
+    console.warn(
+      "[maybeExtractShortTermMemory] Failed to parse STM JSON:",
+      err
+    );
+    return null;
+  }
+
+  const { summary, metadata } = data;
   if (!summary) return null;
+
+  const now = new Date();
 
   const saved = await Memory.create({
     personaId,
     chatId,
     type: MemoryTypeEnum.STM_TRAIL,
     value: summary,
-    importance: 0.6,
-    weight: 1.0,
+    metadata: {
+      ...metadata,
+      lastReferencedAt: now,
+    },
     fromMessageCount: chat.messagesCount - recentMessages.length + 1,
     toMessageCount: chat.messagesCount,
+    createdAt: now,
+    lastUpdated: now,
   });
 
   return saved;
@@ -75,17 +105,25 @@ export const extractLongTermMemory = async ({
     );
 
     if (!response || !response.output_text) return null;
-    const sanitizedOutput = sanitizeJSON(response.output_text);
-    const extractedMemory: LongTermMemoryExtractionResponse =
-      JSON.parse(sanitizedOutput);
 
-    if (!extractedMemory.shouldWriteMemory) return null;
+    const sanitized = sanitizeJSON(response.output_text);
+
+    let data: LongTermMemoryExtractionResponse;
+    try {
+      data = JSON.parse(sanitized);
+    } catch (err) {
+      console.warn("[extractLongTermMemory] Failed to parse LTM JSON:", err);
+      return null;
+    }
+
+    if (!data.shouldWriteMemory) return null;
 
     try {
       const savedMemory = await saveLongTermMemory({
         personaId,
         messageId,
-        extractedMemory,
+        extractedMemory: data,
+        messageEmbedding: message?.metadata?.embedding,
       });
       return savedMemory;
     } catch (error) {
@@ -97,16 +135,15 @@ export const extractLongTermMemory = async ({
   return null;
 };
 
-/**
- * Saves an extracted memory to the database and links it to the persona.
- */
 export const saveLongTermMemory = async ({
   personaId,
   messageId,
+  messageEmbedding,
   extractedMemory,
 }: {
   personaId: string;
   messageId: string;
+  messageEmbedding?: number[] | null;
   extractedMemory: LongTermMemoryExtractionResponse;
 }): Promise<Memory | null> => {
   try {
@@ -114,9 +151,42 @@ export const saveLongTermMemory = async ({
       return null;
     }
 
-    const { category, value, importance, topics } = extractedMemory.memory;
+    const { category, value, metadata, topics } = extractedMemory.memory;
+    const now = new Date();
 
-    const embedding = await createMemoryEmbedding(value);
+    const embedding = messageEmbedding || (await createMemoryEmbedding(value));
+
+    const duplicate = await findSimilarMemory(personaId, embedding!, category);
+
+    if (duplicate?.match) {
+      const existing = duplicate.match;
+
+      await Memory.updateOne(
+        { _id: existing._id },
+        {
+          $set: {
+            "metadata.importance": Math.max(
+              existing.metadata.importance,
+              metadata.importance
+            ),
+            "metadata.confidence": Math.max(
+              existing.metadata.confidence,
+              metadata.confidence
+            ),
+            "metadata.usageCount": (existing.metadata.usageCount ?? 0) + 1,
+            "metadata.lastReferencedAt": now,
+            "metadata.recencyWeight": 1.0,
+            embedding,
+            topics: Array.from(
+              new Set([...(existing.topics || []), ...topics])
+            ),
+            lastUpdated: now,
+          },
+        }
+      );
+
+      return Memory.findById(existing._id);
+    }
 
     const memory = await Memory.create({
       personaId,
@@ -124,9 +194,17 @@ export const saveLongTermMemory = async ({
       messageId,
       category,
       value,
-      importance,
+      metadata: {
+        ...metadata,
+        lastReferencedAt: now,
+        recencyWeight: 1.0,
+        usageCount: 0,
+        source: MemorySourceEnum.USER,
+      },
       topics,
       embedding,
+      createdAt: now,
+      lastUpdated: now,
     });
 
     return memory;
@@ -172,4 +250,83 @@ export const createMemoryEmbedding = async (
   if (!vector) return [];
 
   return vector;
+};
+
+export const reinforceReferencedMemories = async (memories: Memory[]) => {
+  const now = new Date();
+
+  for (const m of memories) {
+    const updatedMetadata = reinforceMemory(m.metadata, { now });
+
+    await Memory.updateOne(
+      { _id: m?._id },
+      {
+        $set: {
+          metadata: updatedMetadata,
+          lastUpdated: now,
+        },
+      }
+    );
+
+    // TODOS: Support converting short term memory to long term memory
+    // if (m?.type === MemoryTypeEnum.STM_TRAIL && !m?.category) {
+    //   const decision = shouldPromoteToLongTerm(
+    //     { ...m, metadata: updatedMetadata },
+    //     now
+    //   );
+
+    //   if (decision?.shouldPromote) {
+    //     await Memory.updateOne(
+    //       { _id: m?._id },
+    //       {
+    //         $set: {
+    //           type: MemoryTypeEnum.LTM,
+    //         },
+    //       }
+    //     );
+    //   }
+    // }
+  }
+};
+
+/**
+ * Finds the most semantically similar existing memory to the incoming embedding.
+ * Searches across all LTM for that persona.
+ */
+export const findSimilarMemory = async (
+  personaId: string,
+  incomingEmbedding: number[],
+  category: string
+) => {
+  const candidates = await Memory.find({
+    personaId,
+    type: MemoryTypeEnum.LTM,
+  }).lean();
+
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const m of candidates) {
+    if (!m.embedding || m.embedding.length === 0) continue;
+
+    const score = cosineSimilarity(incomingEmbedding, m.embedding);
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = m;
+    }
+  }
+
+  if (!bestMatch) return null;
+
+  const isSameCategory = bestMatch.category === category;
+  const threshold = isSameCategory
+    ? EMBED_BASE_SIMILARITY_THRESHOLD
+    : EMBED_CROSS_CATEGORY_THRESHOLD;
+
+  if (bestScore >= threshold) {
+    return { match: bestMatch, score: bestScore };
+  }
+
+  return null;
 };

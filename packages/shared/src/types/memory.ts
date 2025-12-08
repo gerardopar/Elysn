@@ -4,6 +4,16 @@ export enum MemoryTypeEnum {
   STM_TRAIL = "STM_TRAIL",
 }
 
+export enum MemorySourceEnum {
+  USER = "USER",
+  AI = "AI",
+}
+
+export const memorySourceEnum = Object.values(MemorySourceEnum) as [
+  string,
+  ...string[]
+];
+
 export enum LongTermMemoryCategoryEnum {
   Preference = "preference",
   Biographical = "biographical",
@@ -20,24 +30,32 @@ export const longTermMemoryCategoryEnum = Object.values(
   LongTermMemoryCategoryEnum
 ) as [string, ...string[]];
 
+export type MemoryMetadata = {
+  importance: number;
+  confidence: number;
+  usageCount: number;
+  lastReferencedAt: Date;
+  recencyWeight: number;
+  sentiment: number;
+  emotion: string;
+  source: MemorySourceEnum;
+};
+
 export type Memory = {
-  personaId: string; // owner of memory
-  chatId: string; // optional for chat-scoped memory
+  personaId: string;
+  chatId: string;
 
   type: MemoryTypeEnum;
 
-  category: LongTermMemoryCategoryEnum; // long term memory category
+  category: LongTermMemoryCategoryEnum;
 
-  value: string; // memory
+  value: string;
 
-  importance: number; // 0-1 weighting
-  weight: number;
-  sentiment: number;
-  emotion: string;
+  metadata: MemoryMetadata;
   topics: string[];
   embedding: number[];
 
-  messageId?: string; // message where the memory was extracted
+  messageId?: string;
   fromMessageCount?: number;
   toMessageCount?: number;
 
@@ -48,9 +66,15 @@ export type Memory = {
 export type LongTermMemoryExtractionResponse = {
   shouldWriteMemory: boolean;
   memory: {
-    category: LongTermMemoryCategoryEnum;
     value: string;
-    importance: number;
     topics: string[];
+    category: LongTermMemoryCategoryEnum;
+
+    metadata: MemoryMetadata;
   } | null;
+};
+
+export type ShortTermMemorySummaryResponse = {
+  summary: string;
+  metadata: MemoryMetadata;
 };

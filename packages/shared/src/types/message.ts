@@ -1,3 +1,8 @@
+export enum MessageSenderEnum {
+  USER = "USER",
+  AI = "AI",
+}
+
 export type Message = {
   id: string;
   userId: string;
@@ -29,8 +34,3 @@ export type MessageInput = {
     embedding?: number[];
   };
 };
-
-export enum MessageSenderEnum {
-  USER = "USER",
-  AI = "AI",
-}

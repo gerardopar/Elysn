@@ -33,8 +33,9 @@ export const getOrCreatePersona = async (userId: string, session?: any) => {
 /**
  * Get persona by ID
  */
-export const getPersona = async (personaId: string) => {
-  return Persona.findById(personaId).lean();
+export const getPersona = async (persona: Persona | string) => {
+  if (persona instanceof Persona || typeof persona !== "string") return persona;
+  return Persona.findById(persona).lean();
 };
 
 /**
