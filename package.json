@@ -1,5 +1,5 @@
 {
-  "name": "apollo-monorepo",
+  "name": "elysn-monorepo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,12 +7,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"pnpm --filter server dev\" \"pnpm --filter client dev\"",
     "dev:watch": "concurrently -n server,client,codegen -c cyan,green,magenta \"pnpm --filter server dev\" \"pnpm --filter client dev\" \"pnpm --filter server codegen:watch\"",
-    "build": "pnpm -F @elysn/shared build && pnpm -F @elysn/core build && pnpm -F server build"
+    "build": "pnpm install --frozen-lockfile && pnpm -F @elysn/shared build && pnpm -F @elysn/core build && pnpm -F server build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.10.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "dependencies": {
     "@graphql-tools/graphql-file-loader": "^8.1.2",
     "@graphql-tools/load": "^8.1.2",
