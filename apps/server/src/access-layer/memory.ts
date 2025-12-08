@@ -110,7 +110,7 @@ export const getLongTermMemories = async (
   const metadataFiltered = await getMetadataFilteredLongTermMemories(
     personaId,
     topics,
-    { minImportance, maxAgeMonths, limit } // passes options down
+    { minImportance, maxAgeMonths } // passes options down
   );
 
   // semantic filtering (embedding similarity)
