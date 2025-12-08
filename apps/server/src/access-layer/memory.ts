@@ -120,8 +120,7 @@ export const getLongTermMemories = async (
     // @ts-expect-error expected type Memory[]
     embeddingRelevant = await getRelevantLTMMemories(
       metadataFiltered,
-      embedding,
-      limit
+      embedding
     );
   }
 
