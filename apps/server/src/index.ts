@@ -116,6 +116,11 @@ export const startServer = async () => {
     }) as any
   );
 
+  // Health check
+  app.get("/health", (_req, res) => {
+    res.status(200).json({ status: "ok" });
+  });
+
   // Jobs
   app.use("/jobs", jobsRouter);
 
