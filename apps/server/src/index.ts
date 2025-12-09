@@ -94,15 +94,26 @@ export const startServer = async () => {
 
   await server.start();
 
-  // Express middleware for GraphQL endpoint
+  const corsOriginList = process.env.CORS_ORIGIN?.split(",").map((o) =>
+    o.trim()
+  ) ?? ["http://localhost:5173"];
+  // graphQL
   app.use(
     "/graphql",
     cors({
-      origin: corsOrigin,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+
+        if (corsOriginList.includes(origin)) {
+          return callback(null, true);
+        }
+
+        console.error("❌ CORS blocked origin:", origin);
+        return callback(new Error("Not allowed by CORS"));
+      },
       credentials: true,
     }),
     bodyParser.json(),
-    // Cast to any to work around Express v4/v5 RequestHandler type mismatch
     expressMiddleware(server, {
       context: async ({ req }): Promise<GraphQLContext> => {
         const authHeader = req.headers.authorization || "";
