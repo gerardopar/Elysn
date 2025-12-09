@@ -1,4 +1,4 @@
-import { getUserByFirebaseUid } from "src/access-layer/user.js";
+import { getUserByFirebaseUid } from "../access-layer/user.js";
 
 import {
   createMessage,

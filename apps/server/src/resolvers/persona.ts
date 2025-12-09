@@ -1,4 +1,4 @@
-import { Resolvers } from "src/graphql/__generated__/graphql.js";
+import { Resolvers } from "../graphql/__generated__/graphql.js";
 
 import { pubsub, PERSONA_STATUS_CHANNEL } from "../pubsub/pubsub.js";
 

@@ -1,4 +1,4 @@
-import { openaiClient as openai } from "src/services/openAi.js";
+import { openaiClient as openai } from "../services/openAi.js";
 import { OpenAI } from "openai";
 
 import { Memory } from "../models/memory.js";

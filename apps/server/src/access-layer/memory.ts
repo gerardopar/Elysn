@@ -7,7 +7,7 @@ import {
 } from "@elysn/core";
 
 import { MemoryTypeEnum } from "@elysn/shared";
-import { reinforceReferencedMemories } from "src/helpers/memory.helpers.js";
+import { reinforceReferencedMemories } from "../helpers/memory.helpers.js";
 
 export const getMemory = async (id: string): Promise<Memory | null> => {
   const memory = await Memory.findById(id);
