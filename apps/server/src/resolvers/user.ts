@@ -5,14 +5,14 @@ import {
   MutationUpdateUserArgs,
   MutationDeleteUserArgs,
   MutationUpsertUserArgs,
-} from "../graphql/__generated__/graphql";
+} from "../graphql/__generated__/graphql.js";
 
 import {
   createUser,
   getUser,
   getUserByFirebaseUid,
-} from "../access-layer/user";
-import { User } from "../models/user";
+} from "../access-layer/user.js";
+import { User } from "../models/user.js";
 
 export const userResolvers: Resolvers = {
   Query: {

@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { DecodedIdToken } from "firebase-admin/auth";
 import { Request } from "express";
 
-import { firebaseAdmin } from "../firebase/firebase";
+import { firebaseAdmin } from "../firebase/firebase.js";
 
 export interface GraphQLContext {
   user: DecodedIdToken | null;

@@ -1,4 +1,4 @@
-import { Memory } from "../models/memory";
+import { Memory } from "../models/memory.js";
 
 import {
   buildLongTermMemoryFilter,
@@ -7,7 +7,7 @@ import {
 } from "@elysn/core";
 
 import { MemoryTypeEnum } from "@elysn/shared";
-import { reinforceReferencedMemories } from "src/helpers/memory.helpers";
+import { reinforceReferencedMemories } from "../helpers/memory.helpers.js";
 
 export const getMemory = async (id: string): Promise<Memory | null> => {
   const memory = await Memory.findById(id);

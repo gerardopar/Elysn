@@ -1,4 +1,4 @@
-import { User } from "../models/user";
+import { User } from "../models/user.js";
 
 export const getUser = async (user: User | string) => {
   if (user instanceof User || typeof user !== "string") return user;

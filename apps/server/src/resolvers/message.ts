@@ -1,4 +1,4 @@
-import { getUserByFirebaseUid } from "src/access-layer/user";
+import { getUserByFirebaseUid } from "../access-layer/user.js";
 
 import {
   createMessage,
@@ -6,8 +6,8 @@ import {
   updateMessage,
   getMessages,
   getMessage,
-} from "../access-layer/message";
-import { getChat } from "../access-layer/chat";
+} from "../access-layer/message.js";
+import { getChat } from "../access-layer/chat.js";
 
 import {
   Resolvers,
@@ -20,20 +20,20 @@ import {
   Message,
   MessageSenderEnum,
   SubscriptionNewMessageStreamArgs,
-} from "../graphql/__generated__/graphql";
+} from "../graphql/__generated__/graphql.js";
 
-import { createPersonaMessage } from "../helpers/persona.helpers";
+import { createPersonaMessage } from "../helpers/persona.helpers.js";
 import {
   extractLongTermMemory,
   maybeExtractShortTermMemory,
-} from "../helpers/memory.helpers";
+} from "../helpers/memory.helpers.js";
 
 import {
   pubsub,
   MESSAGE_CHANNEL,
   PERSONA_STATUS_CHANNEL,
   MESSAGE_STREAM_CHANNEL,
-} from "../pubsub/pubsub";
+} from "../pubsub/pubsub.js";
 
 export const messageResolvers: Resolvers = {
   Query: {
