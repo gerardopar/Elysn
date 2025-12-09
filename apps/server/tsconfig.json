@@ -2,14 +2,17 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "types": ["node"],
+
     "baseUrl": "."
   },
   "include": ["src"]
