@@ -12,8 +12,8 @@ import { SetContextLink } from "@apollo/client/link/context";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
 
-const HTTP_URL = "http://localhost:4000/graphql";
-const WS_URL = "ws://localhost:4000/graphql";
+const HTTP_URL = import.meta.env.VITE_GRAPHQL_HTTP;
+const WS_URL = import.meta.env.VITE_GRAPHQL_WS;
 
 export const useApolloClient = () => {
   const auth = getAuth();
