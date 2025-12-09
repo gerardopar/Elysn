@@ -100,22 +100,18 @@ export const startServer = async () => {
   // graphQL
   app.use(
     "/graphql",
-    // cors({
-    //   origin: (origin, callback) => {
-    //     if (!origin) return callback(null, true);
-
-    //     if (corsOriginList.includes(origin)) {
-    //       return callback(null, true);
-    //     }
-
-    //     console.error("❌ CORS blocked origin:", origin);
-    //     return callback(new Error("Not allowed by CORS"));
-    //   },
-    //   credentials: true,
-    // }),
     cors({
-      origin: "*",
-      credentials: false,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+
+        if (corsOriginList.includes(origin)) {
+          return callback(null, true);
+        }
+
+        console.error("❌ CORS blocked origin:", origin);
+        return callback(new Error("Not allowed by CORS"));
+      },
+      credentials: true,
     }),
     bodyParser.json(),
     expressMiddleware(server, {
