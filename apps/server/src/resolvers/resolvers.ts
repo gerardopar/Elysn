@@ -1,9 +1,9 @@
-import { userResolvers } from "./user";
-import { chatResolvers } from "./chat";
-import { messageResolvers } from "./message";
-import { personaResolvers } from "./persona";
+import { userResolvers } from "./user.js";
+import { chatResolvers } from "./chat.js";
+import { messageResolvers } from "./message.js";
+import { personaResolvers } from "./persona.js";
 
-import { Resolvers } from "../graphql/__generated__/graphql";
+import { Resolvers } from "../graphql/__generated__/graphql.js";
 
 export const resolvers: Resolvers = {
   Query: {

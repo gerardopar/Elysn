@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-import { Message } from "../models/message";
-import { Chat } from "../models/chat";
+import { Message } from "../models/message.js";
+import { Chat } from "../models/chat.js";
 
 import { MessageSenderEnum } from "@elysn/shared";
 

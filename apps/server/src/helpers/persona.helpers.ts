@@ -1,27 +1,27 @@
-import { openaiClient as openai } from "../services/openAi";
+import { openaiClient as openai } from "../services/openAi.js";
 
-import { Persona } from "../models/persona";
-import { Message } from "../models/message";
-import { Chat } from "../models/chat";
-import { User } from "../models/user";
+import { Persona } from "../models/persona.js";
+import { Message } from "../models/message.js";
+import { Chat } from "../models/chat.js";
+import { User } from "../models/user.js";
 
-import { sanitizeText } from "./string.helpers";
-import { updateMessageEmbedding } from "./message.helpers";
-import { createMemoryEmbedding, extractTopics } from "./memory.helpers";
+import { sanitizeText } from "./string.helpers.js";
+import { updateMessageEmbedding } from "./message.helpers.js";
+import { createMemoryEmbedding, extractTopics } from "./memory.helpers.js";
 
 import {
   createMessage,
   getRecentMessages,
   getMessage,
   updateMessageTopics,
-} from "../access-layer/message";
+} from "../access-layer/message.js";
 import {
   getLatestShortTermMemory,
   getLongTermMemories,
-} from "../access-layer/memory";
-import { getUser } from "../access-layer/user";
-import { getChat } from "../access-layer/chat";
-import { getPersona } from "../access-layer/persona";
+} from "../access-layer/memory.js";
+import { getUser } from "../access-layer/user.js";
+import { getChat } from "../access-layer/chat.js";
+import { getPersona } from "../access-layer/persona.js";
 
 import { createResponse } from "@elysn/core";
 import { MessageSenderEnum } from "@elysn/shared";
@@ -31,7 +31,7 @@ import {
   MESSAGE_CHANNEL,
   MESSAGE_STREAM_CHANNEL,
   PERSONA_STATUS_CHANNEL,
-} from "../pubsub/pubsub";
+} from "../pubsub/pubsub.js";
 
 export const personaExists = async (userId: string): Promise<boolean> => {
   const persona = await Persona.findOne({ userId });

@@ -13,20 +13,20 @@ import { expressMiddleware } from "@as-integrations/express5";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
-import { connectDB } from "./db/db";
-import { connectRedis } from "./cache/redisClient";
-import { resolvers } from "./resolvers/resolvers";
-import { firebaseAdmin } from "./firebase/firebase";
+import { connectDB } from "./db/db.js";
+import { connectRedis } from "./cache/redisClient.js";
+import { resolvers } from "./resolvers/resolvers.js";
+import { firebaseAdmin } from "./firebase/firebase.js";
 import { loadSchema } from "@graphql-tools/load";
-import { GraphQLContext } from "./context/context";
+import { GraphQLContext } from "./context/context.js";
 import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
 
 // MCP
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { setupMcpServer } from "./mcp";
+import { setupMcpServer } from "./mcp/index.js";
 
 // Jobs
-import { jobsRouter } from "./jobs/jobsRouter";
+import { jobsRouter } from "./jobs/jobsRouter.js";
 
 const schemaPath = path.resolve("src/schema/**/*.graphql");
 

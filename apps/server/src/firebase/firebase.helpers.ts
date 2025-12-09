@@ -1,4 +1,4 @@
-import { firebaseAdmin } from "./firebase";
+import { firebaseAdmin } from "./firebase.js";
 import { UserRecord } from "firebase-admin/auth";
 
 export const updateFirebaseUser = async (uid: string, user: UserRecord) => {

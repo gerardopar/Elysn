@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 
-import { runMemoryDecayForAllPersonas } from "./scripts/memory-jobs";
+import { runMemoryDecayForAllPersonas } from "./scripts/memory-jobs.js";
 
 export const jobsRouter = Router();
 

@@ -7,10 +7,10 @@ import {
   deleteChat,
   updateChat as updateChatRecord,
   getLastChatMessage,
-} from "../access-layer/chat";
-import { createMessage } from "../access-layer/message";
-import { getOrCreatePersona } from "../access-layer/persona";
-import { getUserByFirebaseUid } from "src/access-layer/user";
+} from "../access-layer/chat.js";
+import { createMessage } from "../access-layer/message.js";
+import { getOrCreatePersona } from "../access-layer/persona.js";
+import { getUserByFirebaseUid } from "../access-layer/user.js";
 
 import {
   Resolvers,
@@ -19,12 +19,12 @@ import {
   MutationCreateChatWithMessageArgs,
   MutationDeleteChatArgs,
   MutationUpdateChatArgs,
-} from "../graphql/__generated__/graphql";
+} from "../graphql/__generated__/graphql.js";
 
-import { isChatOwner } from "../helpers/chat.helpers";
-import { createPersonaMessage } from "../helpers/persona.helpers";
+import { isChatOwner } from "../helpers/chat.helpers.js";
+import { createPersonaMessage } from "../helpers/persona.helpers.js";
 
-import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub";
+import { pubsub, MESSAGE_CHANNEL } from "../pubsub/pubsub.js";
 
 export const chatResolvers: Resolvers = {
   Query: {

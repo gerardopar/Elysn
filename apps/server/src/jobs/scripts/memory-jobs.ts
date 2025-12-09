@@ -1,5 +1,5 @@
-import { Persona } from "../../models/persona";
-import { Memory } from "../../models/memory";
+import { Persona } from "../../models/persona.js";
+import { Memory } from "../../models/memory.js";
 
 import { applyDecay } from "@elysn/core";
 

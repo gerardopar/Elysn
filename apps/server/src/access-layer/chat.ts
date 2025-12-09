@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-import { Chat } from "../models/chat";
-import { Message } from "../models/message";
+import { Chat } from "../models/chat.js";
+import { Message } from "../models/message.js";
 
 /**
  * Fetch all chats for a specific user.

@@ -1,4 +1,4 @@
-import { Persona } from "../models/persona";
+import { Persona } from "../models/persona.js";
 
 import mongoose from "mongoose";
 

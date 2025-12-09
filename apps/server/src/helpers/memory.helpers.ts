@@ -1,7 +1,7 @@
-import { openaiClient as openai } from "src/services/openAi";
+import { openaiClient as openai } from "src/services/openAi.js";
 import { OpenAI } from "openai";
 
-import { Memory } from "../models/memory";
+import { Memory } from "../models/memory.js";
 
 import {
   EMBED_BASE_SIMILARITY_THRESHOLD,
@@ -20,10 +20,10 @@ import {
   MemorySourceEnum,
 } from "@elysn/shared";
 
-import { getChat } from "../access-layer/chat";
-import { getMessage, getRecentMessages } from "../access-layer/message";
+import { getChat } from "../access-layer/chat.js";
+import { getMessage, getRecentMessages } from "../access-layer/message.js";
 
-import { sanitizeJSON } from "./string.helpers";
+import { sanitizeJSON } from "./string.helpers.js";
 
 export const maybeExtractShortTermMemory = async (
   chatId: string,
