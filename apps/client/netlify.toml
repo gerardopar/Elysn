@@ -1,0 +1,8 @@
+[build]
+  base = "apps/client"
+  command = "pnpm build"
+  publish = "apps/client/dist"
+
+[dev]
+  command = "pnpm dev"
+  port = 5173
