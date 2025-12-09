@@ -126,7 +126,7 @@ export const startServer = async () => {
 
   // Start everything
   const PORT = Number(process.env.PORT) || 4000;
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 GraphQL endpoint: http://localhost:${PORT}/graphql`);
     console.log(`🔌 Subscriptions endpoint: ws://localhost:${PORT}/graphql`);
   });
