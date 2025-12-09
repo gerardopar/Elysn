@@ -1,7 +1,10 @@
+[build.environment]
+  GIT_CLONE_FLAGS = "--no-recurse-submodules"
+
 [build]
   base = "apps/client"
   command = "pnpm build"
-  publish = "apps/client/dist"
+  publish = "dist"
 
 [dev]
   command = "pnpm dev"
