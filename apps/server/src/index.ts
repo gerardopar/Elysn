@@ -30,6 +30,10 @@ import { jobsRouter } from "./jobs/jobsRouter.js";
 
 const schemaPath = path.resolve("src/schema/**/*.graphql");
 
+const corsOrigin = process?.env?.CORS_ORIGIN?.split(",") ?? [
+  "http://localhost:5173",
+];
+
 export const startServer = async () => {
   await connectDB();
   await connectRedis();
@@ -93,7 +97,10 @@ export const startServer = async () => {
   // Express middleware for GraphQL endpoint
   app.use(
     "/graphql",
-    cors(),
+    cors({
+      origin: corsOrigin,
+      credentials: true,
+    }),
     bodyParser.json(),
     // Cast to any to work around Express v4/v5 RequestHandler type mismatch
     expressMiddleware(server, {
@@ -126,7 +133,7 @@ export const startServer = async () => {
 
   // Start everything
   const PORT = Number(process.env.PORT) || 4000;
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 GraphQL endpoint: http://localhost:${PORT}/graphql`);
     console.log(`🔌 Subscriptions endpoint: ws://localhost:${PORT}/graphql`);
   });

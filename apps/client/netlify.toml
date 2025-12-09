@@ -1,0 +1,11 @@
+[build.environment]
+  GIT_CLONE_FLAGS = "--no-recurse-submodules"
+
+[build]
+  base = "apps/client"
+  command = "pnpm build"
+  publish = "dist"
+
+[dev]
+  command = "pnpm dev"
+  port = 5173
