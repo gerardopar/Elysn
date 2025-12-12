@@ -5,6 +5,20 @@ import { type Message as MessageCore } from "@elysn/core";
 
 export interface Message extends MessageCore, Document {}
 
+export const MessageMetadataSchema = new Schema(
+  {
+    emotion: { type: String },
+    intent: { type: String },
+    memoryTag: { type: String },
+    isMemoryWorthy: { type: Boolean },
+    topics: { type: [String], default: [] },
+    embedding: { type: [Number], default: [] },
+  },
+  {
+    _id: false,
+  }
+);
+
 const MessageSchema = new Schema<Message>(
   {
     chatId: { type: String, ref: "Chat", required: true },
@@ -21,17 +35,7 @@ const MessageSchema = new Schema<Message>(
     timestamp: { type: Date, default: Date.now },
 
     metadata: {
-      type: new Schema(
-        {
-          emotion: { type: String },
-          intent: { type: String },
-          memoryTag: { type: String },
-          isMemoryWorthy: { type: Boolean },
-          topics: { type: [String], default: [] },
-          embedding: { type: [Number], default: [] },
-        },
-        { _id: false }
-      ),
+      type: MessageMetadataSchema,
     },
   },
   { timestamps: true }

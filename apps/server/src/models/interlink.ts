@@ -12,7 +12,6 @@ const InterlinkSchema = new Schema({
   userId: { type: String, required: true, index: true },
 
   trust: { type: Number, default: INTERLINK_DEFAULTS.trust },
-  closeness: { type: Number, default: INTERLINK_DEFAULTS.closeness },
   safety: { type: Number, default: INTERLINK_DEFAULTS.safety },
   warmth: { type: Number, default: INTERLINK_DEFAULTS.warmth },
   tension: { type: Number, default: INTERLINK_DEFAULTS.tension },
@@ -24,7 +23,6 @@ const InterlinkSchema = new Schema({
 
   attunement: { type: Number, default: INTERLINK_DEFAULTS.attunement },
   rapport: { type: Number, default: INTERLINK_DEFAULTS.rapport },
-  openness: { type: Number, default: INTERLINK_DEFAULTS.openness },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
