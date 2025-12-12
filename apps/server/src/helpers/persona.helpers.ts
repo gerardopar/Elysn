@@ -6,6 +6,7 @@ import { Chat } from "../models/chat.js";
 import { User } from "../models/user.js";
 
 import { sanitizeText } from "./string.helpers.js";
+import { getOrCreateInterlink } from "./interlink.helpers.js";
 import { updateMessageEmbedding } from "./message.helpers.js";
 import { createMemoryEmbedding, extractTopics } from "./memory.helpers.js";
 
@@ -77,6 +78,11 @@ export const createPersonaMessage = async (
     text: _message.text,
   } as Message);
 
+  const interlink = await getOrCreateInterlink(
+    String(_user._id),
+    String(_persona._id)
+  );
+
   const longTermMemories = await getLongTermMemories(
     String(_persona._id),
     extractedTopics || [],
@@ -93,6 +99,7 @@ export const createPersonaMessage = async (
 
   const payload = createResponse(
     _persona,
+    interlink,
     recentMessages,
     _message.text ?? "",
     longTermMemories,
@@ -100,7 +107,7 @@ export const createPersonaMessage = async (
   );
 
   let aiText = "";
-  const streamPreference = true;
+  const streamPreference = false; // TODO: make this a user setting
 
   if (streamPreference) {
     const stream = await openai.responses.create({
