@@ -3,6 +3,15 @@ export enum MessageSenderEnum {
   AI = "AI",
 }
 
+export type MessageMetaData = {
+  emotion?: string;
+  intent?: string;
+  memoryTag?: string;
+  isMemoryWorthy?: boolean;
+  topics?: string[];
+  embedding?: number[];
+};
+
 export type Message = {
   id: string;
   userId: string;
@@ -11,26 +20,12 @@ export type Message = {
   sender: MessageSenderEnum;
   text: string;
   timestamp: number;
-  metadata?: {
-    emotion?: string;
-    intent?: string;
-    memoryTag?: string;
-    isMemoryWorthy?: boolean;
-    topics?: string[];
-    embedding?: number[];
-  };
+  metadata?: MessageMetaData;
 };
 
 export type MessageInput = {
   chatId?: string;
   sender: MessageSenderEnum;
   text: string;
-  metadata?: {
-    emotion?: string;
-    intent?: string;
-    memoryTag?: string;
-    isMemoryWorthy?: boolean;
-    topics?: string[];
-    embedding?: number[];
-  };
+  metadata?: MessageMetaData;
 };
