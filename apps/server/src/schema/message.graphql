@@ -27,6 +27,7 @@ type MessageMetadata {
   memoryTag: String
   isMemoryWorthy: Boolean
   embedding: [Float]
+  topics: [String]
 }
 
 input MessageInput {
