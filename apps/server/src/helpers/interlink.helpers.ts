@@ -11,7 +11,7 @@ import {
 
 import { sanitizeJSON } from "./string.helpers.js";
 
-import { userSignalResponse, updateInterlinkFromUserSignal } from "@elysn/core";
+import { userSignalResponse, getInterlinkPatch } from "@elysn/core";
 
 export const getOrCreateInterlink = async (
   userId: string,
@@ -72,7 +72,7 @@ export const updateInterlinkWithUserSignalMetadata = async (
   const interlink = await getOrCreateInterlink(userId, personaId);
   if (!userSignal) return interlink;
 
-  const patch = updateInterlinkFromUserSignal(interlink, userSignal);
+  const patch = getInterlinkPatch(interlink, userSignal);
 
   return updateInterlink(userId, personaId, patch);
 };
