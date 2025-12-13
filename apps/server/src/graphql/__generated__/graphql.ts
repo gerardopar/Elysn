@@ -41,6 +41,24 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Interlink = {
+  __typename?: 'Interlink';
+  attunement: Scalars['Float']['output'];
+  createdAt: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+  lastAiEmotion?: Maybe<Scalars['String']['output']>;
+  lastEmotionalTone?: Maybe<Scalars['String']['output']>;
+  lastInteractionAt: Scalars['Float']['output'];
+  lastUserEmotion?: Maybe<Scalars['String']['output']>;
+  personaId: Scalars['ID']['output'];
+  safety: Scalars['Float']['output'];
+  tension: Scalars['Float']['output'];
+  trust: Scalars['Float']['output'];
+  updatedAt: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
+  warmth: Scalars['Float']['output'];
+};
+
 export type Message = {
   __typename?: 'Message';
   chatId?: Maybe<Scalars['ID']['output']>;
@@ -67,6 +85,7 @@ export type MessageMetadata = {
   intent?: Maybe<Scalars['String']['output']>;
   isMemoryWorthy?: Maybe<Scalars['Boolean']['output']>;
   memoryTag?: Maybe<Scalars['String']['output']>;
+  topics?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
 export enum MessageSenderEnum {
@@ -174,13 +193,9 @@ export type Persona = {
   __typename?: 'Persona';
   avatarUrl?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Float']['output'];
-  emotion?: Maybe<PersonaEmotion>;
   id: Scalars['ID']['output'];
-  meta?: Maybe<PersonaMeta>;
   name?: Maybe<Scalars['String']['output']>;
   persona?: Maybe<PersonaData>;
-  relationship?: Maybe<PersonaRelationship>;
-  settings?: Maybe<PersonaSettings>;
   state?: Maybe<PersonaState>;
   updatedAt: Scalars['Float']['output'];
   userId: Scalars['ID']['output'];
@@ -189,45 +204,13 @@ export type Persona = {
 export type PersonaData = {
   __typename?: 'PersonaData';
   archetype?: Maybe<Scalars['String']['output']>;
-  baseSystemPrompt?: Maybe<Scalars['String']['output']>;
   coreTraits?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  dynamicSystemPrompt?: Maybe<Scalars['String']['output']>;
   tone?: Maybe<Scalars['String']['output']>;
-};
-
-export type PersonaEmotion = {
-  __typename?: 'PersonaEmotion';
-  current?: Maybe<Scalars['String']['output']>;
-  lastUpdated?: Maybe<Scalars['Float']['output']>;
-};
-
-export type PersonaMeta = {
-  __typename?: 'PersonaMeta';
-  interactions?: Maybe<Scalars['Int']['output']>;
-  tokensUsed?: Maybe<Scalars['Int']['output']>;
-  version?: Maybe<Scalars['String']['output']>;
-};
-
-export type PersonaRelationship = {
-  __typename?: 'PersonaRelationship';
-  closeness?: Maybe<Scalars['Float']['output']>;
-  history?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  trust?: Maybe<Scalars['Float']['output']>;
-};
-
-export type PersonaSettings = {
-  __typename?: 'PersonaSettings';
-  memoryRetention?: Maybe<Scalars['Float']['output']>;
-  model?: Maybe<Scalars['String']['output']>;
-  openness?: Maybe<Scalars['Float']['output']>;
-  temperature?: Maybe<Scalars['Float']['output']>;
 };
 
 export type PersonaState = {
   __typename?: 'PersonaState';
-  attention?: Maybe<Scalars['Float']['output']>;
   availability?: Maybe<Scalars['String']['output']>;
-  energy?: Maybe<Scalars['Float']['output']>;
 };
 
 export type PersonaStatus = {
@@ -405,6 +388,7 @@ export type ResolversTypes = {
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Interlink: ResolverTypeWrapper<Interlink>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   Message: ResolverTypeWrapper<Message>;
   MessageInput: MessageInput;
@@ -414,10 +398,6 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Persona: ResolverTypeWrapper<Persona>;
   PersonaData: ResolverTypeWrapper<PersonaData>;
-  PersonaEmotion: ResolverTypeWrapper<PersonaEmotion>;
-  PersonaMeta: ResolverTypeWrapper<PersonaMeta>;
-  PersonaRelationship: ResolverTypeWrapper<PersonaRelationship>;
-  PersonaSettings: ResolverTypeWrapper<PersonaSettings>;
   PersonaState: ResolverTypeWrapper<PersonaState>;
   PersonaStatus: ResolverTypeWrapper<PersonaStatus>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -437,6 +417,7 @@ export type ResolversParentTypes = {
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
+  Interlink: Interlink;
   JSON: Scalars['JSON']['output'];
   Message: Message;
   MessageInput: MessageInput;
@@ -445,10 +426,6 @@ export type ResolversParentTypes = {
   Mutation: Record<PropertyKey, never>;
   Persona: Persona;
   PersonaData: PersonaData;
-  PersonaEmotion: PersonaEmotion;
-  PersonaMeta: PersonaMeta;
-  PersonaRelationship: PersonaRelationship;
-  PersonaSettings: PersonaSettings;
   PersonaState: PersonaState;
   PersonaStatus: PersonaStatus;
   Query: Record<PropertyKey, never>;
@@ -469,6 +446,23 @@ export type ChatResolvers<ContextType = any, ParentType extends ResolversParentT
   topic?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+};
+
+export type InterlinkResolvers<ContextType = any, ParentType extends ResolversParentTypes['Interlink'] = ResolversParentTypes['Interlink']> = {
+  attunement?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  lastAiEmotion?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  lastEmotionalTone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  lastInteractionAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  lastUserEmotion?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  personaId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  safety?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  tension?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  trust?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  warmth?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
@@ -492,6 +486,7 @@ export type MessageMetadataResolvers<ContextType = any, ParentType extends Resol
   intent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   isMemoryWorthy?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   memoryTag?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  topics?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
 };
 
 export type MessageStreamResolvers<ContextType = any, ParentType extends ResolversParentTypes['MessageStream'] = ResolversParentTypes['MessageStream']> = {
@@ -520,13 +515,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type PersonaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Persona'] = ResolversParentTypes['Persona']> = {
   avatarUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  emotion?: Resolver<Maybe<ResolversTypes['PersonaEmotion']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  meta?: Resolver<Maybe<ResolversTypes['PersonaMeta']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   persona?: Resolver<Maybe<ResolversTypes['PersonaData']>, ParentType, ContextType>;
-  relationship?: Resolver<Maybe<ResolversTypes['PersonaRelationship']>, ParentType, ContextType>;
-  settings?: Resolver<Maybe<ResolversTypes['PersonaSettings']>, ParentType, ContextType>;
   state?: Resolver<Maybe<ResolversTypes['PersonaState']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -534,40 +525,12 @@ export type PersonaResolvers<ContextType = any, ParentType extends ResolversPare
 
 export type PersonaDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaData'] = ResolversParentTypes['PersonaData']> = {
   archetype?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  baseSystemPrompt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   coreTraits?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
-  dynamicSystemPrompt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   tone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
-export type PersonaEmotionResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaEmotion'] = ResolversParentTypes['PersonaEmotion']> = {
-  current?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  lastUpdated?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-};
-
-export type PersonaMetaResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaMeta'] = ResolversParentTypes['PersonaMeta']> = {
-  interactions?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  tokensUsed?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-};
-
-export type PersonaRelationshipResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaRelationship'] = ResolversParentTypes['PersonaRelationship']> = {
-  closeness?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  history?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
-  trust?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-};
-
-export type PersonaSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaSettings'] = ResolversParentTypes['PersonaSettings']> = {
-  memoryRetention?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  model?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  openness?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  temperature?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-};
-
 export type PersonaStateResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaState'] = ResolversParentTypes['PersonaState']> = {
-  attention?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   availability?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  energy?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
 };
 
 export type PersonaStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonaStatus'] = ResolversParentTypes['PersonaStatus']> = {
@@ -608,6 +571,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   Chat?: ChatResolvers<ContextType>;
+  Interlink?: InterlinkResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   Message?: MessageResolvers<ContextType>;
   MessageMetadata?: MessageMetadataResolvers<ContextType>;
@@ -615,10 +579,6 @@ export type Resolvers<ContextType = any> = {
   Mutation?: MutationResolvers<ContextType>;
   Persona?: PersonaResolvers<ContextType>;
   PersonaData?: PersonaDataResolvers<ContextType>;
-  PersonaEmotion?: PersonaEmotionResolvers<ContextType>;
-  PersonaMeta?: PersonaMetaResolvers<ContextType>;
-  PersonaRelationship?: PersonaRelationshipResolvers<ContextType>;
-  PersonaSettings?: PersonaSettingsResolvers<ContextType>;
   PersonaState?: PersonaStateResolvers<ContextType>;
   PersonaStatus?: PersonaStatusResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

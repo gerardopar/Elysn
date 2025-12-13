@@ -13,7 +13,6 @@ export type Interlink = {
   lastInteractionAt: Date;
 
   attunement: number;
-  rapport: number;
 
   createdAt: Date;
   updatedAt: Date;

@@ -22,7 +22,6 @@ const InterlinkSchema = new Schema({
   lastInteractionAt: { type: Date, default: Date.now },
 
   attunement: { type: Number, default: INTERLINK_DEFAULTS.attunement },
-  rapport: { type: Number, default: INTERLINK_DEFAULTS.rapport },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
