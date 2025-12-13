@@ -1,10 +1,17 @@
 import { openaiClient as openai } from "../services/openAi.js";
 import { OpenAI } from "openai";
 
-import { getInterlink, createInterlink } from "../access-layer/interlink.js";
+import { Interlink } from "src/models/interlink.js";
 
-import { userSignalResponse } from "@elysn/core";
+import {
+  getInterlink,
+  createInterlink,
+  updateInterlink,
+} from "../access-layer/interlink.js";
+
 import { sanitizeJSON } from "./string.helpers.js";
+
+import { userSignalResponse, updateInterlinkFromUserSignal } from "@elysn/core";
 
 export const getOrCreateInterlink = async (
   userId: string,
@@ -50,4 +57,21 @@ export const extractUserSignal = async (
     return null;
 
   return extractedTopics;
+};
+
+export const updateInterlinkWithUserSignalMetadata = async (
+  userId: string,
+  personaId: string,
+  userSignal: {
+    sentiment: number;
+    emotion: string;
+    intensity: number;
+  } | null
+): Promise<Interlink | null> => {
+  const interlink = await getOrCreateInterlink(userId, personaId);
+  if (!userSignal) return interlink;
+
+  const patch = updateInterlinkFromUserSignal(interlink, userSignal);
+
+  return updateInterlink(userId, personaId, patch);
 };

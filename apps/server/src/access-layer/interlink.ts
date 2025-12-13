@@ -13,5 +13,12 @@ export const updateInterlink = async (
   personaId: string,
   updates: Partial<Interlink>
 ) => {
-  return Interlink.updateOne({ userId, personaId }, updates);
+  return Interlink.findOneAndUpdate(
+    { userId, personaId },
+    { $set: updates },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 };
