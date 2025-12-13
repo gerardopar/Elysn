@@ -6,8 +6,11 @@ import { Chat } from "../models/chat.js";
 import { User } from "../models/user.js";
 
 import { sanitizeText } from "./string.helpers.js";
-import { getOrCreateInterlink } from "./interlink.helpers.js";
-import { updateMessageEmbedding } from "./message.helpers.js";
+import {
+  extractUserSignal,
+  updateInterlinkWithUserSignalMetadata,
+} from "./interlink.helpers.js";
+import { updateMessageMetadataAsync } from "./message.helpers.js";
 import { createMemoryEmbedding, extractTopics } from "./memory.helpers.js";
 
 import {
@@ -65,10 +68,14 @@ export const createPersonaMessage = async (
 
   const extractedTopics = await extractTopics(_message.text);
   const embedding = await createMemoryEmbedding(_message.text);
+  const extractedUserSignal = await extractUserSignal(_message.text);
 
-  if (extractedTopics)
-    updateMessageTopics(String(_message._id), extractedTopics);
-  if (embedding) updateMessageEmbedding(String(_message._id), embedding);
+  updateMessageMetadataAsync(
+    String(_message._id),
+    extractedTopics,
+    embedding,
+    extractedUserSignal
+  );
 
   let recentMessages = await getRecentMessages(String(_chat._id));
   recentMessages = recentMessages.slice(-10);
@@ -78,9 +85,10 @@ export const createPersonaMessage = async (
     text: _message.text,
   } as Message);
 
-  const interlink = await getOrCreateInterlink(
+  const interlink = await updateInterlinkWithUserSignalMetadata(
     String(_user._id),
-    String(_persona._id)
+    String(_persona._id),
+    extractedUserSignal
   );
 
   const longTermMemories = await getLongTermMemories(
