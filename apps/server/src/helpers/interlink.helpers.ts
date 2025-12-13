@@ -1,7 +1,7 @@
 import { openaiClient as openai } from "../services/openAi.js";
 import { OpenAI } from "openai";
 
-import { Interlink } from "src/models/interlink.js";
+import { Interlink } from "../models/interlink.js";
 
 import {
   getInterlink,
@@ -50,9 +50,10 @@ export const extractUserSignal = async (
   } = JSON.parse(sanitizedOutput);
 
   if (
-    !extractedTopics?.sentiment ||
-    !extractedTopics?.emotion ||
-    !extractedTopics?.intensity
+    extractedTopics?.sentiment == null ||
+    typeof extractedTopics?.emotion !== "string" ||
+    extractedTopics.emotion.length === 0 ||
+    extractedTopics?.intensity == null
   )
     return null;
 

@@ -17,7 +17,6 @@ import {
   createMessage,
   getRecentMessages,
   getMessage,
-  updateMessageTopics,
 } from "../access-layer/message.js";
 import {
   getLatestShortTermMemory,
