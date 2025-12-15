@@ -20,6 +20,7 @@ import {
   MemoryTypeEnum,
   MemorySourceEnum,
   MemoryRelationshipEnum,
+  LongTermMemoryCategoryEnum,
 } from "@elysn/shared";
 
 import { getChat } from "../access-layer/chat.js";
@@ -218,7 +219,7 @@ const updateSimilarMemory = async ({
   existing: Memory;
   personaId: string;
   messageId: string;
-  category: string;
+  category: LongTermMemoryCategoryEnum;
   value: string;
   metadata: NonNullable<LongTermMemoryExtractionResponse["memory"]>["metadata"];
   topics: string[];
