@@ -8,6 +8,7 @@ import {
   EMBED_CROSS_CATEGORY_THRESHOLD,
   extractShortTermMemoryResponse,
   extractLongTermMemoryResponse,
+  memoryComparisonResponse,
   extractMessageTopics,
   embeddingResponse,
   cosineSimilarity,
@@ -18,6 +19,7 @@ import {
   ShortTermMemorySummaryResponse,
   MemoryTypeEnum,
   MemorySourceEnum,
+  MemoryRelationshipEnum,
 } from "@elysn/shared";
 
 import { getChat } from "../access-layer/chat.js";
@@ -161,31 +163,19 @@ export const saveLongTermMemory = async ({
     if (duplicate?.match) {
       const existing = duplicate.match;
 
-      await Memory.updateOne(
-        { _id: existing._id },
-        {
-          $set: {
-            "metadata.importance": Math.max(
-              existing.metadata.importance,
-              metadata.importance
-            ),
-            "metadata.confidence": Math.max(
-              existing.metadata.confidence,
-              metadata.confidence
-            ),
-            "metadata.usageCount": (existing.metadata.usageCount ?? 0) + 1,
-            "metadata.lastReferencedAt": now,
-            "metadata.recencyWeight": 1.0,
-            embedding,
-            topics: Array.from(
-              new Set([...(existing.topics || []), ...topics])
-            ),
-            lastUpdated: now,
-          },
-        }
-      );
+      const updated = await updateSimilarMemory({
+        existing,
+        personaId,
+        messageId,
+        category,
+        value,
+        metadata,
+        topics,
+        embedding: embedding!,
+        now,
+      });
 
-      return Memory.findById(existing._id);
+      if (updated) return updated;
     }
 
     const memory = await Memory.create({
@@ -212,6 +202,130 @@ export const saveLongTermMemory = async ({
     console.error("[saveLongTermMemory] Failed to save memory:", err);
     return null;
   }
+};
+
+const updateSimilarMemory = async ({
+  existing,
+  personaId,
+  messageId,
+  category,
+  value,
+  metadata,
+  topics,
+  embedding,
+  now,
+}: {
+  existing: Memory;
+  personaId: string;
+  messageId: string;
+  category: string;
+  value: string;
+  metadata: NonNullable<LongTermMemoryExtractionResponse["memory"]>["metadata"];
+  topics: string[];
+  embedding: number[];
+  now: Date;
+}): Promise<Memory | null> => {
+  if (existing.category !== category) return null;
+
+  const comparison = await compareMemories(existing.value, value, category);
+
+  let relationship: string;
+  if (comparison && comparison.confidence >= 0.65) {
+    relationship = comparison.relationship;
+  } else {
+    relationship = MemoryRelationshipEnum.Reinforce;
+  }
+
+  // ───── reinforce (same belief) ─────
+  if (relationship === MemoryRelationshipEnum.Reinforce) {
+    await Memory.updateOne(
+      { _id: existing._id },
+      {
+        $set: {
+          "metadata.importance": Math.max(
+            existing.metadata.importance,
+            metadata.importance
+          ),
+          "metadata.confidence": Math.max(
+            existing.metadata.confidence,
+            metadata.confidence
+          ),
+          "metadata.usageCount": (existing.metadata.usageCount ?? 0) + 1,
+          "metadata.lastReferencedAt": now,
+          "metadata.recencyWeight": 1.0,
+          embedding,
+          topics: Array.from(new Set([...(existing.topics || []), ...topics])),
+          lastUpdated: now,
+        },
+      }
+    );
+
+    return Memory.findById(existing._id);
+  }
+
+  // ───── supersede (update belief) ─────
+  if (relationship === MemoryRelationshipEnum.Supersede) {
+    await Memory.updateOne(
+      { _id: existing._id },
+      {
+        $set: {
+          value,
+          embedding,
+          topics,
+          "metadata.importance": metadata.importance,
+          "metadata.confidence": metadata.confidence,
+          "metadata.lastReferencedAt": now,
+          "metadata.recencyWeight": 1.0,
+          lastUpdated: now,
+        },
+      }
+    );
+
+    return Memory.findById(existing._id);
+  }
+
+  // ───── contradict (old belief invalidated) ─────
+  if (relationship === MemoryRelationshipEnum.Contradict) {
+    // Deprecate existing memory
+    await Memory.updateOne(
+      { _id: existing._id },
+      {
+        $set: {
+          "metadata.confidence": Math.min(
+            existing.metadata.confidence ?? 0.5,
+            0.3
+          ),
+          "metadata.deprecatedAt": now,
+          lastUpdated: now,
+        },
+      }
+    );
+
+    // Create new memory
+    const memory = await Memory.create({
+      personaId,
+      type: MemoryTypeEnum.LTM,
+      messageId,
+      category,
+      value,
+      metadata: {
+        ...metadata,
+        lastReferencedAt: now,
+        recencyWeight: 1.0,
+        usageCount: 0,
+        source: MemorySourceEnum.USER,
+        supersedesMemoryId: existing?._id?.toString(),
+      },
+      topics,
+      embedding,
+      createdAt: now,
+      lastUpdated: now,
+    });
+
+    return memory;
+  }
+
+  return null;
 };
 
 export const extractTopics = async (
@@ -297,11 +411,11 @@ export const findSimilarMemory = async (
   personaId: string,
   incomingEmbedding: number[],
   category: string
-) => {
+): Promise<{ match: Memory; score: number } | null> => {
   const candidates = await Memory.find({
     personaId,
     type: MemoryTypeEnum.LTM,
-  }).lean();
+  });
 
   let bestMatch = null;
   let bestScore = 0;
@@ -309,7 +423,12 @@ export const findSimilarMemory = async (
   for (const m of candidates) {
     if (!m.embedding || m.embedding.length === 0) continue;
 
-    const score = cosineSimilarity(incomingEmbedding, m.embedding);
+    let score = cosineSimilarity(incomingEmbedding, m.embedding);
+
+    // Penalize deprecated memories heavily
+    if (m?.metadata?.deprecatedAt) {
+      score *= 0.25;
+    }
 
     if (score > bestScore) {
       bestScore = score;
@@ -329,4 +448,26 @@ export const findSimilarMemory = async (
   }
 
   return null;
+};
+
+export const compareMemories = async (
+  existing: string,
+  incoming: string,
+  category: string
+): Promise<{ relationship: string; confidence: number } | null> => {
+  const payload = await memoryComparisonResponse(existing, incoming, category);
+
+  if (!payload) return null;
+
+  const response: OpenAI.Responses.Response = await openai.responses.create(
+    payload
+  );
+
+  if (!response || !response.output_text) return null;
+
+  const sanitizedOutput = sanitizeJSON(response.output_text);
+  const comparison: { relationship: string; confidence: number } =
+    JSON.parse(sanitizedOutput);
+
+  return comparison;
 };

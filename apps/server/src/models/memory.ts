@@ -25,6 +25,9 @@ const MemoryMetadataSchema = new Schema(
       enum: Object.values(MemorySourceEnum),
       default: MEMORY_DEFAULTS.source,
     },
+
+    deprecatedAt: { type: Date, default: null },
+    supersedesMemoryId: { type: String, default: null },
   },
   { _id: false }
 );

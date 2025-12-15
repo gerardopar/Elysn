@@ -39,6 +39,8 @@ export type MemoryMetadata = {
   sentiment: number;
   emotion: string;
   source: MemorySourceEnum;
+  deprecatedAt?: Date;
+  supersedesMemoryId?: string;
 };
 
 export type Memory = {
@@ -78,3 +80,15 @@ export type ShortTermMemorySummaryResponse = {
   summary: string;
   metadata: MemoryMetadata;
 };
+
+export enum MemoryRelationshipEnum {
+  Reinforce = "reinforce",
+  Contradict = "contradict",
+  Supersede = "supersede",
+  Unrelated = "unrelated",
+}
+
+export const memoryRelationshipEnum = Object.values(MemoryRelationshipEnum) as [
+  string,
+  ...string[]
+];
