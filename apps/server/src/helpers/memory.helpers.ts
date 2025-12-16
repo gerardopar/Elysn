@@ -126,7 +126,6 @@ export const extractLongTermMemory = async ({
         personaId,
         messageId,
         extractedMemory: data,
-        messageEmbedding: message?.metadata?.embedding,
       });
       return savedMemory;
     } catch (error) {
@@ -141,18 +140,19 @@ export const extractLongTermMemory = async ({
 export const saveLongTermMemory = async ({
   personaId,
   messageId,
-  messageEmbedding,
   extractedMemory,
 }: {
   personaId: string;
   messageId: string;
-  messageEmbedding?: number[] | null;
   extractedMemory: LongTermMemoryExtractionResponse;
 }): Promise<Memory | null> => {
   try {
     if (!extractedMemory.shouldWriteMemory || !extractedMemory.memory) {
       return null;
     }
+
+    const message = await getMessage(messageId);
+    const messageEmbedding = message?.metadata?.embedding;
 
     const { category, value, metadata, topics } = extractedMemory.memory;
     const now = new Date();
