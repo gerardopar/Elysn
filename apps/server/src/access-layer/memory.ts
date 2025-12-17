@@ -1,9 +1,11 @@
 import { Memory } from "../models/memory.js";
 
 import {
+  selectMemoriesWithCategoryCaps,
   buildLongTermMemoryFilter,
   getRelevantLTMMemories,
   rankMemoriesByScore,
+  MEMORY_FILTER_DEFAULTS,
 } from "@elysn/core";
 
 import { MemoryTypeEnum } from "@elysn/shared";
@@ -71,7 +73,7 @@ export const getMetadataFilteredLongTermMemories = async (
   }
 ): Promise<Memory[]> => {
   const filter = buildLongTermMemoryFilter(personaId, topics, options);
-  const { limit = 100 } = options || {};
+  const { limit = MEMORY_FILTER_DEFAULTS.fetchLimit } = options || {};
 
   let memories = await Memory.find(filter)
     .sort({ "metadata.importance": -1, lastUpdated: -1 })
@@ -100,9 +102,9 @@ export const getLongTermMemories = async (
   } = {}
 ): Promise<Memory[]> => {
   const {
-    minImportance = 0.3,
-    maxAgeMonths = 12,
-    limit = 10,
+    minImportance = MEMORY_FILTER_DEFAULTS.minImportance,
+    maxAgeMonths = MEMORY_FILTER_DEFAULTS.maxAgeMonths,
+    limit = MEMORY_FILTER_DEFAULTS.fetchLimit,
     reinforce = true,
   } = options;
 
@@ -110,7 +112,7 @@ export const getLongTermMemories = async (
   const metadataFiltered = await getMetadataFilteredLongTermMemories(
     personaId,
     topics,
-    { minImportance, maxAgeMonths }
+    { minImportance, maxAgeMonths, limit }
   );
 
   // semantic filtering (embedding similarity)
@@ -120,7 +122,8 @@ export const getLongTermMemories = async (
     // @ts-expect-error expected type Memory[]
     embeddingRelevant = await getRelevantLTMMemories(
       metadataFiltered,
-      embedding
+      embedding,
+      limit
     );
   }
 
@@ -129,15 +132,21 @@ export const getLongTermMemories = async (
 
   // Ranking phase: compute scoring, sort by score
   const ranked = rankMemoriesByScore(candidateMemories);
-  const topRanked = ranked.slice(0, limit).map((r) => r.memory);
+  const topRanked = ranked.slice(0, MEMORY_FILTER_DEFAULTS.rankedLimit);
+
+  // Categorize memories
+  const categorized = selectMemoriesWithCategoryCaps(
+    topRanked,
+    MEMORY_FILTER_DEFAULTS.categorizedLimit
+  );
 
   // Reinforce only the memories actually used to build the context.
-  if (reinforce && topRanked.length > 0) {
+  if (reinforce && categorized.length > 0) {
     // non-blocking
-    reinforceReferencedMemories(topRanked as Memory[]).catch((err) =>
+    reinforceReferencedMemories(categorized as Memory[]).catch((err) =>
       console.warn("[getLongTermMemories] Reinforcement failed:", err)
     );
   }
 
-  return topRanked as Memory[];
+  return categorized as Memory[];
 };
