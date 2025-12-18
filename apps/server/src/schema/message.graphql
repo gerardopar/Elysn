@@ -30,6 +30,21 @@ type MessageMetadata {
   topics: [String]
 }
 
+type MessageEdge {
+  cursor: String!
+  node: Message!
+}
+
+type MessageConnection {
+  edges: [MessageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
 input MessageInput {
   chatId: ID
   sender: MessageSenderEnum!
@@ -40,6 +55,7 @@ input MessageInput {
 extend type Query {
   messages(chatId: ID!): [Message!]
   message(id: ID!): Message
+  paginatedMessages(chatId: ID!, first: Int, after: String): MessageConnection
 }
 
 extend type Mutation {

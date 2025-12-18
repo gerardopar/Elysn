@@ -71,6 +71,18 @@ export type Message = {
   userId: Scalars['ID']['output'];
 };
 
+export type MessageConnection = {
+  __typename?: 'MessageConnection';
+  edges: Array<MessageEdge>;
+  pageInfo: PageInfo;
+};
+
+export type MessageEdge = {
+  __typename?: 'MessageEdge';
+  cursor: Scalars['String']['output'];
+  node: Message;
+};
+
 export type MessageInput = {
   chatId?: InputMaybe<Scalars['ID']['input']>;
   sender: MessageSenderEnum;
@@ -189,6 +201,12 @@ export type MutationUpsertUserArgs = {
   picture?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+};
+
 export type Persona = {
   __typename?: 'Persona';
   avatarUrl?: Maybe<Scalars['String']['output']>;
@@ -228,6 +246,7 @@ export type Query = {
   hello?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Message>;
   messages?: Maybe<Array<Message>>;
+  paginatedMessages?: Maybe<MessageConnection>;
   persona?: Maybe<Persona>;
   personas?: Maybe<Array<Persona>>;
   users?: Maybe<Array<User>>;
@@ -256,6 +275,13 @@ export type QueryMessageArgs = {
 
 export type QueryMessagesArgs = {
   chatId: Scalars['ID']['input'];
+};
+
+
+export type QueryPaginatedMessagesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  chatId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -391,11 +417,14 @@ export type ResolversTypes = {
   Interlink: ResolverTypeWrapper<Interlink>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   Message: ResolverTypeWrapper<Message>;
+  MessageConnection: ResolverTypeWrapper<MessageConnection>;
+  MessageEdge: ResolverTypeWrapper<MessageEdge>;
   MessageInput: MessageInput;
   MessageMetadata: ResolverTypeWrapper<MessageMetadata>;
   MessageSenderEnum: MessageSenderEnum;
   MessageStream: ResolverTypeWrapper<MessageStream>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
   Persona: ResolverTypeWrapper<Persona>;
   PersonaData: ResolverTypeWrapper<PersonaData>;
   PersonaState: ResolverTypeWrapper<PersonaState>;
@@ -420,10 +449,13 @@ export type ResolversParentTypes = {
   Interlink: Interlink;
   JSON: Scalars['JSON']['output'];
   Message: Message;
+  MessageConnection: MessageConnection;
+  MessageEdge: MessageEdge;
   MessageInput: MessageInput;
   MessageMetadata: MessageMetadata;
   MessageStream: MessageStream;
   Mutation: Record<PropertyKey, never>;
+  PageInfo: PageInfo;
   Persona: Persona;
   PersonaData: PersonaData;
   PersonaState: PersonaState;
@@ -480,6 +512,16 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
   userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
 };
 
+export type MessageConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MessageConnection'] = ResolversParentTypes['MessageConnection']> = {
+  edges?: Resolver<Array<ResolversTypes['MessageEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+};
+
+export type MessageEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MessageEdge'] = ResolversParentTypes['MessageEdge']> = {
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['Message'], ParentType, ContextType>;
+};
+
 export type MessageMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['MessageMetadata'] = ResolversParentTypes['MessageMetadata']> = {
   embedding?: Resolver<Maybe<Array<Maybe<ResolversTypes['Float']>>>, ParentType, ContextType>;
   emotion?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -510,6 +552,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   updatePersona?: Resolver<ResolversTypes['Persona'], ParentType, ContextType, RequireFields<MutationUpdatePersonaArgs, 'id' | 'input'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id'>>;
   upsertUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpsertUserArgs, 'email' | 'firebaseUid'>>;
+};
+
+export type PageInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
+  endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
 
 export type PersonaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Persona'] = ResolversParentTypes['Persona']> = {
@@ -546,6 +593,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   hello?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, Partial<QueryHelloArgs>>;
   message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessageArgs, 'id'>>;
   messages?: Resolver<Maybe<Array<ResolversTypes['Message']>>, ParentType, ContextType, RequireFields<QueryMessagesArgs, 'chatId'>>;
+  paginatedMessages?: Resolver<Maybe<ResolversTypes['MessageConnection']>, ParentType, ContextType, RequireFields<QueryPaginatedMessagesArgs, 'chatId'>>;
   persona?: Resolver<Maybe<ResolversTypes['Persona']>, ParentType, ContextType, RequireFields<QueryPersonaArgs, 'id'>>;
   personas?: Resolver<Maybe<Array<ResolversTypes['Persona']>>, ParentType, ContextType>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
@@ -574,9 +622,12 @@ export type Resolvers<ContextType = any> = {
   Interlink?: InterlinkResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   Message?: MessageResolvers<ContextType>;
+  MessageConnection?: MessageConnectionResolvers<ContextType>;
+  MessageEdge?: MessageEdgeResolvers<ContextType>;
   MessageMetadata?: MessageMetadataResolvers<ContextType>;
   MessageStream?: MessageStreamResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  PageInfo?: PageInfoResolvers<ContextType>;
   Persona?: PersonaResolvers<ContextType>;
   PersonaData?: PersonaDataResolvers<ContextType>;
   PersonaState?: PersonaStateResolvers<ContextType>;
