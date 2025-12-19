@@ -4,27 +4,30 @@ import {
   MemoryTypeEnum,
   MemorySourceEnum,
 } from "@elysn/shared";
-import { type Memory as MemoryCore } from "@elysn/core";
+import { type Memory as MemoryCore, MEMORY_DEFAULTS } from "@elysn/core";
 
 export interface Memory extends MemoryCore, Document {}
 
 const MemoryMetadataSchema = new Schema(
   {
-    importance: { type: Number, default: 0.5 },
-    confidence: { type: Number, default: 0.8 },
+    importance: { type: Number, default: MEMORY_DEFAULTS.importance },
+    confidence: { type: Number, default: MEMORY_DEFAULTS.confidence },
     usageCount: { type: Number, default: 0 },
 
     lastReferencedAt: { type: Date, default: Date.now },
     recencyWeight: { type: Number, default: 1.0 },
 
-    sentiment: { type: Number, default: 0 },
+    sentiment: { type: Number, default: MEMORY_DEFAULTS.sentiment },
     emotion: { type: String },
 
     source: {
       type: String,
       enum: Object.values(MemorySourceEnum),
-      default: "user",
+      default: MEMORY_DEFAULTS.source,
     },
+
+    deprecatedAt: { type: Date, default: null },
+    supersedesMemoryId: { type: String, default: null },
   },
   { _id: false }
 );

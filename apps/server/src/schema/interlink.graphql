@@ -1,0 +1,16 @@
+type Interlink {
+  id: ID!
+  personaId: ID!
+  userId: ID!
+  trust: Float!
+  safety: Float!
+  warmth: Float!
+  tension: Float!
+  lastUserEmotion: String
+  lastAiEmotion: String
+  lastEmotionalTone: String
+  lastInteractionAt: Float!
+  attunement: Float!
+  createdAt: Float!
+  updatedAt: Float!
+}

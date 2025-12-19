@@ -4,11 +4,7 @@ type Persona {
   name: String
   avatarUrl: String
   persona: PersonaData
-  relationship: PersonaRelationship
-  emotion: PersonaEmotion
   state: PersonaState
-  settings: PersonaSettings
-  meta: PersonaMeta
   createdAt: Float!
   updatedAt: Float!
 }
@@ -17,38 +13,10 @@ type PersonaData {
   coreTraits: [String]
   tone: String
   archetype: String
-  baseSystemPrompt: String
-  dynamicSystemPrompt: String
-}
-
-type PersonaRelationship {
-  trust: Float
-  closeness: Float
-  history: [String]
-}
-
-type PersonaEmotion {
-  current: String
-  lastUpdated: Float
 }
 
 type PersonaState {
   availability: String
-  energy: Float
-  attention: Float
-}
-
-type PersonaSettings {
-  model: String
-  temperature: Float
-  openness: Float
-  memoryRetention: Float
-}
-
-type PersonaMeta {
-  version: String
-  interactions: Int
-  tokensUsed: Int
 }
 
 input UpdatePersonaInput {

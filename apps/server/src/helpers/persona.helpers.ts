@@ -6,18 +6,21 @@ import { Chat } from "../models/chat.js";
 import { User } from "../models/user.js";
 
 import { sanitizeText } from "./string.helpers.js";
-import { updateMessageEmbedding } from "./message.helpers.js";
+import {
+  extractUserSignal,
+  updateInterlinkWithUserSignalMetadata,
+} from "./interlink.helpers.js";
+import { updateMessageMetadataAsync } from "./message.helpers.js";
 import { createMemoryEmbedding, extractTopics } from "./memory.helpers.js";
 
 import {
   createMessage,
   getRecentMessages,
   getMessage,
-  updateMessageTopics,
 } from "../access-layer/message.js";
 import {
-  getLatestShortTermMemory,
   getLongTermMemories,
+  getShortTermMemoryWindow,
 } from "../access-layer/memory.js";
 import { getUser } from "../access-layer/user.js";
 import { getChat } from "../access-layer/chat.js";
@@ -64,10 +67,14 @@ export const createPersonaMessage = async (
 
   const extractedTopics = await extractTopics(_message.text);
   const embedding = await createMemoryEmbedding(_message.text);
+  const extractedUserSignal = await extractUserSignal(_message.text);
 
-  if (extractedTopics)
-    updateMessageTopics(String(_message._id), extractedTopics);
-  if (embedding) updateMessageEmbedding(String(_message._id), embedding);
+  updateMessageMetadataAsync(
+    String(_message._id),
+    extractedTopics,
+    embedding,
+    extractedUserSignal
+  );
 
   let recentMessages = await getRecentMessages(String(_chat._id));
   recentMessages = recentMessages.slice(-10);
@@ -77,22 +84,30 @@ export const createPersonaMessage = async (
     text: _message.text,
   } as Message);
 
+  const interlink = await updateInterlinkWithUserSignalMetadata(
+    String(_user._id),
+    String(_persona._id),
+    extractedUserSignal
+  );
+
   const longTermMemories = await getLongTermMemories(
     String(_persona._id),
     extractedTopics || [],
     embedding,
+    interlink,
     {
       reinforce: true,
     }
   );
 
-  const recentStm = await getLatestShortTermMemory(
+  const recentStm = await getShortTermMemoryWindow(
     String(_persona._id),
     String(_chat._id)
   );
 
   const payload = createResponse(
     _persona,
+    interlink,
     recentMessages,
     _message.text ?? "",
     longTermMemories,
@@ -100,7 +115,7 @@ export const createPersonaMessage = async (
   );
 
   let aiText = "";
-  const streamPreference = true;
+  const streamPreference = false; // TODO: make this a user setting
 
   if (streamPreference) {
     const stream = await openai.responses.create({

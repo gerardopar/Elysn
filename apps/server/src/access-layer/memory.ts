@@ -1,9 +1,12 @@
 import { Memory } from "../models/memory.js";
+import { Interlink } from "../models/interlink.js";
 
 import {
+  selectMemoriesWithCategoryCaps,
   buildLongTermMemoryFilter,
   getRelevantLTMMemories,
   rankMemoriesByScore,
+  MEMORY_FILTER_DEFAULTS,
 } from "@elysn/core";
 
 import { MemoryTypeEnum } from "@elysn/shared";
@@ -49,6 +52,24 @@ export const getLatestShortTermMemory = async (
   return memory || null;
 };
 
+export const getShortTermMemoryWindow = async (
+  personaId: string,
+  chatId: string,
+  options?: {
+    windowSize?: number; // STM_TRAIL window
+  }
+): Promise<Memory[]> => {
+  const { windowSize = 3 } = options || {};
+
+  return Memory.find({
+    personaId,
+    chatId,
+    type: MemoryTypeEnum.STM_TRAIL,
+  })
+    .sort({ createdAt: -1 }) // most recent first based on creation time
+    .limit(windowSize);
+};
+
 export const getLongTermMemoriesSimple = async (
   personaId: string,
   limit = 10
@@ -71,7 +92,7 @@ export const getMetadataFilteredLongTermMemories = async (
   }
 ): Promise<Memory[]> => {
   const filter = buildLongTermMemoryFilter(personaId, topics, options);
-  const { limit = 100 } = options || {};
+  const { limit = MEMORY_FILTER_DEFAULTS.fetchLimit } = options || {};
 
   let memories = await Memory.find(filter)
     .sort({ "metadata.importance": -1, lastUpdated: -1 })
@@ -92,6 +113,7 @@ export const getLongTermMemories = async (
   personaId: string,
   topics?: string[],
   embedding?: number[] | null,
+  interlink?: Interlink | null,
   options: {
     minImportance?: number;
     maxAgeMonths?: number;
@@ -100,9 +122,9 @@ export const getLongTermMemories = async (
   } = {}
 ): Promise<Memory[]> => {
   const {
-    minImportance = 0.3,
-    maxAgeMonths = 12,
-    limit = 10,
+    minImportance = MEMORY_FILTER_DEFAULTS.minImportance,
+    maxAgeMonths = MEMORY_FILTER_DEFAULTS.maxAgeMonths,
+    limit = MEMORY_FILTER_DEFAULTS.fetchLimit,
     reinforce = true,
   } = options;
 
@@ -110,7 +132,7 @@ export const getLongTermMemories = async (
   const metadataFiltered = await getMetadataFilteredLongTermMemories(
     personaId,
     topics,
-    { minImportance, maxAgeMonths } // passes options down
+    { minImportance, maxAgeMonths, limit }
   );
 
   // semantic filtering (embedding similarity)
@@ -120,7 +142,8 @@ export const getLongTermMemories = async (
     // @ts-expect-error expected type Memory[]
     embeddingRelevant = await getRelevantLTMMemories(
       metadataFiltered,
-      embedding
+      embedding,
+      limit
     );
   }
 
@@ -128,16 +151,23 @@ export const getLongTermMemories = async (
     embeddingRelevant.length > 0 ? embeddingRelevant : metadataFiltered;
 
   // Ranking phase: compute scoring, sort by score
-  const ranked = rankMemoriesByScore(candidateMemories);
-  const topRanked = ranked.slice(0, limit).map((r) => r.memory);
+  const ranked = rankMemoriesByScore(candidateMemories, new Date(), interlink);
+  const topRanked = ranked.slice(0, MEMORY_FILTER_DEFAULTS.rankedLimit);
+
+  // Categorize memories
+  const categorized = selectMemoriesWithCategoryCaps(
+    topRanked,
+    MEMORY_FILTER_DEFAULTS.categorizedLimit,
+    interlink
+  );
 
   // Reinforce only the memories actually used to build the context.
-  if (reinforce && topRanked.length > 0) {
+  if (reinforce && categorized.length > 0) {
     // non-blocking
-    reinforceReferencedMemories(topRanked as Memory[]).catch((err) =>
+    reinforceReferencedMemories(categorized as Memory[]).catch((err) =>
       console.warn("[getLongTermMemories] Reinforcement failed:", err)
     );
   }
 
-  return topRanked as Memory[];
+  return categorized as Memory[];
 };

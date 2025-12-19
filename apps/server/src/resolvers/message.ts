@@ -20,6 +20,7 @@ import {
   Message,
   MessageSenderEnum,
   SubscriptionNewMessageStreamArgs,
+  QueryPaginatedMessagesArgs,
 } from "../graphql/__generated__/graphql.js";
 
 import { createPersonaMessage } from "../helpers/persona.helpers.js";
@@ -34,6 +35,10 @@ import {
   PERSONA_STATUS_CHANNEL,
   MESSAGE_STREAM_CHANNEL,
 } from "../pubsub/pubsub.js";
+
+import { Message as MessageModel } from "../models/message.js";
+
+import { decodeCursor, encodeCursor } from "../utils/encoder.js";
 
 export const messageResolvers: Resolvers = {
   Query: {
@@ -53,6 +58,63 @@ export const messageResolvers: Resolvers = {
         timestamp: message.timestamp.getTime(),
         metadata: message.metadata,
       }));
+    },
+    paginatedMessages: async (
+      _parent,
+      { chatId, first = 30, after }: QueryPaginatedMessagesArgs,
+      ctx
+    ) => {
+      if (!ctx.user?.uid) throw new Error("Must be authenticated");
+
+      const user = await getUserByFirebaseUid(ctx.user.uid);
+      if (!user) throw new Error("User not found");
+
+      const query: any = { chatId }; // initial query
+
+      if (after) {
+        // paginated query
+        const { timestamp, id } = decodeCursor(after);
+
+        query.$or = [
+          { timestamp: { $lt: new Date(timestamp) } },
+          {
+            timestamp: new Date(timestamp),
+            _id: { $lt: id },
+          },
+        ];
+      }
+
+      const results = await MessageModel.find(query)
+        .sort({ timestamp: -1, _id: -1 })
+        .limit(first! + 1);
+
+      const hasNextPage = results.length > first!;
+      const nodes = hasNextPage ? results.slice(0, first!) : results;
+
+      const edges = nodes.map((message) => ({
+        cursor: encodeCursor(
+          message.timestamp.getTime(),
+          message?._id?.toString() || ""
+        ),
+        node: {
+          id: String(message._id),
+          chatId: String(message.chatId),
+          userId: message.userId,
+          sender: message.sender,
+          text: message.text,
+          timestamp: message.timestamp.getTime(),
+          metadata: message.metadata,
+        },
+      }));
+
+      return {
+        edges, // messages
+        pageInfo: {
+          // pagination info
+          hasNextPage,
+          endCursor: edges.length ? edges[edges.length - 1].cursor : null,
+        },
+      };
     },
     message: async (_parent, { id }: QueryMessageArgs, ctx) => {
       if (!ctx.user?.uid) throw new Error("Must be authenticated");
