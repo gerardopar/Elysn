@@ -1,4 +1,5 @@
 import { Memory } from "../models/memory.js";
+import { Interlink } from "../models/interlink.js";
 
 import {
   selectMemoriesWithCategoryCaps,
@@ -94,6 +95,7 @@ export const getLongTermMemories = async (
   personaId: string,
   topics?: string[],
   embedding?: number[] | null,
+  interlink?: Interlink | null,
   options: {
     minImportance?: number;
     maxAgeMonths?: number;
@@ -131,13 +133,14 @@ export const getLongTermMemories = async (
     embeddingRelevant.length > 0 ? embeddingRelevant : metadataFiltered;
 
   // Ranking phase: compute scoring, sort by score
-  const ranked = rankMemoriesByScore(candidateMemories);
+  const ranked = rankMemoriesByScore(candidateMemories, new Date(), interlink);
   const topRanked = ranked.slice(0, MEMORY_FILTER_DEFAULTS.rankedLimit);
 
   // Categorize memories
   const categorized = selectMemoriesWithCategoryCaps(
     topRanked,
-    MEMORY_FILTER_DEFAULTS.categorizedLimit
+    MEMORY_FILTER_DEFAULTS.categorizedLimit,
+    interlink
   );
 
   // Reinforce only the memories actually used to build the context.

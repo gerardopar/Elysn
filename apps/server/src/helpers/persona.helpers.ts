@@ -94,6 +94,7 @@ export const createPersonaMessage = async (
     String(_persona._id),
     extractedTopics || [],
     embedding,
+    interlink,
     {
       reinforce: true,
     }
