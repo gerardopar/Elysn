@@ -19,8 +19,8 @@ import {
   getMessage,
 } from "../access-layer/message.js";
 import {
-  getLatestShortTermMemory,
   getLongTermMemories,
+  getShortTermMemoryWindow,
 } from "../access-layer/memory.js";
 import { getUser } from "../access-layer/user.js";
 import { getChat } from "../access-layer/chat.js";
@@ -100,7 +100,7 @@ export const createPersonaMessage = async (
     }
   );
 
-  const recentStm = await getLatestShortTermMemory(
+  const recentStm = await getShortTermMemoryWindow(
     String(_persona._id),
     String(_chat._id)
   );

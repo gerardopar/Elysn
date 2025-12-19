@@ -52,6 +52,24 @@ export const getLatestShortTermMemory = async (
   return memory || null;
 };
 
+export const getShortTermMemoryWindow = async (
+  personaId: string,
+  chatId: string,
+  options?: {
+    windowSize?: number; // STM_TRAIL window
+  }
+): Promise<Memory[]> => {
+  const { windowSize = 3 } = options || {};
+
+  return Memory.find({
+    personaId,
+    chatId,
+    type: MemoryTypeEnum.STM_TRAIL,
+  })
+    .sort({ createdAt: -1 }) // most recent first based on creation time
+    .limit(windowSize);
+};
+
 export const getLongTermMemoriesSimple = async (
   personaId: string,
   limit = 10
