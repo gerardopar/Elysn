@@ -87,7 +87,8 @@ export const createPersonaMessage = async (
   const interlink = await updateInterlinkWithUserSignalMetadata(
     String(_user._id),
     String(_persona._id),
-    extractedUserSignal
+    extractedUserSignal,
+    _persona?.persona?.archetype
   );
 
   const longTermMemories = await getLongTermMemories(
