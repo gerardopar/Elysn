@@ -1,9 +1,9 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'ai.alysn.app',
-  appName: 'elysn',
-  webDir: 'dist'
+  appId: "com.elysn.app",
+  appName: "elysn",
+  webDir: "dist",
 };
 
 export default config;

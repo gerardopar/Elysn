@@ -39,6 +39,24 @@ export type CreateChatWithMessageInput = {
   topic?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Interlink = {
+  __typename: 'Interlink';
+  attunement: Scalars['Float']['output'];
+  createdAt: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+  lastAiEmotion: Maybe<Scalars['String']['output']>;
+  lastEmotionalTone: Maybe<Scalars['String']['output']>;
+  lastInteractionAt: Scalars['Float']['output'];
+  lastUserEmotion: Maybe<Scalars['String']['output']>;
+  personaId: Scalars['ID']['output'];
+  safety: Scalars['Float']['output'];
+  tension: Scalars['Float']['output'];
+  trust: Scalars['Float']['output'];
+  updatedAt: Scalars['Float']['output'];
+  userId: Scalars['ID']['output'];
+  warmth: Scalars['Float']['output'];
+};
+
 export type Message = {
   __typename: 'Message';
   chatId: Maybe<Scalars['ID']['output']>;
@@ -49,6 +67,18 @@ export type Message = {
   text: Scalars['String']['output'];
   timestamp: Scalars['Float']['output'];
   userId: Scalars['ID']['output'];
+};
+
+export type MessageConnection = {
+  __typename: 'MessageConnection';
+  edges: Array<MessageEdge>;
+  pageInfo: PageInfo;
+};
+
+export type MessageEdge = {
+  __typename: 'MessageEdge';
+  cursor: Scalars['String']['output'];
+  node: Message;
 };
 
 export type MessageInput = {
@@ -65,6 +95,7 @@ export type MessageMetadata = {
   intent: Maybe<Scalars['String']['output']>;
   isMemoryWorthy: Maybe<Scalars['Boolean']['output']>;
   memoryTag: Maybe<Scalars['String']['output']>;
+  topics: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
 export enum MessageSenderEnum {
@@ -168,17 +199,19 @@ export type MutationUpsertUserArgs = {
   picture?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type PageInfo = {
+  __typename: 'PageInfo';
+  endCursor: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+};
+
 export type Persona = {
   __typename: 'Persona';
   avatarUrl: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Float']['output'];
-  emotion: Maybe<PersonaEmotion>;
   id: Scalars['ID']['output'];
-  meta: Maybe<PersonaMeta>;
   name: Maybe<Scalars['String']['output']>;
   persona: Maybe<PersonaData>;
-  relationship: Maybe<PersonaRelationship>;
-  settings: Maybe<PersonaSettings>;
   state: Maybe<PersonaState>;
   updatedAt: Scalars['Float']['output'];
   userId: Scalars['ID']['output'];
@@ -187,45 +220,13 @@ export type Persona = {
 export type PersonaData = {
   __typename: 'PersonaData';
   archetype: Maybe<Scalars['String']['output']>;
-  baseSystemPrompt: Maybe<Scalars['String']['output']>;
   coreTraits: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  dynamicSystemPrompt: Maybe<Scalars['String']['output']>;
   tone: Maybe<Scalars['String']['output']>;
-};
-
-export type PersonaEmotion = {
-  __typename: 'PersonaEmotion';
-  current: Maybe<Scalars['String']['output']>;
-  lastUpdated: Maybe<Scalars['Float']['output']>;
-};
-
-export type PersonaMeta = {
-  __typename: 'PersonaMeta';
-  interactions: Maybe<Scalars['Int']['output']>;
-  tokensUsed: Maybe<Scalars['Int']['output']>;
-  version: Maybe<Scalars['String']['output']>;
-};
-
-export type PersonaRelationship = {
-  __typename: 'PersonaRelationship';
-  closeness: Maybe<Scalars['Float']['output']>;
-  history: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  trust: Maybe<Scalars['Float']['output']>;
-};
-
-export type PersonaSettings = {
-  __typename: 'PersonaSettings';
-  memoryRetention: Maybe<Scalars['Float']['output']>;
-  model: Maybe<Scalars['String']['output']>;
-  openness: Maybe<Scalars['Float']['output']>;
-  temperature: Maybe<Scalars['Float']['output']>;
 };
 
 export type PersonaState = {
   __typename: 'PersonaState';
-  attention: Maybe<Scalars['Float']['output']>;
   availability: Maybe<Scalars['String']['output']>;
-  energy: Maybe<Scalars['Float']['output']>;
 };
 
 export type PersonaStatus = {
@@ -243,6 +244,7 @@ export type Query = {
   hello: Maybe<Scalars['String']['output']>;
   message: Maybe<Message>;
   messages: Maybe<Array<Message>>;
+  paginatedMessages: Maybe<MessageConnection>;
   persona: Maybe<Persona>;
   personas: Maybe<Array<Persona>>;
   users: Maybe<Array<User>>;
@@ -271,6 +273,13 @@ export type QueryMessageArgs = {
 
 export type QueryMessagesArgs = {
   chatId: Scalars['ID']['input'];
+};
+
+
+export type QueryPaginatedMessagesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  chatId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
