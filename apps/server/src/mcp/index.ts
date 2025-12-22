@@ -12,12 +12,12 @@ export const setupMcpServer = async () => {
     {
       title: "Addition Tool",
       description: "Add two numbers",
-      // @ts-expect-error zod types are not compatible with MCP types
+      // @ts-ignore
       inputSchema: z.object({
         a: z.number(),
         b: z.number(),
       }),
-      // @ts-expect-error zod types are not compatible with MCP types
+      // @ts-ignore
       outputSchema: z.object({
         result: z.number(),
       }),

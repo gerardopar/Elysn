@@ -1,12 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
-
-import { useCurrentUser } from "@/stores/user";
+import React from "react";
 
 import ChatInput from "./ChatInput";
-import { useDeviceWidth } from "@hooks/useDeviceWidth";
-import { OrbMemo as Orb, type AgentState, getOrbColors } from "../ui/orb";
 
-import { hashStringToSeed } from "@helpers/seed.helpers";
+import { useDeviceWidth } from "@hooks/useDeviceWidth";
 
 type ChatEmptyStateProps = {
   input: string;
@@ -14,7 +10,6 @@ type ChatEmptyStateProps = {
   handleSubmit: () => void;
   mode?: "default" | "fixed";
   isLoading?: boolean;
-  isSpeaking?: boolean; // hook this to ElevenLabs playback if you want
 };
 
 export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
@@ -22,39 +17,8 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
   setInput,
   handleSubmit,
   isLoading,
-  isSpeaking,
 }) => {
-  const { user } = useCurrentUser();
   const { isMobile } = useDeviceWidth();
-
-  const [isFocused, setIsFocused] = useState(false);
-  const [isUserTyping, setIsUserTyping] = useState(false);
-
-  useEffect(() => {
-    if (!input) {
-      setIsUserTyping(false);
-      return;
-    }
-
-    setIsUserTyping(true);
-    const timeout = setTimeout(() => {
-      setIsUserTyping(false);
-    }, 600);
-
-    return () => clearTimeout(timeout);
-  }, [input]);
-
-  const rawState: AgentState = useMemo(() => {
-    if (isLoading) return "thinking";
-    if (isSpeaking) return "talking";
-    if (isFocused || isUserTyping) return "listening";
-    return null;
-  }, [isLoading, isSpeaking, isFocused, isUserTyping]);
-
-  const userId = user?.uid ?? "";
-  const seed = useMemo(() => hashStringToSeed(userId), [userId]);
-
-  const colors = useMemo(() => getOrbColors(), []);
 
   const containerStyles = isMobile ? "mb-[100px]" : "mb-[300px]";
 
@@ -70,12 +34,6 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
               "radial-gradient(circle at center, rgba(0, 28, 85, 0.45), rgba(11, 9, 10, 0))", // penn blue -> night
           }}
         />
-        <Orb
-          agentState={rawState}
-          colors={colors}
-          seed={seed}
-          className="relative h-[220px] w-[220px] md:h-[280px] md:w-[280px]"
-        />
       </div>
 
       <h1 className="text-[--color-primary-light] text-2xl font-bold font-roboto">
@@ -88,8 +46,6 @@ export const ChatEmptyState: React.FC<ChatEmptyStateProps> = ({
           setInput={setInput}
           handleSubmit={handleSubmit}
           isLoading={isLoading}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
         />
       )}
     </div>
