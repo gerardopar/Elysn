@@ -24,6 +24,15 @@ export enum PersonaCoreTrait {
   Encouraging = "encouraging", // supportive, motivating
 }
 
+export enum PersonaTone {
+  Gentle = "gentle",
+  Casual = "casual",
+  Calm = "calm",
+  Grounded = "grounded",
+  Poetic = "poetic",
+  Minimal = "minimal",
+}
+
 export type Persona = {
   userId: string;
   name: string;
@@ -31,7 +40,7 @@ export type Persona = {
 
   persona: {
     coreTraits: PersonaCoreTrait[];
-    tone: string;
+    tone: PersonaTone;
     archetype: PersonaArchetype;
   };
 

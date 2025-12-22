@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 import { Persona as PersonaCore, PERSONA_DEFAULTS } from "@elysn/core";
 
-import { PersonaCoreTrait, PersonaArchetype } from "@elysn/shared";
+import { PersonaCoreTrait, PersonaArchetype, PersonaTone } from "@elysn/shared";
 
 export interface Persona extends PersonaCore, Document {}
 
@@ -23,7 +23,11 @@ const PersonaSchema = new Schema<Persona>(
           message: "Persona must have between 2 and 4 core traits.",
         },
       },
-      tone: { type: String, default: PERSONA_DEFAULTS.tone },
+      tone: {
+        type: String,
+        enum: Object.values(PersonaTone),
+        default: PERSONA_DEFAULTS.tone,
+      },
       archetype: {
         type: String,
         enum: Object.values(PersonaArchetype),
