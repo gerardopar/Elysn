@@ -17,7 +17,7 @@ const PersonaSchema = new Schema<Persona>(
     name: { type: String, default: "Elysn" },
     avatarUrl: { type: String },
 
-    persona: {
+    identity: {
       coreTraits: {
         type: [String],
         enum: Object.values(PersonaCoreTrait),
