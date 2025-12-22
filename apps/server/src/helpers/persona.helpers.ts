@@ -88,7 +88,7 @@ export const createPersonaMessage = async (
     String(_user._id),
     String(_persona._id),
     extractedUserSignal,
-    _persona?.persona?.archetype
+    _persona?.identity?.archetype
   );
 
   const longTermMemories = await getLongTermMemories(
