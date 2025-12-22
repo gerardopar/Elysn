@@ -23,6 +23,7 @@
     "@graphql-tools/schema": "^10.0.28",
     "axios": "^1.11.0",
     "firebase-admin": "^13.5.0",
+    "graphql": "^16.12.0",
     "graphql-subscriptions": "^3.0.0",
     "graphql-ws": "^6.0.6",
     "mongodb": "^6.19.0",
@@ -35,5 +36,10 @@
     "concurrently": "^9.2.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "graphql": "16.12.0"
+    }
   }
 }
