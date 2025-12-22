@@ -12,15 +12,17 @@ import {
 import { sanitizeJSON } from "./string.helpers.js";
 
 import { userSignalResponse, getInterlinkPatch } from "@elysn/core";
+import { PersonaArchetype } from "@elysn/shared";
 
 export const getOrCreateInterlink = async (
   userId: string,
-  personaId: string
+  personaId: string,
+  archeType?: PersonaArchetype
 ) => {
   const existingInterlink = await getInterlink(userId, personaId);
   if (existingInterlink) return existingInterlink;
 
-  const interlink = await createInterlink(userId, personaId);
+  const interlink = await createInterlink(userId, personaId, archeType);
   return interlink;
 };
 
@@ -67,9 +69,10 @@ export const updateInterlinkWithUserSignalMetadata = async (
     sentiment: number;
     emotion: string;
     intensity: number;
-  } | null
+  } | null,
+  archeType?: PersonaArchetype
 ): Promise<Interlink | null> => {
-  const interlink = await getOrCreateInterlink(userId, personaId);
+  const interlink = await getOrCreateInterlink(userId, personaId, archeType);
   if (!userSignal) return interlink;
 
   const patch = getInterlinkPatch(interlink, userSignal);

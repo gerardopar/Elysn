@@ -1,4 +1,7 @@
+import { PERSONA_DEFAULTS } from "@elysn/core";
 import { Persona } from "../models/persona.js";
+
+import { PersonaArchetype } from "@elysn/shared";
 
 import mongoose from "mongoose";
 
@@ -7,10 +10,22 @@ import mongoose from "mongoose";
  */
 export const createPersona = async (
   userId: string,
-  session?: mongoose.ClientSession
+  session?: mongoose.ClientSession,
+  archetype?: PersonaArchetype,
+  coreTraits?: string[],
+  tone?: string
 ) => {
+  const _archetype = archetype ?? PERSONA_DEFAULTS.archetype;
+  const _coreTraits = coreTraits ?? PERSONA_DEFAULTS.coreTraits;
+  const _tone = tone ?? PERSONA_DEFAULTS.tone;
+
   const persona = new Persona({
     userId,
+    persona: {
+      archetype: _archetype,
+      coreTraits: _coreTraits,
+      tone: _tone,
+    },
   });
 
   if (session) {
@@ -23,11 +38,17 @@ export const createPersona = async (
 /**
  * Get or create persona
  */
-export const getOrCreatePersona = async (userId: string, session?: any) => {
+export const getOrCreatePersona = async (
+  userId: string,
+  session?: any,
+  archetype?: PersonaArchetype,
+  coreTraits?: string[],
+  tone?: string
+) => {
   const existing = await Persona.findOne({ userId }).session(session);
   if (existing) return existing;
 
-  return createPersona(userId, session);
+  return createPersona(userId, session, archetype, coreTraits, tone);
 };
 
 /**

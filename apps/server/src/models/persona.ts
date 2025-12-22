@@ -2,6 +2,13 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 import { Persona as PersonaCore, PERSONA_DEFAULTS } from "@elysn/core";
 
+import {
+  PersonaCoreTrait,
+  PersonaArchetype,
+  PersonaTone,
+  PersonaAvailability,
+} from "@elysn/shared";
+
 export interface Persona extends PersonaCore, Document {}
 
 const PersonaSchema = new Schema<Persona>(
@@ -11,13 +18,34 @@ const PersonaSchema = new Schema<Persona>(
     avatarUrl: { type: String },
 
     persona: {
-      coreTraits: { type: [String], default: PERSONA_DEFAULTS.coreTraits },
-      tone: { type: String, default: PERSONA_DEFAULTS.tone },
-      archetype: { type: String, default: PERSONA_DEFAULTS.archetype },
+      coreTraits: {
+        type: [String],
+        enum: Object.values(PersonaCoreTrait),
+        default: PERSONA_DEFAULTS.coreTraits,
+        validate: {
+          validator: (traits: string[]) =>
+            Array.isArray(traits) && traits.length >= 2 && traits.length <= 4,
+          message: "Persona must have between 2 and 4 core traits.",
+        },
+      },
+      tone: {
+        type: String,
+        enum: Object.values(PersonaTone),
+        default: PERSONA_DEFAULTS.tone,
+      },
+      archetype: {
+        type: String,
+        enum: Object.values(PersonaArchetype),
+        default: PERSONA_DEFAULTS.archetype,
+      },
     },
 
     state: {
-      availability: { type: String, default: "online" },
+      availability: {
+        type: String,
+        enum: Object.values(PersonaAvailability),
+        default: PersonaAvailability.Online,
+      },
     },
   },
   {
