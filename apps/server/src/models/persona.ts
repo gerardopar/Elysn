@@ -2,7 +2,12 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 import { Persona as PersonaCore, PERSONA_DEFAULTS } from "@elysn/core";
 
-import { PersonaCoreTrait, PersonaArchetype, PersonaTone } from "@elysn/shared";
+import {
+  PersonaCoreTrait,
+  PersonaArchetype,
+  PersonaTone,
+  PersonaAvailability,
+} from "@elysn/shared";
 
 export interface Persona extends PersonaCore, Document {}
 
@@ -36,7 +41,11 @@ const PersonaSchema = new Schema<Persona>(
     },
 
     state: {
-      availability: { type: String, default: "online" },
+      availability: {
+        type: String,
+        enum: Object.values(PersonaAvailability),
+        default: PersonaAvailability.Online,
+      },
     },
   },
   {

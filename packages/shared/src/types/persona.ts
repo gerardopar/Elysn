@@ -33,6 +33,13 @@ export enum PersonaTone {
   Minimal = "minimal",
 }
 
+export enum PersonaAvailability {
+  Online = "online",
+  Idle = "idle",
+  Sleepy = "sleepy",
+  Busy = "busy_processing",
+}
+
 export type Persona = {
   userId: string;
   name: string;
@@ -45,7 +52,7 @@ export type Persona = {
   };
 
   state: {
-    availability: string; // online | idle | sleepy | busy-processing
+    availability: PersonaAvailability;
   };
 
   createdAt: Date;
