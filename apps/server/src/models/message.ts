@@ -1,9 +1,56 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
-import { MessageSenderEnum } from "@elysn/shared";
+import {
+  MessageSenderEnum,
+  PersonaEmotionEnum,
+  PersonaIntentEnum,
+  PersonaToneShiftEnum,
+} from "@elysn/shared";
 
 import { type Message as MessageCore } from "@elysn/core";
 
 export interface Message extends MessageCore, Document {}
+
+const PersonaResponseMetaSchema = new Schema(
+  {
+    personaEmotion: {
+      type: String,
+      enum: Object.values(PersonaEmotionEnum),
+      required: true,
+    },
+
+    dominantIntent: {
+      type: String,
+      enum: Object.values(PersonaIntentEnum),
+      required: true,
+    },
+
+    toneShift: {
+      type: String,
+      enum: Object.values(PersonaToneShiftEnum),
+    },
+
+    interlinkDelta: {
+      trust: { type: Number, required: true },
+      warmth: { type: Number, required: true },
+      tension: { type: Number, required: true },
+      safety: { type: Number, required: true },
+    },
+
+    flags: {
+      boundaryAsserted: { type: Boolean },
+      boundaryTested: { type: Boolean },
+      repairAttempted: { type: Boolean },
+      repairSucceeded: { type: Boolean },
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
+  },
+  { _id: false }
+);
 
 export const MessageMetadataSchema = new Schema(
   {
@@ -13,6 +60,10 @@ export const MessageMetadataSchema = new Schema(
     isMemoryWorthy: { type: Boolean },
     topics: { type: [String], default: [] },
     embedding: { type: [Number], default: [] },
+    personaResponseMeta: {
+      type: PersonaResponseMetaSchema,
+      required: false,
+    },
   },
   {
     _id: false,
