@@ -28,24 +28,28 @@ export enum MessageSenderEnum {
   AI = "AI",
 }
 
+export type PersonaResponseInterlinkDelta = {
+  trust: number;
+  warmth: number;
+  tension: number;
+  safety: number;
+};
+
+export type PersonaResponseFlags = {
+  boundaryAsserted?: boolean;
+  boundaryTested?: boolean;
+  repairAttempted?: boolean;
+  repairSucceeded?: boolean;
+};
+
 export interface PersonaResponseMeta {
   personaEmotion: PersonaEmotionEnum;
   dominantIntent: PersonaIntentEnum;
   toneShift?: PersonaToneShiftEnum;
 
-  interlinkDelta: {
-    trust: number;
-    warmth: number;
-    tension: number;
-    safety: number;
-  };
+  interlinkDelta: PersonaResponseInterlinkDelta;
 
-  flags?: {
-    boundaryAsserted?: boolean;
-    boundaryTested?: boolean;
-    repairAttempted?: boolean;
-    repairSucceeded?: boolean;
-  };
+  flags?: PersonaResponseFlags;
 
   createdAt: Date;
 }
