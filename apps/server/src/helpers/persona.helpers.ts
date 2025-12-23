@@ -26,7 +26,7 @@ import { getUser } from "../access-layer/user.js";
 import { getChat } from "../access-layer/chat.js";
 import { getPersona } from "../access-layer/persona.js";
 
-import { createResponse } from "@elysn/core";
+import { buildPersonaResponseMeta, createResponse } from "@elysn/core";
 import { MessageSenderEnum } from "@elysn/shared";
 
 import {
@@ -84,7 +84,7 @@ export const createPersonaMessage = async (
     text: _message.text,
   } as Message);
 
-  const interlink = await updateInterlinkWithUserSignalMetadata(
+  const { interlink, delta } = await updateInterlinkWithUserSignalMetadata(
     String(_user._id),
     String(_persona._id),
     extractedUserSignal,
@@ -157,12 +157,20 @@ export const createPersonaMessage = async (
     aiText = sanitizeText(aiResponse.output_text ?? "");
   }
 
+  const personaResponseMeta = buildPersonaResponseMeta({
+    responseText: aiText,
+    interlinkDelta: delta,
+  });
+
   const aiMsg = await createMessage({
     chatId: String(_chat._id),
     personaId: String(_persona._id),
     userId: String(_user._id),
     sender: MessageSenderEnum.AI,
     text: aiText,
+    metadata: {
+      personaResponseMeta,
+    },
   });
 
   pubsub.publish(`${MESSAGE_CHANNEL}_${_chat._id}`, {

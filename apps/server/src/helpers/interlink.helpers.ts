@@ -11,8 +11,13 @@ import {
 
 import { sanitizeJSON } from "./string.helpers.js";
 
-import { userSignalResponse, getInterlinkPatch } from "@elysn/core";
-import { PersonaArchetype } from "@elysn/shared";
+import {
+  getRepairPatch,
+  computeWithDelta,
+  userSignalResponse,
+  deriveInterlinkDeltaFromUserSignal,
+} from "@elysn/core";
+import { PersonaArchetype, PersonaResponseInterlinkDelta } from "@elysn/shared";
 
 export const getOrCreateInterlink = async (
   userId: string,
@@ -71,11 +76,54 @@ export const updateInterlinkWithUserSignalMetadata = async (
     intensity: number;
   } | null,
   archeType?: PersonaArchetype
-): Promise<Interlink | null> => {
+): Promise<{
+  interlink: Interlink;
+  delta: PersonaResponseInterlinkDelta;
+}> => {
   const interlink = await getOrCreateInterlink(userId, personaId, archeType);
-  if (!userSignal) return interlink;
+  if (!interlink) throw new Error("Failed to get or create interlink");
 
-  const patch = getInterlinkPatch(interlink, userSignal);
+  const zeroDelta = { trust: 0, warmth: 0, tension: 0, safety: 0 };
 
-  return updateInterlink(userId, personaId, patch);
+  if (!userSignal) return { interlink, delta: zeroDelta };
+
+  const deltaIntent = deriveInterlinkDeltaFromUserSignal(userSignal);
+
+  const trust = computeWithDelta(interlink.trust, deltaIntent.trust ?? 0);
+  const warmth = computeWithDelta(interlink.warmth, deltaIntent.warmth ?? 0);
+  const safety = computeWithDelta(interlink.safety, deltaIntent.safety ?? 0);
+  const tension = computeWithDelta(interlink.tension, deltaIntent.tension ?? 0);
+
+  let patch: Partial<Interlink> = {
+    trust: trust.value,
+    warmth: warmth.value,
+    safety: safety.value,
+    tension: tension.value,
+    lastInteractionAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  patch = {
+    ...patch,
+    ...getRepairPatch(
+      { ...interlink, ...patch },
+      {
+        sentiment: userSignal.sentiment,
+        intensity: userSignal.intensity,
+      }
+    ),
+  };
+
+  const updatedInterlink = await updateInterlink(userId, personaId, patch);
+  if (!updatedInterlink) return { interlink, delta: zeroDelta };
+
+  return {
+    interlink: updatedInterlink,
+    delta: {
+      trust: trust.delta,
+      warmth: warmth.delta,
+      safety: safety.delta,
+      tension: tension.delta,
+    },
+  };
 };

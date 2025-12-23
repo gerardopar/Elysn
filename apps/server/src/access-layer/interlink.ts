@@ -15,7 +15,7 @@ export const createInterlink = async (
   userId: string,
   personaId: string,
   personaArchetype: PersonaArchetype = PERSONA_DEFAULTS.archetype
-) => {
+): Promise<Interlink> => {
   const archetype = personaArchetype || PERSONA_DEFAULTS.archetype;
   const archetypeBias = ARCHETYPE_INTERLINK_BIAS?.[archetype];
 
@@ -37,7 +37,7 @@ export const updateInterlink = async (
   userId: string,
   personaId: string,
   updates: Partial<Interlink>
-) => {
+): Promise<Interlink | null> => {
   return Interlink.findOneAndUpdate(
     { userId, personaId },
     { $set: updates },
