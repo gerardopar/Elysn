@@ -93,5 +93,27 @@ const EngramSchema = new Schema<Engram>(
   }
 );
 
+// Fast lookup for active engrams per owner
+EngramSchema.index({ ownerId: 1, ownerType: 1 });
+
+// Snapshot retrieval ordering
+EngramSchema.index({
+  ownerId: 1,
+  ownerType: 1,
+  category: 1,
+  emotionalWeight: -1,
+});
+
+// Reinforcement & decay jobs
+EngramSchema.index({
+  lastReinforcedAt: 1,
+});
+
+// Prevent duplicate boundary engrams with identical content
+EngramSchema.index(
+  { ownerId: 1, ownerType: 1, category: 1, content: 1 },
+  { unique: true, partialFilterExpression: { category: "boundary" } }
+);
+
 export const Engram: Model<Engram> =
   mongoose.models.Engram || mongoose.model<Engram>("Engram", EngramSchema);
