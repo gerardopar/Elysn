@@ -11,6 +11,7 @@ import {
   updateInterlinkWithUserSignalMetadata,
 } from "./interlink.helpers.js";
 import { updateMessageMetadataAsync } from "./message.helpers.js";
+import { observePersonaDeltaWindowAsync } from "./engram.helpers.js";
 import { createMemoryEmbedding, extractTopics } from "./memory.helpers.js";
 
 import {
@@ -161,6 +162,13 @@ export const createPersonaMessage = async (
     responseText: aiText,
     interlinkDelta: delta,
   });
+
+  observePersonaDeltaWindowAsync(
+    String(_user._id),
+    String(_persona._id),
+    delta,
+    5
+  );
 
   const aiMsg = await createMessage({
     chatId: String(_chat._id),
