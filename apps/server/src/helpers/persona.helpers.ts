@@ -166,6 +166,9 @@ export const createPersonaMessage = async (
   observePersonaDeltaWindowAsync(
     String(_user._id),
     String(_persona._id),
+    String(_chat._id),
+    interlink,
+    personaResponseMeta,
     delta,
     5
   );

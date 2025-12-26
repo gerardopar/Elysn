@@ -10,7 +10,7 @@ import { type Message as MessageCore } from "@elysn/core";
 
 export interface Message extends MessageCore, Document {}
 
-const PersonaResponseMetaSchema = new Schema(
+export const PersonaResponseMetaSchema = new Schema(
   {
     personaEmotion: {
       type: String,
@@ -70,7 +70,7 @@ export const MessageMetadataSchema = new Schema(
   }
 );
 
-const MessageSchema = new Schema<Message>(
+export const MessageSchema = new Schema<Message>(
   {
     chatId: { type: String, ref: "Chat", required: true },
     userId: { type: String, required: true },
