@@ -14,15 +14,43 @@ export const memorySourceEnum = Object.values(MemorySourceEnum) as [
   ...string[]
 ];
 
+/**
+ * User Long-Term Memory Categories
+ *
+ * These represent **facts, preferences, and context about the user**.
+ * They are declarative, user-owned, and may be explicitly stated or inferred.
+ *
+ * LTM entries describe **who the user is**, **what they do**, and **what matters to them** —
+ * NOT how the persona should behave.
+ *
+ * ⚠️ These categories should NEVER be treated as persona beliefs.
+ */
 export enum LongTermMemoryCategoryEnum {
+  /** What the user likes or dislikes (e.g. food, habits, styles) */
   Preference = "preference",
+
+  /** Factual life details about the user (job, location, background) */
   Biographical = "biographical",
+
+  /** Repeated behaviors or schedules (e.g. works late, exercises mornings) */
   Routine = "routine",
+
+  /** The user’s relationships with other people or entities */
   Relationship = "relationship",
+
+  /** Ongoing work, studies, or personal initiatives */
   Project = "project",
+
+  /** The user’s emotional states or tendencies */
   Emotion = "emotion",
+
+  /** Long-term objectives or aspirations */
   Goal = "goal",
+
+  /** Core beliefs or principles explicitly expressed by the user */
   Value = "value",
+
+  /** Significant life events or achievements */
   Milestone = "milestone",
 }
 
