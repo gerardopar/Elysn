@@ -4,7 +4,9 @@ import {
   EngramSourceEnum,
   EngramCategoryEnum,
   EngramEventTriggerEnum,
+  EngramScopeEnum,
 } from "@elysn/shared";
+
 import { type Engram as EngramCore } from "@elysn/core";
 import { ENGRAM_DEFAULTS } from "@elysn/core";
 
@@ -23,6 +25,18 @@ const EngramSchema = new Schema<Engram>(
       enum: Object.values(EngramSourceEnum),
       required: true,
       index: true,
+    },
+
+    chatId: {
+      type: String,
+    },
+
+    scope: {
+      type: String,
+      enum: Object.values(EngramScopeEnum),
+      required: true,
+      index: true,
+      default: EngramScopeEnum.Thread,
     },
 
     category: {
@@ -77,9 +91,28 @@ const EngramSchema = new Schema<Engram>(
       },
     },
 
+    promotion: {
+      fromScope: {
+        type: String,
+        enum: Object.values(EngramScopeEnum),
+      },
+      toScope: {
+        type: String,
+        enum: Object.values(EngramScopeEnum),
+      },
+      promotedAt: {
+        type: Date,
+      },
+      supportingThreadCount: {
+        type: Number,
+        default: 0,
+      },
+    },
+
     lastReinforcedAt: {
       type: Date,
       index: true,
+      default: Date.now,
     },
 
     createdAt: {
@@ -93,10 +126,10 @@ const EngramSchema = new Schema<Engram>(
   }
 );
 
-// Fast lookup for active engrams per owner
+// Fast lookup per owner
 EngramSchema.index({ ownerId: 1, ownerType: 1 });
 
-// Snapshot retrieval ordering
+// Snapshot retrieval (emotionally relevant first)
 EngramSchema.index({
   ownerId: 1,
   ownerType: 1,
@@ -104,16 +137,35 @@ EngramSchema.index({
   emotionalWeight: -1,
 });
 
-// Reinforcement & decay jobs
-EngramSchema.index({
-  lastReinforcedAt: 1,
-});
+// Decay & reinforcement scans
+EngramSchema.index({ lastReinforcedAt: 1 });
 
-// Prevent duplicate boundary engrams with identical content
+// Promotion analytics / audits
+EngramSchema.index({ "promotion.promotedAt": 1 }, { sparse: true });
+
+// Prevent duplicate boundary engrams WITHIN the same scope
 EngramSchema.index(
-  { ownerId: 1, ownerType: 1, category: 1, content: 1 },
-  { unique: true, partialFilterExpression: { category: "boundary" } }
+  {
+    ownerId: 1,
+    ownerType: 1,
+    scope: 1,
+    category: 1,
+    content: 1,
+  },
+  {
+    unique: true,
+    partialFilterExpression: { category: "boundary" },
+  }
 );
+
+EngramSchema.pre("save", function (next) {
+  if (this.promotion && this.scope !== EngramScopeEnum.Persona) {
+    return next(
+      new Error("Engram with promotion metadata must have Persona scope")
+    );
+  }
+  next();
+});
 
 export const Engram: Model<Engram> =
   mongoose.models.Engram || mongoose.model<Engram>("Engram", EngramSchema);

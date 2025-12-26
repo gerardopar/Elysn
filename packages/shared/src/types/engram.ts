@@ -89,9 +89,28 @@ export const engramEventTriggerEnum = Object.values(EngramEventTriggerEnum) as [
   ...string[]
 ];
 
+/**
+ * Scope of the engram.
+ * Thread-scoped engrams are candidates.
+ * Persona-scoped engrams are global and durable.
+ */
+export enum EngramScopeEnum {
+  Thread = "thread",
+  Persona = "persona",
+}
+
+export const engramScopeEnum = Object.values(EngramScopeEnum) as [
+  string,
+  ...string[]
+];
+
 export type Engram = {
   ownerId: string;
   ownerType: EngramSourceEnum;
+
+  chatId: string;
+
+  scope: EngramScopeEnum;
 
   category: EngramCategoryEnum;
   content: string;
@@ -105,6 +124,13 @@ export type Engram = {
   derivedFrom?: {
     triggerType: EngramEventTriggerEnum;
     interactionIds: string[];
+  };
+
+  promotion?: {
+    fromScope: EngramScopeEnum.Thread;
+    toScope: EngramScopeEnum.Persona;
+    promotedAt: Date;
+    supportingThreadCount: number;
   };
 
   lastReinforcedAt: Date;
