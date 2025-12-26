@@ -1,3 +1,5 @@
+import { PersonaResponseMeta } from "./message.js";
+
 /**
  * Persona Engram Categories
  *
@@ -131,6 +133,45 @@ export type Engram = {
     toScope: EngramScopeEnum.Persona;
     promotedAt: Date;
     supportingThreadCount: number;
+  };
+
+  candidateMeta?: {
+    /**
+     * Snapshot of delta window stats at the moment this became a candidate.
+     * Used for explainability and promotion decisions.
+     */
+    statsSnapshot: {
+      count: number;
+      sum: { trust: number; warmth: number; tension: number; safety: number };
+      mean: { trust: number; warmth: number; tension: number; safety: number };
+      volatility: {
+        trust: number;
+        warmth: number;
+        tension: number;
+        safety: number;
+      };
+    };
+
+    /**
+     * Persona response metadata that triggered this candidate.
+     * Captures intent, tone, and reasoning context.
+     */
+    personaMetaSnapshot: PersonaResponseMeta;
+
+    /**
+     * LLM-generated classification output.
+     * Never injected into responses.
+     */
+    classification?: {
+      category: EngramCategoryEnum;
+      rationale: string;
+      confidence: number; // LLM confidence in categorization
+    };
+
+    /**
+     * Thread-local evidence that contributed to this candidate.
+     */
+    interactionIds: string[];
   };
 
   lastReinforcedAt: Date;

@@ -109,6 +109,36 @@ const EngramSchema = new Schema<Engram>(
       },
     },
 
+    candidateMeta: {
+      statsSnapshot: {
+        type: Schema.Types.Mixed,
+      },
+
+      personaMetaSnapshot: {
+        type: Schema.Types.Mixed,
+      },
+
+      classification: {
+        category: {
+          type: String,
+          enum: Object.values(EngramCategoryEnum),
+        },
+        rationale: {
+          type: String,
+        },
+        confidence: {
+          type: Number,
+          min: 0,
+          max: 1,
+        },
+      },
+
+      interactionIds: {
+        type: [String],
+        default: [],
+      },
+    },
+
     lastReinforcedAt: {
       type: Date,
       index: true,
@@ -159,11 +189,16 @@ EngramSchema.index(
 );
 
 EngramSchema.pre("save", function (next) {
-  if (this.promotion && this.scope !== EngramScopeEnum.Persona) {
+  if (this.scope === EngramScopeEnum.Persona && this.candidateMeta) {
     return next(
-      new Error("Engram with promotion metadata must have Persona scope")
+      new Error("Persona-scoped engrams cannot retain candidateMeta")
     );
   }
+
+  if (this.scope === EngramScopeEnum.Thread && !this.chatId) {
+    return next(new Error("Thread-scoped engrams must have chatId"));
+  }
+
   next();
 });
 
