@@ -46,6 +46,16 @@ const EngramSchema = new Schema<Engram>(
       index: true,
     },
 
+    topics: {
+      type: [String],
+      default: [],
+    },
+
+    embedding: {
+      type: [Number],
+      default: [],
+    },
+
     content: {
       type: String,
       required: true,

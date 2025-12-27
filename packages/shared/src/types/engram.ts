@@ -115,6 +115,10 @@ export type Engram = {
   scope: EngramScopeEnum;
 
   category: EngramCategoryEnum;
+
+  topics: string[];
+  embedding: number[];
+
   content: string;
 
   confidence: number;
@@ -176,4 +180,12 @@ export type Engram = {
 
   lastReinforcedAt: Date;
   createdAt: Date;
+};
+
+export type EngramEvaluationResponse = {
+  category: EngramCategoryEnum;
+  content: string;
+  rationale: string;
+  confidence: number;
+  topics: string[];
 };
